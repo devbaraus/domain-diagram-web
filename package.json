@@ -10,8 +10,5 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
-  "engines": {
-    "node": ">=20"
-  }
+  "type": "module"
 }
