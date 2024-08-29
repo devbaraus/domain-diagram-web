@@ -1,0 +1,17 @@
+{
+  "name": "domain-diagram-modeleer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "web": "pnpm --filter web",
+    "grammar": "pnpm --filter grammar"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  }
+}

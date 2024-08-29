@@ -1,0 +1,243 @@
+{
+  "name": "ddd",
+  "rules": {
+    "source_file": {
+      "type": "REPEAT",
+      "content": {
+        "type": "SYMBOL",
+        "name": "_definition"
+      }
+    },
+    "_definition": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "aggregate"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "entity"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "value_object"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "enum"
+        }
+      ]
+    },
+    "aggregate": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "aggregate"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "generic_type"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "STRING",
+          "value": "{"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "field"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "}"
+        }
+      ]
+    },
+    "entity": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "entity"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "generic_type"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "STRING",
+          "value": "{"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "field"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "}"
+        }
+      ]
+    },
+    "value_object": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "value_object"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "STRING",
+          "value": "{"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "field"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "}"
+        }
+      ]
+    },
+    "enum": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "enum"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "STRING",
+          "value": "{"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "enum_value"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "}"
+        }
+      ]
+    },
+    "enum_value": {
+      "type": "SYMBOL",
+      "name": "identifier"
+    },
+    "field": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "STRING",
+          "value": ":"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "type"
+        }
+      ]
+    },
+    "generic_type": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "<"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        }
+      ]
+    },
+    "type": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "[]"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
+    },
+    "identifier": {
+      "type": "PATTERN",
+      "value": "[a-zA-Z_]\\w*"
+    }
+  },
+  "extras": [
+    {
+      "type": "PATTERN",
+      "value": "\\s"
+    }
+  ],
+  "conflicts": [],
+  "precedences": [],
+  "externals": [],
+  "inline": [],
+  "supertypes": []
+}

@@ -1,0 +1,221 @@
+[
+  {
+    "type": "aggregate",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "field",
+          "named": true
+        },
+        {
+          "type": "generic_type",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "entity",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "field",
+          "named": true
+        },
+        {
+          "type": "generic_type",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "enum",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "enum_value",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "enum_value",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "field",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "generic_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "source_file",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "aggregate",
+          "named": true
+        },
+        {
+          "type": "entity",
+          "named": true
+        },
+        {
+          "type": "enum",
+          "named": true
+        },
+        {
+          "type": "value_object",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "value_object",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "field",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": ":",
+    "named": false
+  },
+  {
+    "type": "<",
+    "named": false
+  },
+  {
+    "type": ">",
+    "named": false
+  },
+  {
+    "type": "[]",
+    "named": false
+  },
+  {
+    "type": "aggregate",
+    "named": false
+  },
+  {
+    "type": "entity",
+    "named": false
+  },
+  {
+    "type": "enum",
+    "named": false
+  },
+  {
+    "type": "identifier",
+    "named": true
+  },
+  {
+    "type": "value_object",
+    "named": false
+  },
+  {
+    "type": "{",
+    "named": false
+  },
+  {
+    "type": "}",
+    "named": false
+  }
+]
