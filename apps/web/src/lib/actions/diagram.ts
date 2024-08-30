@@ -45,14 +45,12 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
     const backgroundColors = {
         'text': 'white',
         'node': '#F3F3F3',
-        'header': '#316896',
-        'class': '#F3F3F3',
-        'interface': '#F3F3F3',
-        'enum': '#F3F3F3',
         'property': '#595959',
         'type': '#8c8c8c',
-        'method': 'green',
-        'parameter': 'lightblue'
+        "aggregate": "#1f78b4",
+        "entity": "#33a02c",
+        "enum": "#e31a1c",
+        "value_object": "#ff7f00"
     }
 
 
@@ -101,7 +99,7 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
         node.append("rect")
             .attr("width", nodeWidth)
             .attr("height", 30)
-            .attr("fill", backgroundColors.header)
+            .attr("fill", d => backgroundColors[d.type])
         // .attr("rx", 4)
         // .attr("ry", 4)
 
