@@ -33,14 +33,23 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
         .append("svg")
         .attr("width", '70dvw')
         .attr("height", window.innerHeight)
-        .attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight}`)
+        .attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight}`);
 
-    // Definições do grid
-    const gridSize = 200; // Tamanho de cada célula do grid
-    const columns = Math.floor(window.innerWidth / gridSize); // Número de colunas na tela
-    let node, link, simulation, entitiesData, entitiesLinks;
+    // const svg = d3.select(el)
+    // .append("svg")
+    // .attr("width", '70dvw')
+    // .attr("height", window.innerHeight)
+    // .attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight}`)
+    // .call(d3.zoom().on("zoom", function(event) {
+    //     svgGroup.attr("transform", event.transform);
+    // }))
+    // .append("g");
+
+    const nodeWidth = 240; // Width of each node
     const lineHeigth = 30;
-    const nodeWidth = 240;
+    const columnGap = 40; // Gap between columns
+    const rowGap = 40; // Gap between rows
+    const columns = Math.floor(window.innerWidth / (nodeWidth + columnGap)); // Number of columns
 
     const backgroundColors = {
         'text': 'white',
@@ -51,217 +60,161 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
         "entity": "#33a02c",
         "enum": "#e31a1c",
         "value_object": "#ff7f00"
-    }
-
+    };
 
     function draw(entities: Entity[]) {
-        entitiesLinks = entities.map((entity, i) => {
-            return entity.properties.map((prop, j) => {
+        // Define links based on entity properties
+        const entitiesLinks = entities.map(entity => {
+            return entity.properties.map(prop => {
                 const propType = prop.type?.replaceAll('[', '').replaceAll(']', '');
-
-                return { source: entity.id, target: entities.find(e => e.id === propType || e.name == propType)?.id };
+                return { source: entity.id, target: entities.find(e => e.id === propType || e.name === propType)?.id };
             }).filter(link => link.target !== undefined);
         }).flat();
 
-
-        simulation = d3.forceSimulation(entities)
-            .force("link", d3.forceLink(entitiesLinks).id((d: Entity) => d.id))
-            .force("collide", d3.forceCollide(180).iterations(50))
-            .force("charge", d3.forceManyBody().strength(-20))
-            .force("center", d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2))
-            .force("y", d3.forceY(0))
-            .force("x", d3.forceX(0));
-
-        link = svg.append("g")
+        // Create links with curved paths
+        const link = svg.append("g")
             .attr("class", "links")
-            .selectAll("line")
+            .selectAll("path")
             .data(entitiesLinks)
             .enter()
-            .append("line")
-            .attr("stroke", "black")
-            .attr("stroke-width", 1);
+            .append("path")
+            .attr("stroke", "lightgrey")
+            .attr("stroke-width", 1)
+            .attr("fill", "none");
 
-        node = svg.append("g")
+        // Create nodes
+        const node = svg.append("g")
             .attr("class", "nodes")
             .selectAll("g")
             .data(entities)
             .enter()
-            .append("g");
+            .append("g")
+            .on("mouseover", function (event, d) {
+                d3.select(this).select("rect").attr("stroke", "black");
+                link.attr("stroke", dl => dl.source === d.id || dl.target === d.id ? "black" : "lightgrey");
+            })
+            .on("mouseout", function (event, d) {
+                d3.select(this).select("rect").attr("stroke", "none");
+                link.attr("stroke", "lightgrey");
+            })
 
-        // Adiciona o retângulo do nó
+        // Add rectangles for nodes
         node.append("rect")
             .attr("width", nodeWidth)
-            .attr("height", (d) => 50 + (d.properties.length + d.values?.length) * lineHeigth)
+            .attr("height", d => 50 + (d.properties.length + d.values?.length) * lineHeigth)
             .attr("fill", backgroundColors.node)
             .attr("rx", 4)
-            .attr("ry", 4);
+            .attr("ry", 4)
+            ;
 
+        // Add node headers
         node.append("rect")
-            .attr("width", nodeWidth)
+            .attr("width", nodeWidth - 2)
             .attr("height", 30)
-            .attr("fill", d => backgroundColors[d.type])
-        // .attr("rx", 4)
-        // .attr("ry", 4)
+            .attr("x", "1")
+            .attr("y", "1")
+            .attr("rx", 3)
+            .attr("ry", 3)
+            .attr("fill", d => backgroundColors[d.type]);
 
         node.append("text")
-            .attr("x", nodeWidth / 2) // Centraliza horizontalmente
-            .attr("y", 20)  // Posiciona no topo do retângulo
-            // .attr("dy", ".35em")
+            .attr("x", nodeWidth / 2)
+            .attr("y", 20)
             .attr("text-anchor", "middle")
             .attr("font-weight", "bold")
             .attr("fill", backgroundColors.text)
             .text(d => d.name);
 
-
-        // Adiciona propriedades ao nó
+        // Add properties to nodes
         node.each(function (d) {
             const props = d3.select(this).selectAll(".property")
                 .data(d.properties)
-                .enter()
+                .enter();
 
-            props.append("rect")
-                .attr("width", nodeWidth)
-                .attr("height", lineHeigth)
-                .attr("x", 0) // Margem à esquerda dentro do retângulo
-                .attr("y", function (prop, i) {
-                    // Espaçamento entre cada propriedade
-                    return (50 - lineHeigth / 2) + i * lineHeigth;
-                })
-                .attr("fill", backgroundColors.node)
-            // .on("mouseover", function (event, prop) {
-            //     d3.select(this).attr("fill", "lightblue");
-            // })
-            // .on("mouseout", function (event, prop) {
-            //     d3.select(this).attr("fill", backgroundColors.node);
-            // })
-            // .attr("stroke", "#316896")
+            // props.append("rect")
+            //     .attr("width", nodeWidth)
+            //     .attr("height", lineHeigth)
+            //     .attr("x", 0)
+            //     .attr("y", (prop, i) => 40 + i * lineHeigth)
+            //     .attr("fill", backgroundColors.node);
 
             props.append("text")
                 .attr("class", "property")
-                .attr("x", 10) // Margem à esquerda dentro do retângulo
-                .attr("y", function (prop, i) {
-                    // Espaçamento entre cada propriedade
-                    return 50 + i * lineHeigth;
-                })
+                .attr("x", 10)
+                .attr("y", (prop, i) => 40 + i * lineHeigth + lineHeigth / 2)
                 .attr("dy", ".35em")
                 .attr("text-anchor", "start")
                 .attr("fill", backgroundColors.property)
-                .text(function (prop) {
-                    return `${prop.name}`;
-                });
+                .text(prop => prop.name);
 
             props.append("text")
                 .attr("class", "property")
-                .attr("x", nodeWidth - 10) // Margem à esquerda dentro do retângulo
-                .attr("y", function (prop, i) {
-                    // Espaçamento entre cada propriedade
-                    return 50 + i * lineHeigth;
-                })
+                .attr("x", nodeWidth - 10)
+                .attr("y", (prop, i) => 40 + i * lineHeigth + lineHeigth / 2)
                 .attr("dy", ".35em")
                 .attr("text-anchor", "end")
                 .attr("fill", backgroundColors.type)
-                .text(function (prop) {
-                    return `${prop.type}`;
-                });
-
+                .text(prop => prop.type);
         });
 
-        // Adiciona valores enum ao nó
+        // Add enum values to nodes
         node.each(function (d) {
-            const props = d3.select(this).selectAll(".value")
+            const values = d3.select(this).selectAll(".value")
                 .data(d.values)
-                .enter()
+                .enter();
 
-            props.append("rect")
-                .attr("width", nodeWidth)
-                .attr("height", lineHeigth)
-                .attr("x", 0) // Margem à esquerda dentro do retângulo
-                .attr("y", function (prop, i) {
-                    // Espaçamento entre cada propriedade
-                    return (50 - lineHeigth / 2) + i * lineHeigth;
-                })
-                .attr("fill", backgroundColors.node)
-            // .on("mouseover", function (event, prop) {
-            //     d3.select(this).attr("fill", "lightblue");
-            // })
-            // .on("mouseout", function (event, prop) {
-            //     d3.select(this).attr("fill", backgroundColors.node);
-            // })
-            // .attr("stroke", "#316896")
+            // values.append("rect")
+            //     .attr("width", nodeWidth)
+            //     .attr("height", lineHeigth)
+            //     .attr("x", 0)
+            //     .attr("y", (value, i) => 40 + d.properties.length * lineHeigth + i * lineHeigth)
+            //     .attr("fill", backgroundColors.node);
 
-            props.append("text")
+            values.append("text")
                 .attr("class", "value")
-                .attr("x", 10) // Margem à esquerda dentro do retângulo
-                .attr("y", function (prop, i) {
-                    // Espaçamento entre cada propriedade
-                    return 50 + i * lineHeigth;
-                })
+                .attr("x", 10)
+                .attr("y", (value, i) => 40 + d.properties.length * lineHeigth + i * lineHeigth + lineHeigth / 2)
                 .attr("dy", ".35em")
                 .attr("text-anchor", "start")
                 .attr("fill", backgroundColors.property)
-                .text(v => v);
-
-            // props.append("text")
-            //     .attr("class", "property")
-            //     .attr("x", nodeWidth - 10) // Margem à esquerda dentro do retângulo
-            //     .attr("y", function (prop, i) {
-            //         // Espaçamento entre cada propriedade
-            //         return 50 + i * lineHeigth;
-            //     })
-            //     .attr("dy", ".35em")
-            //     .attr("text-anchor", "end")
-            //     .attr("fill", backgroundColors.type)
-            //     .text(function (prop) {
-            //         return `${prop.type}`;
-            //     });
-
+                .text(value => value);
         });
 
-        // Posiciona os nós em uma grade
-        // node.attr("transform", function (d, i) {
-        //     const x = (i % columns) * gridSize + gridSize / 2 - 100; // Calcula a posição x
-        //     const y = Math.floor(i / columns) * gridSize + gridSize / 2 - 50; // Calcula a posição y
-        //     d.x = x; // Define a posição x no objeto para uso nos links
-        //     d.y = y; // Define a posição y no objeto para uso nos links
-        //     return `translate(${x}, ${y})`;
-        // });
+        // Manually position nodes in a Masonry layout
+        let columnHeights = new Array(columns).fill(0); // Track the height of each column
 
-        // // Atualiza a posição dos links após posicionar os nós
-        // svg.selectAll("line")
-        //     .attr("x1", d => entities[d.source].x + 100)
-        //     .attr("y1", d => entities[d.source].y + (25 + entities[d.source].properties.length * 10))
-        //     .attr("x2", d => entities[d.target].x + 100)
-        //     .attr("y2", d => entities[d.target].y + (25 + entities[d.target].properties.length * 10));
+        node.attr("transform", function (d, i) {
+            const minHeightIndex = columnHeights.indexOf(Math.min(...columnHeights)); // Find the column with the minimum height
+            const x = minHeightIndex * (nodeWidth + columnGap); // Calculate x position
+            const y = columnHeights[minHeightIndex]; // Calculate y position
 
-        // simulation.nodes(entities)
-        //     .on("tick", () => {
-        //         node.attr("transform", function (d) {
-        //             return `translate(${d.x - 75}, ${d.y - 25})`;
-        //         });
-        //     });
+            columnHeights[minHeightIndex] += d3.select(this).node().getBBox().height + rowGap; // Update the column height
 
-        // Atualiza posições com base na simulação de força
-        simulation.on("tick", () => {
-            node.attr("transform", (d: any) => `translate(${d.x - 100}, ${d.y - 25})`);
+            d.x = x;
+            d.y = y;
+            return `translate(${x}, ${y})`;
+        });
 
-            link.attr("x1", d => d.source.x)
-                .attr("y1", d => d.source.y)
-                .attr("x2", d => d.target.x)
-                .attr("y2", d => d.target.y);
+        // Update positions of the links
+        link.attr("d", function (d) {
+            const sourceNode = entities.find(entity => entity.id === d.source);
+            const targetNode = entities.find(entity => entity.id === d.target);
+            if (!sourceNode || !targetNode) return '';
+
+            const dx = targetNode.x - sourceNode.x;
+            const dy = targetNode.y - sourceNode.y;
+            const dr = Math.sqrt(dx * dx + dy * dy);
+            return `M${sourceNode.x + nodeWidth / 2},${sourceNode.y + 30}A${dr},${dr} 0 0,1 ${targetNode.x + nodeWidth / 2},${targetNode.y + 30}`;
         });
     }
 
-
-
     return {
         update(entities: Entity[]) {
-            entitiesData = entities;
             svg.selectAll('*').remove();
-            draw(entitiesData);
+            draw(entities);
         },
         destroy() {
             svg.remove();
-            console.log('destroy');
         }
     };
 }
