@@ -4,9 +4,7 @@ import { directusClient } from "$lib/client"
 import { readItem, updateItem } from "@directus/sdk"
 
 export const load: PageServerLoad = async ({ locals, params, parent }) => {
-    if (!locals.session) {
-        return fail(401)
-    }
+    await parent()
 
     try {
         await directusClient.setToken(locals.session)
@@ -15,6 +13,6 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
 
         return { ...locals, item: res }
     } catch (error) {
-        return fail(401)
+        return fail(401, { invalid: true })
     }
 }
