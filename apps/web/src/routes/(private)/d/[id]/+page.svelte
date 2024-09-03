@@ -10,7 +10,7 @@
 	import { page } from '$app/stores';
 	import type { PageData } from './$types';
 
-	let data: PageData = $props();
+	let { data }: { data: PageData } = $props();
 	let id = $page.params.id;
 
 	let editor: Monaco.editor.IStandaloneCodeEditor;
