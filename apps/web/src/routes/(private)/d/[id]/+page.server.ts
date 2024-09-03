@@ -7,9 +7,7 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
     await parent()
 
     if (!locals.session) {
-        return fail(401, {
-            unauthorized: true,
-        })
+        throw fail(401)
     }
 
     try {
@@ -19,8 +17,6 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
 
         return { ...locals, project: res }
     } catch (error) {
-        return fail(401, {
-            unauthorized: true,
-        })
+        throw fail(401)
     }
 }

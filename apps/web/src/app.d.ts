@@ -11,8 +11,8 @@ declare global {
 	namespace App {
 		// interface Error {}
 		interface Locals {
-			user: User | null
-			session?: string
+			user: User
+			session: string
 		}
 		// interface PageData {}
 		// interface PageState {}
