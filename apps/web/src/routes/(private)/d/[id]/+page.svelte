@@ -20,11 +20,7 @@
 	let tree = $state<Tree>();
 	let markup = $state<string>(data.item.markup || defaultGrammar);
 
-	const debouncedTreeUpdate = _.debounce(() => {
-		tree = parser?.parse(markup);
-	}, 500);
-
-	const debouncedMarkupUpdate = _.debounce(async () => {
+	const markupUpdate = async () => {
 		if (markup == data.item.markup) return;
 
 		await directusClient.setToken(data.session);
@@ -34,7 +30,13 @@
 				markup
 			})
 		);
-	}, 1500);
+	};
+
+	const debouncedTreeUpdate = _.debounce(() => {
+		tree = parser?.parse(markup);
+	}, 500);
+
+	const debouncedMarkupUpdate = _.debounce(markupUpdate, 1500);
 
 	async function initializeParser() {
 		await TreeSitter.init();
@@ -73,6 +75,13 @@
 		monaco?.editor.getModels().forEach((model) => model.dispose());
 		editor?.dispose();
 	});
+
+	function handleCtrlSave(event: KeyboardEvent) {
+		if (event.ctrlKey && event.key === 's') {
+			event.preventDefault();
+			markupUpdate();
+		}
+	}
 </script>
 
 <svelte:head>
@@ -80,7 +89,15 @@
 </svelte:head>
 
 <div id="wrapper">
-	<div id="code" bind:this={editorContainer}></div>
+	<div
+		id="code"
+		bind:this={editorContainer}
+		onkeydown={handleCtrlSave}
+		role="textbox"
+		aria-label="Code editor"
+		aria-multiline="true"
+		tabindex="0"
+	></div>
 	<Diagram {tree} />
 </div>
 

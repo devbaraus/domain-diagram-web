@@ -47,7 +47,7 @@
 
 					entity.position = {
 						x: index * 200,
-						y: 100,
+						y: 0,
 						width: 200,
 						height: 100
 					};
@@ -61,20 +61,4 @@
 	}
 </script>
 
-<div width="800" height="600" use:diagram={extractEntities(tree?.rootNode)}></div>
-
-<style>
-	.entity {
-		fill: lightblue;
-		stroke: steelblue;
-		stroke-width: 2px;
-	}
-
-	.property {
-		font: 12px sans-serif;
-	}
-
-	.entity-label {
-		font-weight: bold;
-	}
-</style>
+<div use:diagram={extractEntities(tree?.rootNode)}></div>

@@ -1,39 +1,16 @@
 import * as d3 from 'd3';
-import { on } from 'svelte/events';
-import type { SyntaxNode, Tree, Node } from 'web-tree-sitter';
-
-type Entity = {
-    id: string,
-    description?: string | null;
-    name?: string | null;
-    type?: string | null;
-    values: string[];
-    properties: {
-        name?: string | null;
-        type?: string | null;
-    }[];
-    methods: {
-        name?: string | null;
-        parameters: {
-            name?: string | null;
-            type?: string | null;
-        }[];
-        returnType?: string | null;
-    }[];
-    position?: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    };
-};
 
 export function diagram(el: HTMLDivElement, entities: Entity[]) {
     const svg = d3.select(el)
         .append("svg")
         .attr("width", '70dvw')
         .attr("height", window.innerHeight)
-        .attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight}`);
+        .attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight}`)
+        .call(d3.zoom().on("zoom", function (event) {
+            svgGroup.attr("transform", event.transform);
+        }))
+
+    const svgGroup = svg.append("g")
 
     // const svg = d3.select(el)
     // .append("svg")
@@ -45,11 +22,11 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
     // }))
     // .append("g");
 
-    const nodeWidth = 240; // Width of each node
+    const nodeWidth = 320; // Width of each node
     const lineHeigth = 30;
     const columnGap = 40; // Gap between columns
     const rowGap = 40; // Gap between rows
-    const columns = Math.floor(window.innerWidth / (nodeWidth + columnGap)); // Number of columns
+    const columns = 4; // Number of columns
 
     const backgroundColors = {
         'text': 'white',
@@ -72,7 +49,7 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
         }).flat();
 
         // Create links with curved paths
-        const link = svg.append("g")
+        const link = svgGroup.append("g")
             .attr("class", "links")
             .selectAll("path")
             .data(entitiesLinks)
@@ -83,7 +60,7 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
             .attr("fill", "none");
 
         // Create nodes
-        const node = svg.append("g")
+        const node = svgGroup.append("g")
             .attr("class", "nodes")
             .selectAll("g")
             .data(entities)
@@ -210,7 +187,7 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
 
     return {
         update(entities: Entity[]) {
-            svg.selectAll('*').remove();
+            svgGroup.selectAll('*').remove();
             draw(entities);
         },
         destroy() {
