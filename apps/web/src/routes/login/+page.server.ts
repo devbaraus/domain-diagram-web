@@ -23,7 +23,7 @@ export const actions: Actions = {
 
         const data = await directusClient.login(email, password)
 
-        if (!data.access_token || !data.expires) {
+        if (!data.access_token || !data.expires_at) {
             return fail(401, { invalid: true })
         }
 
@@ -32,7 +32,7 @@ export const actions: Actions = {
             httpOnly: true,
             sameSite: "strict",
             secure: process.env.NODE_ENV === "production",
-            maxAge: data.expires * 1000
+            maxAge: data.expires_at
         })
 
         throw redirect(302, "/d")
