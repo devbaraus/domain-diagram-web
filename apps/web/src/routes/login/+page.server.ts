@@ -34,6 +34,6 @@ export const actions: Actions = {
             maxAge: data.expires * 1000
         })
 
-        throw redirect(303, "/d")
+        throw redirect(302, "/d")
     },
 }

@@ -33,6 +33,6 @@ export const actions = {
             name, markup
         }))
 
-        throw redirect(303, `/d/${res.id}`)
+        throw redirect(302, `/d/${res.id}`)
     },
 }
