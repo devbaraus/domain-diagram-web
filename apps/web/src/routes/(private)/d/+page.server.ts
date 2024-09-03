@@ -2,6 +2,7 @@ import { directusClient } from "$lib/client"
 import { createItem, readItems } from "@directus/sdk"
 import { fail, redirect } from "@sveltejs/kit"
 import type { PageServerLoad } from "./$types"
+import { goto } from "$app/navigation"
 
 export const load: PageServerLoad = async ({ locals, parent }) => {
     await parent()
@@ -32,6 +33,8 @@ export const actions = {
         const res = await directusClient.request(createItem('projects', {
             name, markup
         }))
+
+        goto(`/d/${res.id}`)
 
         throw redirect(302, `/d/${res.id}`)
     },

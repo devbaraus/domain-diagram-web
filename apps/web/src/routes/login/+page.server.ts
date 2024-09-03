@@ -1,6 +1,7 @@
 import { fail, redirect } from "@sveltejs/kit"
 import type { Actions, PageServerLoad } from "./$types"
 import { directusClient } from "$lib/client"
+import { goto } from "$app/navigation"
 
 export const load: PageServerLoad = async ({ locals, url, parent }) => {
     await parent()
@@ -33,6 +34,8 @@ export const actions: Actions = {
             secure: process.env.NODE_ENV === "production",
             maxAge: data.expires * 1000
         })
+
+        goto("/d")
 
         throw redirect(302, "/d")
     },
