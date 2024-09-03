@@ -20,6 +20,7 @@
 		"@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
 		"@types/d3": "^7.4.3",
 		"@types/eslint": "^9.6.0",
+		"@types/lodash": "^4.17.7",
 		"autoprefixer": "^10.4.20",
 		"d3": "^7.9.0",
 		"eslint": "^9.0.0",
@@ -39,6 +40,8 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@directus/sdk": "^17.0.0",
+		"lodash": "^4.17.21",
 		"tree-sitter": "^0.21.1",
 		"web-tree-sitter": "^0.23.0"
 	}
