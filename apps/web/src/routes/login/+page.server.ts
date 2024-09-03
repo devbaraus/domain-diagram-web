@@ -3,9 +3,9 @@ import type { Actions, PageServerLoad } from "./$types"
 import { directusClient } from "$lib/client"
 
 export const load: PageServerLoad = async ({ locals, url, ...event }) => {
-    // if (locals.user) {
-    //     throw redirect(303, "/")
-    // }
+    if (locals.user) {
+        redirect(302, '/')
+    }
 }
 
 export const actions: Actions = {
@@ -33,7 +33,7 @@ export const actions: Actions = {
                 maxAge: data.expires * 1000
             })
 
-            throw redirect(303, "/")
+            redirect(303, "/d")
         } catch (error) {
             return fail(401, { invalid: true })
         }

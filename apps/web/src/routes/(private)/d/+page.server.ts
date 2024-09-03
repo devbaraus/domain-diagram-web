@@ -1,9 +1,9 @@
 import { fail } from "@sveltejs/kit"
 import type { PageServerLoad } from "./$types"
 import { directusClient } from "$lib/client"
-import { readItem, updateItem } from "@directus/sdk"
+import { readItem, readItems, updateItem } from "@directus/sdk"
 
-export const load: PageServerLoad = async ({ locals, params, parent }) => {
+export const load: PageServerLoad = async ({ locals }) => {
     if (!locals.session) {
         return fail(401)
     }
@@ -11,9 +11,9 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
     try {
         await directusClient.setToken(locals.session)
 
-        const res = await directusClient.request(readItem('projects', params.id))
+        const res = await directusClient.request(readItems('projects'))
 
-        return { ...locals, item: res }
+        return { ...locals, items: res }
     } catch (error) {
         return fail(401)
     }

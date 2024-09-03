@@ -18,14 +18,14 @@
 	let parser: TreeSitter | undefined;
 	let editorContainer: HTMLElement;
 	let tree = $state<Tree>();
-	let markup = $state<string>(data.project.markup || defaultGrammar);
+	let markup = $state<string>(data.item.markup || defaultGrammar);
 
 	const debouncedTreeUpdate = _.debounce(() => {
 		tree = parser?.parse(markup);
 	}, 500);
 
 	const debouncedMarkupUpdate = _.debounce(async () => {
-		if (markup == data.project.markup) return;
+		if (markup == data.item.markup) return;
 
 		await directusClient.setToken(data.session);
 
@@ -54,7 +54,9 @@
 		monaco = (await import('$lib/monaco')).default;
 
 		// Your monaco instance is ready, let's display some code!
-		const editor = monaco.editor.create(editorContainer);
+		const editor = monaco.editor.create(editorContainer, {
+			theme: 'default'
+		});
 		const model = monaco.editor.createModel(markup, 'ddd');
 		editor.setModel(model);
 
@@ -74,7 +76,7 @@
 </script>
 
 <svelte:head>
-	<title>Domain Driven Diagram - {data.project.name}</title>
+	<title>Domain Driven Diagram - {data.item.name}</title>
 </svelte:head>
 
 <div id="wrapper">
