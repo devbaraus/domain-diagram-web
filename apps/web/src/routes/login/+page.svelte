@@ -3,7 +3,7 @@
 
 <main>
 	<h1>Sign in</h1>
-	<form action="?/login" method="post">
+	<form method="POST">
 		<label for="email">Email:</label>
 		<input name="email" type="email" id="email" required />
 

@@ -12,7 +12,7 @@ export const load: PageServerLoad = async ({ locals, url, parent }) => {
 }
 
 export const actions: Actions = {
-    login: async ({ request, cookies, fetch }) => {
+    default: async ({ request, cookies, fetch }) => {
         const formData = await request.formData()
         const email = formData.get('email')
         const password = formData.get('password')
@@ -34,8 +34,6 @@ export const actions: Actions = {
             secure: process.env.NODE_ENV === "production",
             maxAge: data.expires * 1000
         })
-
-        goto("/d")
 
         throw redirect(302, "/d")
     },

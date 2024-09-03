@@ -34,8 +34,6 @@ export const actions = {
             name, markup
         }))
 
-        goto(`/d/${res.id}`)
-
         throw redirect(302, `/d/${res.id}`)
     },
 }
