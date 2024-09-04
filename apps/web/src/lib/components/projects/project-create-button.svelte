@@ -17,11 +17,11 @@
 	// }
 </script>
 
-<!-- <div class="tooltip tooltip-right" data-tip="New project"> -->
-<button onclick={() => modal.showModal()} class="mask mask-circle btn size-16">
-	<PlusIcon class="w-16" />
-</button>
-<!-- </div> -->
+<div class="tooltip tooltip-right" data-tip="New project">
+	<button onclick={() => modal.showModal()} class="mask mask-circle btn size-12">
+		<PlusIcon class="w-16" />
+	</button>
+</div>
 
 <dialog bind:this={modal} class="modal">
 	<div class="modal-box">
@@ -33,7 +33,7 @@
 			</label>
 
 			<div class="modal-action">
-				<button class="btn" type="button">Close</button>
+				<button class="btn" onclick={() => modal.close()} type="button">Close</button>
 				<button class="btn btn-primary">Create</button>
 			</div>
 		</form>

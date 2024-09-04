@@ -32,21 +32,19 @@
 </div>
 
 <div class="flex max-w-[100dvw]">
-	<aside
-		class="h-[calc(100dvh_-_48px)] max-h-[calc(100dvh_-_48px)] w-24 space-y-4 overflow-y-auto p-2"
-	>
+	<aside class="h-[calc(100dvh_-_64px)] max-h-[calc(100dvh_-_64px)] w-24 space-y-2 p-2">
 		<ProjectCreateButton />
 
 		{#each projects as project}
-			<!-- <div class="tooltip tooltip-right z-20" data-tip={project.name}> -->
-			<a href={`/d/${project.id}`}>
-				<img
-					class="mask mask-circle w-16"
-					alt={`Project Avatar: ${project.name}`}
-					src={`https://avatar.iran.liara.run/username?username=${project.name}`}
-				/>
-			</a>
-			<!-- </div> -->
+			<div class="tooltip tooltip-right z-20" data-tip={project.name}>
+				<a href={`/d/${project.id}`}>
+					<img
+						class="mask mask-circle w-12"
+						alt={`Project Avatar: ${project.name}`}
+						src={`https://avatar.iran.liara.run/username?username=${project.name}`}
+					/>
+				</a>
+			</div>
 		{/each}
 	</aside>
 	<div class="z-0 flex flex-1">
