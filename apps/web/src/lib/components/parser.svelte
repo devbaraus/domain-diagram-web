@@ -54,10 +54,5 @@
 	}
 </script>
 
-<Editor
-	class="w-[calc((100vw_*_0.4)_-_48px)]"
-	value={props.markup}
-	onkeydown={handleCtrlSave}
-	onchange={handleChange}
-/>
+<Editor value={props.markup} onkeydown={handleCtrlSave} onchange={handleChange} />
 <Diagram class="w-full flex-1" {tree} />

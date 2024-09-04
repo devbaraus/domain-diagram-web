@@ -32,7 +32,7 @@
 </div>
 
 <div class="flex max-w-[100dvw]">
-	<aside class="h-[calc(100dvh_-_64px)] max-h-[calc(100dvh_-_64px)] w-24 space-y-2 p-2">
+	<aside class="h-[calc(100dvh_-_64px)] max-h-[calc(100dvh_-_64px)] w-16 space-y-2 p-2">
 		<ProjectCreateButton />
 
 		{#each projects as project}
