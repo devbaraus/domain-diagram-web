@@ -1,12 +1,11 @@
+import { grammar } from "$lib";
 import { directusClient } from "$lib/client";
-import { createItem, readItem, updateItem } from "@directus/sdk";
+import { createItem, readItem, readItems, updateItem, type Query } from "@directus/sdk";
 
 export async function createProject(name: string, token: string) {
     await directusClient.setToken(token)
 
-    const project = await directusClient.request(createItem("projects", { name }));
-
-    return project;
+    return directusClient.request(createItem("projects", { name, markup: grammar }));
 }
 
 export async function updateProject(id: string | number, params: {
@@ -15,15 +14,22 @@ export async function updateProject(id: string | number, params: {
 }, token: string) {
     await directusClient.setToken(token)
 
-    const project = await directusClient.request(updateItem("projects", id, params));
-
-    return project;
+    return await directusClient.request(updateItem("projects", id, params));
 }
 
 export async function getProject(id: string | number, token: string) {
     await directusClient.setToken(token)
 
-    const project = await directusClient.request(readItem("projects", id));
+    return directusClient.request(readItem("projects", id));
+}
 
-    return project;
+
+export async function listProjects(token: string, query?: Query<any, any>) {
+    await directusClient.setToken(token)
+
+    return directusClient.request(readItems("projects", {
+        fields: "id,name,date_created,date_updated",
+        sort: ["-date_updated"],
+        ...query
+    }));
 }

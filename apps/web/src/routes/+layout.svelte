@@ -1,5 +1,4 @@
 <script>
-	import Shell from '$lib/components/shell.svelte';
 	import '../app.css';
 </script>
 

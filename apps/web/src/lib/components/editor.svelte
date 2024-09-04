@@ -10,7 +10,6 @@
 </script>
 
 <div
-	id="code"
 	use:editor={data.value}
 	onkeydown={data.onkeydown}
 	oncontentchange={data.onchange}

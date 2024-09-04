@@ -1,5 +1,5 @@
 // place files you want to import through the `$lib` alias in this folder.
-export const grammar = `
+export const grammar = `// This a placeholder grammar
 aggregate<UserID> User {
     name: String
     isActive: Boolean

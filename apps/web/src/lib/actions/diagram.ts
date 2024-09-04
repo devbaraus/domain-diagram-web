@@ -1,32 +1,25 @@
 import * as d3 from 'd3';
 
 export function diagram(el: HTMLDivElement, entities: Entity[]) {
+    let firstDraw = true;
     const svg = d3.select(el)
         .append("svg")
-        .attr("width", '70dvw')
-        .attr("height", window.innerHeight)
-        .attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight}`)
+        .attr("width", '100%')
+        .attr("height", '100%')
+        .attr("viewBox", `0 0 ${el.getBoundingClientRect().width} ${el.getBoundingClientRect().height}`)
         .call(d3.zoom().on("zoom", function (event) {
             svgGroup.attr("transform", event.transform);
         }))
 
-    const svgGroup = svg.append("g")
+    const svgGroup = svg.append("g");
 
-    // const svg = d3.select(el)
-    // .append("svg")
-    // .attr("width", '70dvw')
-    // .attr("height", window.innerHeight)
-    // .attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight}`)
-    // .call(d3.zoom().on("zoom", function(event) {
-    //     svgGroup.attr("transform", event.transform);
-    // }))
-    // .append("g");
 
     const nodeWidth = 320; // Width of each node
     const lineHeigth = 30;
     const columnGap = 40; // Gap between columns
     const rowGap = 40; // Gap between rows
     const columns = 4; // Number of columns
+
 
     const backgroundColors = {
         'text': 'white',
@@ -38,6 +31,23 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
         "enum": "#e31a1c",
         "value_object": "#ff7f00"
     };
+
+    // Function to zoom and fit the diagram to the viewport
+    function zoomToFit() {
+        const bounds = svgGroup.node().getBBox();
+        const parent = svg.node().getBoundingClientRect();
+        const width = bounds.width, height = bounds.height;
+        const midX = bounds.x + width / 2, midY = bounds.y + height / 2;
+        const scale = 0.9 / Math.max(width / parent.width, height / parent.height);
+        const translate = [parent.width / 2 - scale * midX, parent.height / 2 - scale * midY];
+
+        svg.call(
+            d3.zoom().transform,
+            d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
+        );
+
+        svgGroup.attr("transform", `translate(${translate[0]}, ${translate[1]}) scale(${scale})`);
+    }
 
     function draw(entities: Entity[]) {
         // Define links based on entity properties
@@ -140,13 +150,6 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
                 .data(d.values)
                 .enter();
 
-            // values.append("rect")
-            //     .attr("width", nodeWidth)
-            //     .attr("height", lineHeigth)
-            //     .attr("x", 0)
-            //     .attr("y", (value, i) => 40 + d.properties.length * lineHeigth + i * lineHeigth)
-            //     .attr("fill", backgroundColors.node);
-
             values.append("text")
                 .attr("class", "value")
                 .attr("x", 10)
@@ -161,18 +164,18 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
         let columnHeights = new Array(columns).fill(0); // Track the height of each column
 
         node.attr("transform", function (d, i) {
-            const minHeightIndex = columnHeights.indexOf(Math.min(...columnHeights)); // Find the column with the minimum height
-            const x = minHeightIndex * (nodeWidth + columnGap); // Calculate x position
-            const y = columnHeights[minHeightIndex]; // Calculate y position
+            // const nextColumnIndex = columnHeights.indexOf(Math.min(...columnHeights)); // Find the column with the minimum height
+            const nextColumnIndex = i % columns;
+            const x = nextColumnIndex * (nodeWidth + columnGap); // Calculate x position
+            const y = columnHeights[nextColumnIndex]; // Calculate y position
 
-            columnHeights[minHeightIndex] += d3.select(this).node().getBBox().height + rowGap; // Update the column height
+            columnHeights[nextColumnIndex] += d3.select(this).node().getBBox().height + rowGap; // Update the column height
 
             d.x = x;
             d.y = y;
             return `translate(${x}, ${y})`;
         });
 
-        // Update positions of the links
         link.attr("d", function (d) {
             const sourceNode = entities.find(entity => entity.id === d.source);
             const targetNode = entities.find(entity => entity.id === d.target);
@@ -183,6 +186,71 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
             const dr = Math.sqrt(dx * dx + dy * dy);
             return `M${sourceNode.x + nodeWidth / 2},${sourceNode.y + 30}A${dr},${dr} 0 0,1 ${targetNode.x + nodeWidth / 2},${targetNode.y + 30}`;
         });
+
+        // link.attr("d", function (d) {
+        //     const sourceNode = entities.find(entity => entity.id === d.source);
+        //     const targetNode = entities.find(entity => entity.id === d.target);
+        //     if (!sourceNode || !targetNode) return '';
+
+        //     const sourceX = sourceNode.x + nodeWidth / 2;
+        //     const sourceY = sourceNode.y + 30;
+        //     const targetX = targetNode.x + nodeWidth / 2;
+        //     const targetY = targetNode.y + 30;
+
+        //     if (sourceX === targetX) {
+        //         // Alinhamento vertical
+        //         return `M${sourceX},${sourceY}L${targetX},${targetY}`;
+        //     } else if (sourceY === targetY) {
+        //         // Alinhamento horizontal
+        //         return `M${sourceX},${sourceY}L${targetX},${targetY}`;
+        //     } else {
+        //         // Link com curvas de 90º
+        //         const midX = (sourceX + targetX) / 2;
+        //         const midY = (sourceY + targetY) / 2;
+        //         return `M${sourceX},${sourceY}L${midX},${sourceY}L${midX},${targetY}L${targetX},${targetY}`;
+        //     }
+        // });
+
+        // link.attr("d", function (d) {
+        //     const sourceNode = entities.find(entity => entity.id === d.source);
+        //     const targetNode = entities.find(entity => entity.id === d.target);
+        //     if (!sourceNode || !targetNode) return '';
+
+        //     const sourceX = sourceNode.x + nodeWidth / 2;
+        //     const sourceY = sourceNode.y + 30;
+        //     const targetX = targetNode.x + nodeWidth / 2;
+        //     const targetY = targetNode.y + 30;
+        //     const radius = 15; // Raio das bordas arredondadas
+
+        //     if (sourceX === targetX) {
+        //         // Alinhamento vertical
+        //         return `M${sourceX},${sourceY}L${targetX},${targetY}`;
+        //     } else if (sourceY === targetY) {
+        //         // Alinhamento horizontal
+        //         return `M${sourceX},${sourceY}L${targetX},${targetY}`;
+        //     } else {
+        //         // Link com curvas de 90º e bordas arredondadas
+        //         const horizontalDir = targetX > sourceX ? 1 : -1;
+        //         const verticalDir = targetY > sourceY ? 1 : -1;
+
+        //         const midX = sourceX + horizontalDir * radius;
+        //         const midY = sourceY + verticalDir * radius;
+
+        //         return `
+        //             M${sourceX},${sourceY}
+        //             L${midX},${sourceY}
+        //             A${radius},${radius} 0 0,${horizontalDir === 1 ? 1 : 0} ${midX},${midY}
+        //             L${midX},${targetY - verticalDir * radius}
+        //             A${radius},${radius} 0 0,${verticalDir === 1 ? 1 : 0} ${midX + horizontalDir * radius},${targetY}
+        //             L${targetX},${targetY}`;
+        //     }
+        // });
+
+
+        if (firstDraw) {
+            zoomToFit();
+            firstDraw = false;
+        }
     }
 
     return {

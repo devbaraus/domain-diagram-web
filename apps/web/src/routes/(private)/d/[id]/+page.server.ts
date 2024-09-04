@@ -1,18 +1,37 @@
-import { fail } from "@sveltejs/kit"
+import { createProject, getProject } from "$lib/services/project-service.svelte"
+import { fail, redirect } from "@sveltejs/kit"
 import type { PageServerLoad } from "./$types"
-import { directusClient } from "$lib/client"
-import { readItem, updateItem } from "@directus/sdk"
 
 export const load: PageServerLoad = async ({ locals, params, parent }) => {
     await parent()
 
     try {
-        await directusClient.setToken(locals.session)
-
-        const res = await directusClient.request(readItem('projects', params.id))
+        const res = await getProject(params.id, locals.session)
 
         return { ...locals, item: res }
     } catch (error) {
-        return fail(401, { invalid: true })
+        throw redirect(302, '/d')
     }
+}
+
+
+export const actions = {
+    default: async ({ request, locals }) => {
+        if (!locals.session) {
+            return fail(401, { invalid: true })
+        }
+
+        const formData = await request.formData()
+        const name = formData.get('name')
+
+        console.log('name', name)
+
+        if (typeof name !== 'string' || !name) {
+            return fail(400, { invalid: true })
+        }
+
+        const res = await createProject(name, locals.session)
+
+        throw redirect(302, `/d/${res.id}`)
+    },
 }

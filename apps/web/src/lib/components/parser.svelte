@@ -16,14 +16,13 @@
 
 	let parser: TreeSitter | undefined;
 	let tree = $state<Tree>();
-	let markup = $state<string>(props.markup || defaultGrammar);
 
-	const markupUpdate = async () => {
-		return updateProject(props.id, { markup }, $page.data.session);
+	const markupUpdate = async (value: string) => {
+		return updateProject(props.id, { markup: value }, $page.data.session);
 	};
 
-	const debouncedTreeUpdate = _.debounce(() => {
-		tree = parser?.parse(markup);
+	const debouncedTreeUpdate = _.debounce((value: string) => {
+		tree = parser?.parse(value);
 	}, 500);
 
 	const debouncedMarkupUpdate = _.debounce(markupUpdate, 1500);
@@ -39,26 +38,26 @@
 	onMount(async () => {
 		await initializeParser();
 
-		tree = parser?.parse(markup);
-
-		debouncedTreeUpdate();
+		tree = parser?.parse(props.markup);
 	});
 
 	function handleChange(event: CustomEvent<string>) {
-		markup = event.detail;
-		debouncedTreeUpdate();
-		debouncedMarkupUpdate();
+		debouncedTreeUpdate(event.detail);
+		debouncedMarkupUpdate(event.detail);
 	}
 
 	function handleCtrlSave(event: KeyboardEvent) {
 		if (event.ctrlKey && event.key === 's') {
 			event.preventDefault();
-			markupUpdate();
+			// markupUpdate(event);
 		}
 	}
 </script>
 
-<div class="flex">
-	<Editor class="w-[40dvw]" value={markup} onkeydown={handleCtrlSave} onchange={handleChange} />
-	<Diagram {tree} />
-</div>
+<Editor
+	class="w-[calc((100vw_*_0.4)_-_48px)]"
+	value={props.markup}
+	onkeydown={handleCtrlSave}
+	onchange={handleChange}
+/>
+<Diagram class="w-full flex-1" {tree} />
