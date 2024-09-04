@@ -5,8 +5,6 @@ import type { PageServerLoad } from "./$types"
 export const load: PageServerLoad = async ({ locals, parent }) => {
     await parent()
 
-    console.log("locals", locals)
-
     let res = await listProjects(locals.session, { limit: 1 })
 
     if (!res.length) {
