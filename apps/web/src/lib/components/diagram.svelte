@@ -3,10 +3,11 @@
 	import type { SyntaxNode, Tree } from 'web-tree-sitter';
 
 	type Props = {
+		class?: string;
 		tree: Tree | undefined;
 	};
 
-	let { tree }: Props = $props();
+	let props: Props = $props();
 
 	function extractEntities(node: SyntaxNode | undefined): Entity[] {
 		if (!node) {
@@ -61,4 +62,4 @@
 	}
 </script>
 
-<div use:diagram={extractEntities(tree?.rootNode)}></div>
+<div class={props.class} use:diagram={extractEntities(props.tree?.rootNode)}></div>

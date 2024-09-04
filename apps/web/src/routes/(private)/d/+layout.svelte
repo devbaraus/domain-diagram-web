@@ -1,10 +1,11 @@
 <script>
 	import Shell from '$lib/components/shell.svelte';
-	import '../app.css';
 </script>
 
 <svelte:head>
 	<title>Domain Driven Diagram</title>
 </svelte:head>
 
-<slot></slot>
+<Shell>
+	<slot></slot>
+</Shell>

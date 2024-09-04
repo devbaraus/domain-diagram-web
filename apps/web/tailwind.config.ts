@@ -7,5 +7,10 @@ export default {
 		extend: {}
 	},
 
-	plugins: []
+	daisyui: {
+		themes: [
+			'bumblebee'
+		]
+	},
+	plugins: [require('daisyui')]
 } as Config;
