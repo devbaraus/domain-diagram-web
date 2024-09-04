@@ -24,14 +24,14 @@ export const actions = {
         const formData = await request.formData()
         const name = formData.get('name')
 
-        console.log('name', name)
-
         if (typeof name !== 'string' || !name) {
             return fail(400, { invalid: true })
         }
 
         const res = await createProject(name, locals.session)
 
-        throw redirect(302, `/d/${res.id}`)
+        return {
+            item: res
+        }
     },
 }
