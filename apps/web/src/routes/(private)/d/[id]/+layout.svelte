@@ -38,15 +38,15 @@
 		<ProjectCreateButton />
 
 		{#each projects as project}
-			<div class="tooltip tooltip-right z-20" data-tip={project.name}>
-				<a href={`/d/${project.id}`}>
-					<img
-						class="mask mask-circle w-16"
-						alt={`Project Avatar: ${project.name}`}
-						src={`https://avatar.iran.liara.run/username?username=${project.name}`}
-					/>
-				</a>
-			</div>
+			<!-- <div class="tooltip tooltip-right z-20" data-tip={project.name}> -->
+			<a href={`/d/${project.id}`}>
+				<img
+					class="mask mask-circle w-16"
+					alt={`Project Avatar: ${project.name}`}
+					src={`https://avatar.iran.liara.run/username?username=${project.name}`}
+				/>
+			</a>
+			<!-- </div> -->
 		{/each}
 	</aside>
 	<div class="z-0 flex flex-1">
