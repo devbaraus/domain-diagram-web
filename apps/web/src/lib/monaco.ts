@@ -37,8 +37,8 @@ monaco.languages.register({ id: 'ddd' });
 monaco.languages.setMonarchTokensProvider('ddd', {
   tokenizer: {
     root: [
-      [/\b(aggregate|entity|value_object|enum|identifier)\b/, 'keyword'],
-      [/\b(UUID|String|Boolean|Float|Int|Date)\b/, 'type'],
+      [/\b(AggregateRoot|Entity|ValueObject|Enum|Event|Context|Service|Repository)\b/, 'keyword'],
+      [/\b(UUID|String|Boolean|Float|Int|Date|Null)\b/, 'type'],
       [/\b[a-zA-Z_][a-zA-Z0-9_]*\b/, 'identifier'],
       [/{|}/, 'delimiter.bracket'],
       [/:/, 'delimiter'],

@@ -53,7 +53,7 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
         // Define links based on entity properties
         const entitiesLinks = entities.map(entity => {
             return entity.properties.map(prop => {
-                const propType = prop.type?.replaceAll('[', '').replaceAll(']', '');
+                const propType = prop.type?.replaceAll('[', '').replaceAll(']', '').replaceAll('?', '');
                 return { source: entity.id, target: entities.find(e => e.id === propType || e.name === propType)?.id };
             }).filter(link => link.target !== undefined);
         }).flat();

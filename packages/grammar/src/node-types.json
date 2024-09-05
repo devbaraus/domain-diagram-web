@@ -18,6 +18,73 @@
         {
           "type": "identifier",
           "named": true
+        },
+        {
+          "type": "method",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "array_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "primitive_type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "boolean",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "context",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "aggregate",
+          "named": true
+        },
+        {
+          "type": "entity",
+          "named": true
+        },
+        {
+          "type": "enum",
+          "named": true
+        },
+        {
+          "type": "event",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "repository",
+          "named": true
+        },
+        {
+          "type": "service",
+          "named": true
+        },
+        {
+          "type": "value_object",
+          "named": true
         }
       ]
     }
@@ -41,6 +108,10 @@
         {
           "type": "identifier",
           "named": true
+        },
+        {
+          "type": "method",
+          "named": true
         }
       ]
     }
@@ -54,10 +125,6 @@
       "required": true,
       "types": [
         {
-          "type": "enum_value",
-          "named": true
-        },
-        {
           "type": "identifier",
           "named": true
         }
@@ -65,13 +132,17 @@
     }
   },
   {
-    "type": "enum_value",
+    "type": "event",
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "field",
+          "named": true
+        },
         {
           "type": "identifier",
           "named": true
@@ -114,6 +185,120 @@
     }
   },
   {
+    "type": "method",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "method_param",
+          "named": true
+        },
+        {
+          "type": "type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "method_param",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "field",
+          "named": true
+        },
+        {
+          "type": "method_param",
+          "named": true
+        },
+        {
+          "type": "value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "nullable_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "primitive_type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "primitive_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "repository",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "method",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "service",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "method",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "source_file",
     "named": true,
     "fields": {},
@@ -126,11 +311,27 @@
           "named": true
         },
         {
+          "type": "context",
+          "named": true
+        },
+        {
           "type": "entity",
           "named": true
         },
         {
           "type": "enum",
+          "named": true
+        },
+        {
+          "type": "event",
+          "named": true
+        },
+        {
+          "type": "repository",
+          "named": true
+        },
+        {
+          "type": "service",
           "named": true
         },
         {
@@ -149,7 +350,42 @@
       "required": true,
       "types": [
         {
-          "type": "identifier",
+          "type": "array_type",
+          "named": true
+        },
+        {
+          "type": "nullable_type",
+          "named": true
+        },
+        {
+          "type": "primitive_type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "value",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "boolean",
+          "named": true
+        },
+        {
+          "type": "null",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "string",
           "named": true
         }
       ]
@@ -175,6 +411,18 @@
     }
   },
   {
+    "type": "(",
+    "named": false
+  },
+  {
+    "type": ")",
+    "named": false
+  },
+  {
+    "type": ",",
+    "named": false
+  },
+  {
     "type": ":",
     "named": false
   },
@@ -183,7 +431,47 @@
     "named": false
   },
   {
+    "type": "=",
+    "named": false
+  },
+  {
     "type": ">",
+    "named": false
+  },
+  {
+    "type": "?",
+    "named": false
+  },
+  {
+    "type": "AggregateRoot",
+    "named": false
+  },
+  {
+    "type": "Context",
+    "named": false
+  },
+  {
+    "type": "Entity",
+    "named": false
+  },
+  {
+    "type": "Enum",
+    "named": false
+  },
+  {
+    "type": "Event",
+    "named": false
+  },
+  {
+    "type": "Repository",
+    "named": false
+  },
+  {
+    "type": "Service",
+    "named": false
+  },
+  {
+    "type": "ValueObject",
     "named": false
   },
   {
@@ -191,15 +479,7 @@
     "named": false
   },
   {
-    "type": "aggregate",
-    "named": false
-  },
-  {
-    "type": "entity",
-    "named": false
-  },
-  {
-    "type": "enum",
+    "type": "false",
     "named": false
   },
   {
@@ -207,7 +487,19 @@
     "named": true
   },
   {
-    "type": "value_object",
+    "type": "null",
+    "named": true
+  },
+  {
+    "type": "number",
+    "named": true
+  },
+  {
+    "type": "string",
+    "named": true
+  },
+  {
+    "type": "true",
     "named": false
   },
   {

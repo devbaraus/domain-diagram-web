@@ -10,6 +10,8 @@
 	let props: Props = $props();
 
 	function extractEntities(node: SyntaxNode | undefined): Entity[] {
+		console.log(node?.toString());
+
 		if (!node) {
 			return [];
 		}

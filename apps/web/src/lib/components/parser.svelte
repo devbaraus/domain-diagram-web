@@ -31,7 +31,7 @@
 		await TreeSitter.init();
 		parser = new TreeSitter();
 
-		const dslLang = await TreeSitter.Language.load('/parser.wasm');
+		const dslLang = await TreeSitter.Language.load('/tree-sitter-ddd.wasm');
 		parser.setLanguage(dslLang);
 	}
 
