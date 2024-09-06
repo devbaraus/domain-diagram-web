@@ -13,6 +13,8 @@ export function editor(el: HTMLElement, value: string) {
         // Your monaco instance is ready, let's display some code!
         editor = monaco.editor.create(el, {
             theme: 'default',
+            wordWrap: 'on',
+            scrollBeyondLastLine: false,
             minimap: { enabled: false },
         });
 

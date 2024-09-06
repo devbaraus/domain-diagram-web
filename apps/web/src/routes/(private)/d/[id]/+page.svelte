@@ -10,4 +10,4 @@
 	<title>Domain Driven Diagram - {data.item?.name}</title>
 </svelte:head>
 
-<Parser markup={data.item?.markup} id={$page.params.id} />
+<Parser markup={data.item?.markup} diagram={data.item?.diagram} id={$page.params.id} />

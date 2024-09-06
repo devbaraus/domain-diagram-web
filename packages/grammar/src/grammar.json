@@ -49,8 +49,17 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "Context"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "Context"
+            },
+            {
+              "type": "STRING",
+              "value": "BoundedContext"
+            }
+          ]
         },
         {
           "type": "SYMBOL",
@@ -106,8 +115,17 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "AggregateRoot"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "Aggregate"
+            },
+            {
+              "type": "STRING",
+              "value": "AggregateRoot"
+            }
+          ]
         },
         {
           "type": "SYMBOL",
@@ -216,8 +234,17 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "Event"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "DomainEvent"
+            },
+            {
+              "type": "STRING",
+              "value": "Event"
+            }
+          ]
         },
         {
           "type": "SYMBOL",
@@ -244,8 +271,17 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "Service"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "DomainService"
+            },
+            {
+              "type": "STRING",
+              "value": "Service"
+            }
+          ]
         },
         {
           "type": "SYMBOL",
@@ -315,7 +351,7 @@
           "type": "REPEAT",
           "content": {
             "type": "SYMBOL",
-            "name": "identifier"
+            "name": "enum_value"
           }
         },
         {
@@ -323,6 +359,10 @@
           "value": "}"
         }
       ]
+    },
+    "enum_value": {
+      "type": "SYMBOL",
+      "name": "identifier"
     },
     "method": {
       "type": "SEQ",
@@ -337,44 +377,26 @@
         },
         {
           "type": "SYMBOL",
-          "name": "method_param"
-        },
-        {
-          "type": "STRING",
-          "value": ")"
-        },
-        {
-          "type": "STRING",
-          "value": ":"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "type"
-        }
-      ]
-    },
-    "method_param": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
           "name": "field"
         },
         {
           "type": "CHOICE",
           "members": [
             {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": "="
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "value"
-                }
-              ]
+              "type": "REPEAT",
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": ","
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "field"
+                  }
+                ]
+              }
             },
             {
               "type": "BLANK"
@@ -382,6 +404,10 @@
           ]
         },
         {
+          "type": "STRING",
+          "value": ")"
+        },
+        {
           "type": "CHOICE",
           "members": [
             {
@@ -389,11 +415,11 @@
               "members": [
                 {
                   "type": "STRING",
-                  "value": ","
+                  "value": ":"
                 },
                 {
                   "type": "SYMBOL",
-                  "name": "method_param"
+                  "name": "type"
                 }
               ]
             },
@@ -418,6 +444,27 @@
         {
           "type": "SYMBOL",
           "name": "type"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "="
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "value"
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         }
       ]
     },
@@ -443,6 +490,10 @@
       "members": [
         {
           "type": "SYMBOL",
+          "name": "reference_type"
+        },
+        {
+          "type": "SYMBOL",
           "name": "primitive_type"
         },
         {
@@ -455,16 +506,62 @@
         }
       ]
     },
-    "primitive_type": {
+    "reference_type": {
       "type": "SYMBOL",
       "name": "identifier"
+    },
+    "primitive_type": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "String"
+        },
+        {
+          "type": "STRING",
+          "value": "Int"
+        },
+        {
+          "type": "STRING",
+          "value": "UUID"
+        },
+        {
+          "type": "STRING",
+          "value": "Boolean"
+        },
+        {
+          "type": "STRING",
+          "value": "Int"
+        },
+        {
+          "type": "STRING",
+          "value": "Float"
+        },
+        {
+          "type": "STRING",
+          "value": "Date"
+        },
+        {
+          "type": "STRING",
+          "value": "Null"
+        }
+      ]
     },
     "array_type": {
       "type": "SEQ",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "primitive_type"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "reference_type"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "primitive_type"
+            }
+          ]
         },
         {
           "type": "STRING",
@@ -476,8 +573,17 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "primitive_type"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "reference_type"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "primitive_type"
+            }
+          ]
         },
         {
           "type": "STRING",
@@ -506,6 +612,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "array"
+        },
+        {
+          "type": "SYMBOL",
           "name": "null"
         }
       ]
@@ -514,9 +624,63 @@
       "type": "PATTERN",
       "value": "\"[^\"]*\""
     },
+    "array": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "["
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "value"
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "REPEAT",
+                      "content": {
+                        "type": "SEQ",
+                        "members": [
+                          {
+                            "type": "STRING",
+                            "value": ","
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "value"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": "]"
+        }
+      ]
+    },
     "number": {
       "type": "PATTERN",
-      "value": "\\d+"
+      "value": "-?\\d+(\\.\\d+)?"
     },
     "boolean": {
       "type": "CHOICE",
