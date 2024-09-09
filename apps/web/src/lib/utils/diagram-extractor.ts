@@ -188,6 +188,7 @@ export function extractAggregate(node: SyntaxNode | undefined): Aggregate | unde
     const data: Aggregate = {
         ids: [],
         name: '',
+        type: 'aggregate',
         properties: [],
         methods: [],
         position: {
@@ -236,6 +237,7 @@ export function extractValueObject(node: SyntaxNode | undefined): ValueObject | 
     const data: ValueObject = {
         id: '',
         name: '',
+        type: 'value_object',
         properties: [],
         position: {
             fixed: false,
@@ -271,6 +273,7 @@ export function extractEntity(node: SyntaxNode | undefined): Entity | undefined 
     const data: Entity = {
         ids: [],
         name: '',
+        type: 'entity',
         properties: [],
         methods: [],
         position: {
@@ -319,6 +322,7 @@ export function extractRepository(node: SyntaxNode | undefined): Repository | un
     const data: Repository = {
         id: '',
         name: '',
+        type: 'repository',
         methods: [],
         position: {
             fixed: false,
@@ -355,6 +359,7 @@ export function extractService(node: SyntaxNode | undefined): Service | undefine
     const data: Service = {
         id: '',
         name: '',
+        type: 'service',
         methods: [],
         position: {
             fixed: false,
@@ -391,6 +396,7 @@ export function extractEnum(node: SyntaxNode | undefined): Enum | undefined {
     const data: Enum = {
         id: '',
         name: '',
+        type: 'enum',
         values: [],
         position: {
             fixed: false,
@@ -434,6 +440,7 @@ export function extractDiagram(node: SyntaxNode | undefined, context: string = '
     const contextData: Context = {
         id: context,
         name: context,
+        type: 'context',
         aggregates: [],
         entities: [],
         valueObjects: [],

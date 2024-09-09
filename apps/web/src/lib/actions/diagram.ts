@@ -1,7 +1,8 @@
 import * as d3 from 'd3';
 
-export function diagram(el: HTMLDivElement, entities: Entity[]) {
+export function diagram(el: HTMLDivElement, value: Diagram) {
     let firstDraw = true;
+
     const svg = d3.select(el)
         .append("svg")
         .attr("width", '100%')
@@ -29,7 +30,9 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
         "aggregate": "#1f78b4",
         "entity": "#33a02c",
         "enum": "#e31a1c",
-        "value_object": "#ff7f00"
+        "value_object": "#ff7f00",
+        "service": "#6a3d9a",
+        "repository": "#b15928"
     };
 
     // Function to zoom and fit the diagram to the viewport
@@ -49,12 +52,20 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
         svgGroup.attr("transform", `translate(${translate[0]}, ${translate[1]}) scale(${scale})`);
     }
 
-    function draw(entities: Entity[]) {
+    function draw(value: Diagram) {
         // Define links based on entity properties
-        const entitiesLinks = entities.map(entity => {
-            return entity.properties.map(prop => {
-                const propType = prop.type?.replaceAll('[', '').replaceAll(']', '').replaceAll('?', '');
-                return { source: entity.id, target: entities.find(e => e.id === propType || e.name === propType)?.id };
+        const domainEntities = [value.aggregates, value.entities, value.valueObjects].flat()
+        // const domainEntities = [value.aggregates, value.entities, value.valueObjects, value.enums].flat()
+
+        const domainLinks = domainEntities.map(domain => {
+            return domain.properties?.map(prop => {
+                return {
+                    source: domain.name, target: domainEntities.find(e => {
+                        if ('id' in e) return prop.type === e.id;
+                        if ('ids' in e) return e.ids.includes(prop.type);
+                        return false;
+                    })?.name
+                };
             }).filter(link => link.target !== undefined);
         }).flat();
 
@@ -62,7 +73,7 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
         const link = svgGroup.append("g")
             .attr("class", "links")
             .selectAll("path")
-            .data(entitiesLinks)
+            .data(domainLinks)
             .enter()
             .append("path")
             .attr("stroke", "lightgrey")
@@ -73,12 +84,13 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
         const node = svgGroup.append("g")
             .attr("class", "nodes")
             .selectAll("g")
-            .data(entities)
+            .data(domainEntities)
             .enter()
             .append("g")
+            .attr("class", (d) => d.type)
             .on("mouseover", function (event, d) {
                 d3.select(this).select("rect").attr("stroke", "black");
-                link.attr("stroke", dl => dl.source === d.id || dl.target === d.id ? "black" : "lightgrey");
+                link.attr("stroke", dl => dl.source === d.name || dl.target === d.name ? "black" : "lightgrey");
             })
             .on("mouseout", function (event, d) {
                 d3.select(this).select("rect").attr("stroke", "none");
@@ -88,11 +100,10 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
         // Add rectangles for nodes
         node.append("rect")
             .attr("width", nodeWidth)
-            .attr("height", d => 50 + (d.properties.length + d.values?.length) * lineHeigth)
+            .attr("height", d => 50 + ((d.properties?.length ?? 0) + (d.methods?.length ?? 0) + (d.values?.length ?? 0)) * lineHeigth)
             .attr("fill", backgroundColors.node)
             .attr("rx", 4)
-            .attr("ry", 4)
-            ;
+            .attr("ry", 4);
 
         // Add node headers
         node.append("rect")
@@ -145,20 +156,20 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
         });
 
         // Add enum values to nodes
-        node.each(function (d) {
-            const values = d3.select(this).selectAll(".value")
-                .data(d.values)
-                .enter();
+        // node.each(function (d) {
+        //     const values = d3.select(this).selectAll(".value")
+        //         .data(d.values ?? [])
+        //         .enter();
 
-            values.append("text")
-                .attr("class", "value")
-                .attr("x", 10)
-                .attr("y", (value, i) => 40 + d.properties.length * lineHeigth + i * lineHeigth + lineHeigth / 2)
-                .attr("dy", ".35em")
-                .attr("text-anchor", "start")
-                .attr("fill", backgroundColors.property)
-                .text(value => value);
-        });
+        //     values.append("text")
+        //         .attr("class", "value")
+        //         .attr("x", 10)
+        //         .attr("y", (value, i) => 40 + d.properties.length * lineHeigth + i * lineHeigth + lineHeigth / 2)
+        //         .attr("dy", ".35em")
+        //         .attr("text-anchor", "start")
+        //         .attr("fill", backgroundColors.property)
+        //         .text();
+        // });
 
         // Manually position nodes in a Masonry layout
         let columnHeights = new Array(columns).fill(0); // Track the height of each column
@@ -177,8 +188,19 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
         });
 
         link.attr("d", function (d) {
-            const sourceNode = entities.find(entity => entity.id === d.source);
-            const targetNode = entities.find(entity => entity.id === d.target);
+            const sourceNode = domainEntities.find(entity => {
+                if ('id' in entity) return entity.id === d.source;
+                if ('ids' in entity) return entity.ids.includes(d.source);
+                return false;
+            });
+
+            const targetNode = domainEntities.find(
+                entity => {
+                    if ('id' in entity) return entity.id === d.target;
+                    if ('ids' in entity) return entity.ids.includes(d.target);
+                    return false;
+                }
+            );
             if (!sourceNode || !targetNode) return '';
 
             const dx = targetNode.x - sourceNode.x;
@@ -254,9 +276,9 @@ export function diagram(el: HTMLDivElement, entities: Entity[]) {
     }
 
     return {
-        update(entities: Entity[]) {
+        update(value: Diagram) {
             svgGroup.selectAll('*').remove();
-            draw(entities);
+            draw(value);
         },
         destroy() {
             svg.remove();

@@ -3,7 +3,7 @@
 	import Diagram from '$lib/components/diagram.svelte';
 	import Editor from '$lib/components/editor.svelte';
 	import { updateProject } from '$lib/services/project-service.svelte';
-	import { extractDiagram } from '$lib/utils/diagram-utils';
+	import { extractDiagram } from '$lib/utils/diagram-extractor';
 	import _ from 'lodash';
 	import { onMount } from 'svelte';
 	import TreeSitter, { type Tree } from 'web-tree-sitter';
@@ -21,8 +21,6 @@
 	let diagram = $state(props.diagram);
 
 	const markupUpdate = async (markup: string, diagram: Diagram) => {
-		console.log('markupUpdate', markup, diagram);
-
 		return updateProject(props.id, { markup, diagram }, $page.data.session);
 	};
 
@@ -66,5 +64,5 @@
 </script>
 
 <Editor value={props.markup} onkeydown={handleCtrlSave} onchange={handleChange} />
-<span class="w-96">{tree?.rootNode?.toString()}</span>
-<!-- <Diagram class="w-full flex-1" {diagram} /> -->
+<!-- <span class="w-96">{tree?.rootNode?.toString()}</span> -->
+<Diagram class="w-full flex-1" {diagram} />
