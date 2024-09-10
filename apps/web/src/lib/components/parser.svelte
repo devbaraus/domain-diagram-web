@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { grammar as defaultGrammar } from '$lib';
 	import Diagram from '$lib/components/diagram.svelte';
 	import Editor from '$lib/components/editor.svelte';
 	import { updateProject } from '$lib/services/project-service.svelte';
+	import { extractDiagram } from '$lib/utils/diagram-extractor';
 	import _ from 'lodash';
 	import { onMount } from 'svelte';
 	import TreeSitter, { type Tree } from 'web-tree-sitter';
 
 	type Props = {
+		diagram: Diagram;
 		markup: string;
 		id: string;
 	};
@@ -16,22 +17,30 @@
 
 	let parser: TreeSitter | undefined;
 	let tree = $state<Tree>();
+	let markup = $state(props.markup);
+	let diagram = $state(props.diagram);
 
-	const markupUpdate = async (value: string) => {
-		return updateProject(props.id, { markup: value }, $page.data.session);
+	const markupUpdate = async (markup: string, diagram: Diagram) => {
+		return updateProject(props.id, { markup, diagram }, $page.data.session);
 	};
 
 	const debouncedTreeUpdate = _.debounce((value: string) => {
 		tree = parser?.parse(value);
-	}, 500);
+		diagram = extractDiagram(tree?.rootNode);
 
-	const debouncedMarkupUpdate = _.debounce(markupUpdate, 1500);
+		debouncedMarkupUpdate(value, diagram);
+	}, 1500);
+
+	const debouncedMarkupUpdate = _.debounce(
+		(markup: string, diagram: Diagram) => markupUpdate(markup, diagram),
+		1500
+	);
 
 	async function initializeParser() {
 		await TreeSitter.init();
 		parser = new TreeSitter();
 
-		const dslLang = await TreeSitter.Language.load('/parser.wasm');
+		const dslLang = await TreeSitter.Language.load('/tree-sitter-ddd.wasm');
 		parser.setLanguage(dslLang);
 	}
 
@@ -39,11 +48,11 @@
 		await initializeParser();
 
 		tree = parser?.parse(props.markup);
+		diagram = extractDiagram(tree?.rootNode);
 	});
 
 	function handleChange(event: CustomEvent<string>) {
 		debouncedTreeUpdate(event.detail);
-		debouncedMarkupUpdate(event.detail);
 	}
 
 	function handleCtrlSave(event: KeyboardEvent) {
@@ -52,7 +61,12 @@
 			// markupUpdate(event);
 		}
 	}
+
+	function handleOnClick(d: any) {
+		
+	}
 </script>
 
 <Editor value={props.markup} onkeydown={handleCtrlSave} onchange={handleChange} />
-<Diagram class="w-full flex-1" {tree} />
+<!-- <span class="w-96">{tree?.rootNode?.toString()}</span> -->
+<Diagram class="w-full flex-1" {diagram} />

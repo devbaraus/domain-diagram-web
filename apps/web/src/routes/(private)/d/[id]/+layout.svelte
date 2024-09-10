@@ -17,7 +17,8 @@
 		<div class="dropdown dropdown-end">
 			<div tabindex="0" role="button" class="avatar">
 				<div class="w-12 rounded-full">
-					<img alt="Random Avatar" src="https://avatar.iran.liara.run/public" />
+					<div class="size-full bg-gray-300"></div>
+					<!-- <img alt="Random Avatar" src="https://avatar.iran.liara.run/public" /> -->
 				</div>
 			</div>
 			<ul class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
@@ -38,11 +39,12 @@
 		{#each projects as project}
 			<div class="tooltip tooltip-right z-20" data-tip={project.name}>
 				<a href={`/d/${project.id}`}>
-					<img
+					<div class="mask mask-circle size-12 bg-gray-300"></div>
+					<!-- <img
 						class="mask mask-circle w-12"
 						alt={`Project Avatar: ${project.name}`}
 						src={`https://avatar.iran.liara.run/username?username=${project.name}`}
-					/>
+					/> -->
 				</a>
 			</div>
 		{/each}

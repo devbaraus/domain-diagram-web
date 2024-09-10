@@ -2,84 +2,162 @@
 // @ts-check
 
 module.exports = grammar({
-  name: 'ddd',
+  name: "ddd",
 
   rules: {
     // Entry point
-    source_file: $ => repeat($._definition),
+    source_file: ($) => repeat($._definition),
 
     // Definitions
-    _definition: $ => choice(
-      $.aggregate,
-      $.entity,
-      $.value_object,
-      $.enum
-    ),
+    _definition: ($) =>
+      choice(
+        $.aggregate,
+        $.entity,
+        $.value_object,
+        $.enum,
+        $.event,
+        $.service,
+        $.repository,
+        $.context,
+      ),
+
+    // Context definition
+    context: ($) =>
+      seq(
+        choice("Context", "BoundedContext"),
+        $.identifier,
+        "{",
+        repeat(
+          choice(
+            $.aggregate,
+            $.entity,
+            $.value_object,
+            $.enum,
+            $.event,
+            $.service,
+            $.repository,
+          ),
+        ),
+        "}",
+      ),
 
     // Aggregate definition (with optional generic type)
-    aggregate: $ => seq(
-      'aggregate',
-      optional($.generic_type),
-      $.identifier,
-      '{',
-      repeat($.field),
-      '}'
-    ),
+    aggregate: ($) =>
+      seq(
+        choice("Aggregate", "AggregateRoot"),
+        $.generic_type,
+        $.identifier,
+        "{",
+        repeat(choice($.field, $.method)),
+        "}",
+      ),
 
     // Entity definition (with optional generic type)
-    entity: $ => seq(
-      'entity',
-      optional($.generic_type),
-      $.identifier,
-      '{',
-      repeat($.field),
-      '}'
-    ),
+    entity: ($) =>
+      seq(
+        "Entity",
+        $.generic_type,
+        $.identifier,
+        "{",
+        repeat(choice($.field, $.method)),
+        "}",
+      ),
 
     // Value Object definition
-    value_object: $ => seq(
-      'value_object',
-      $.identifier,
-      '{',
-      repeat($.field),
-      '}'
-    ),
+    value_object: ($) =>
+      seq("ValueObject", $.identifier, "{", repeat($.field), "}"),
+
+    // Event definition
+    event: ($) =>
+      seq(
+        choice("DomainEvent", "Event"),
+        $.identifier,
+        "{",
+        repeat($.field),
+        "}",
+      ),
+
+    // Service definition
+    service: ($) =>
+      seq(
+        choice("DomainService", "Service"),
+        $.identifier,
+        "{",
+        repeat($.method),
+        "}",
+      ),
+
+    // Repository definition
+    repository: ($) =>
+      seq("Repository", $.identifier, "{", repeat($.method), "}"),
 
     // Enum definition
-    enum: $ => seq(
-      'enum',
-      $.identifier,
-      '{',
-      repeat($.enum_value),
-      '}'
-    ),
+    enum: ($) => seq("Enum", $.identifier, "{", repeat($.enum_value), "}"),
 
     // Enum values inside enum definition
-    enum_value: $ => $.identifier,
+    enum_value: ($) => $.identifier,
+
+    // Method definition
+    method: ($) =>
+      seq(
+        $.identifier,
+        "(",
+        $.field,
+        optional(repeat(seq(",", $.field))),
+        ")",
+        optional(seq(":", $.type)),
+      ),
 
     // Field definition
-    field: $ => seq(
-      $.identifier,
-      ':',
-      $.type
-    ),
+    field: ($) => seq($.identifier, ":", $.type, optional(seq("=", $.value))),
 
     // Generic type definition
-    generic_type: $ => seq(
-      '<',
-      $.identifier,
-      '>'
-    ),
+    generic_type: ($) => seq("<", $.identifier, ">"),
 
-    // Type definition (e.g., String, Int, UUID, TaskID[])
-    type: $ => seq(
-      $.identifier,
-      optional('[]')
-    ),
+    // Type definition (e.g., String, Int, UUID, TaskID[], TaskID?)
+    type: ($) =>
+      choice($.reference_type, $.primitive_type, $.array_type, $.nullable_type),
+
+    // Reference to another type (e.g., TaskID)
+    reference_type: ($) => $.identifier,
+
+    // Type definition (e.g., String, Int, UUID)
+    primitive_type: ($) =>
+      choice(
+        "String",
+        "Int",
+        "UUID",
+        "Boolean",
+        "Int",
+        "Float",
+        "Date",
+        "Null",
+      ),
+
+    // Array type definition (e.g., String[])
+    array_type: ($) => seq(choice($.reference_type, $.primitive_type), "[]"),
+
+    // Nullable type definition (e.g., String?)
+    nullable_type: ($) => seq(choice($.reference_type, $.primitive_type), "?"),
 
     // Identifier (names for types, fields, entities, etc.)
-    identifier: $ => /[a-zA-Z_]\w*/
-  }
+    identifier: ($) => /[a-zA-Z_]\w*/,
+
+    value: ($) => choice($.string, $.number, $.boolean, $.array, $.null),
+
+    string: ($) => /"[^"]*"/,
+
+    array: ($) =>
+      seq(
+        "[",
+        optional(seq($.value, optional(repeat(seq(",", $.value))))),
+        "]",
+      ),
+
+    number: ($) => /-?\d+(\.\d+)?/,
+
+    boolean: ($) => choice("true", "false"),
+
+    null: ($) => "null",
+  },
 });
-
-

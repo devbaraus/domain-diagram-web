@@ -4,7 +4,6 @@
   "main": "index.js",
   "types": "bindings/node",
   "scripts": {
-    "dev": "",
     "generate": "tree-sitter generate",
     "postgenerate": "tree-sitter build --wasm",
     "install": "node-gyp-build",

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { editor } from '$lib/actions/editor';
+	import { editor } from '$lib/actions/editor.svelte';
 
 	let data: {
 		id?: string;
