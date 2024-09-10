@@ -91,7 +91,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             .enter()
             .append("g")
             .attr("id", d => d.name)
-            .attr("class", (d) => d.type)
+            .attr("class", (d) => `${d.type} hover:cursor-pointer`)
             .on("mouseover", function (event, d) {
                 d3.select(this).select("rect").attr("stroke", "black");
                 links.attr("stroke", l => {

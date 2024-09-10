@@ -62,11 +62,9 @@
 		}
 	}
 
-	function handleOnClick(d: any) {
-		
-	}
+	function handleOnClick(d: any) {}
 </script>
 
 <Editor value={props.markup} onkeydown={handleCtrlSave} onchange={handleChange} />
 <!-- <span class="w-96">{tree?.rootNode?.toString()}</span> -->
-<Diagram class="w-full flex-1" {diagram} />
+<Diagram class="w-full flex-1 select-none" {diagram} />
