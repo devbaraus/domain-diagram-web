@@ -3,6 +3,29 @@
 	import ProjectCreateButton from '$lib/components/projects/project-create-button.svelte';
 
 	let projects = $page.data.items;
+
+	function getAvatarName(name) {
+		let res = name.split(' ');
+
+		if (res.length > 1) {
+			return res[0][0] + res[1][0];
+		}
+
+		return res[0][0] + res[0][1];
+	}
+
+	function stringToColour(str) {
+		let hash = 0;
+		str.split('').forEach((char) => {
+			hash = char.charCodeAt(0) + ((hash << 5) - hash);
+		});
+		let colour = '#';
+		for (let i = 0; i < 3; i++) {
+			const value = (hash >> (i * 8)) & 0xff;
+			colour += value.toString(16).padStart(2, '0');
+		}
+		return colour;
+	}
 </script>
 
 <svelte:head>
@@ -39,7 +62,12 @@
 		{#each projects as project}
 			<div class="tooltip tooltip-right z-20" data-tip={project.name}>
 				<a href={`/d/${project.id}`}>
-					<div class="mask mask-circle size-12 bg-gray-300"></div>
+					<div
+						class="mask mask-circle flex size-12 items-center justify-center uppercase"
+						style={`background-color: ${stringToColour(project.name)}50;`}
+					>
+						{getAvatarName(project.name)}
+					</div>
 					<!-- <img
 						class="mask mask-circle w-12"
 						alt={`Project Avatar: ${project.name}`}

@@ -6,7 +6,6 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
     editorInstance.subscribe(value => editor = value);
 
-
     const svg = d3.select(el)
         .append("svg")
         .attr("width", '100%')
@@ -166,7 +165,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
                 .attr("dy", ".35em")
                 .attr("text-anchor", "end")
                 .attr("fill", backgroundColors.type)
-                .text(prop => prop.type);
+                .text(prop => `${prop.type}${prop.nullable ? '?' : ''}${prop.array ? '[]' : ''}`);
         });
 
         // Add properties to entity nodes
@@ -191,7 +190,8 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
                 .attr("dy", ".35em")
                 .attr("text-anchor", "end")
                 .attr("fill", backgroundColors.type)
-                .text(prop => prop.type);
+                .text(prop => `${prop.type}${prop.nullable ? '?' : ''}${prop.array ? '[]' : ''}`);
+
         });
 
         // Add properties to value object nodes
@@ -216,7 +216,8 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
                 .attr("dy", ".35em")
                 .attr("text-anchor", "end")
                 .attr("fill", backgroundColors.type)
-                .text(prop => prop.type);
+                .text(prop => `${prop.type}${prop.nullable ? '?' : ''}${prop.array ? '[]' : ''}`);
+
         });
 
         // Add enum values to nodes
