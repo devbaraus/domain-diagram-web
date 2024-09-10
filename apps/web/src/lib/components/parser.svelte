@@ -61,6 +61,10 @@
 			// markupUpdate(event);
 		}
 	}
+
+	function handleOnClick(d: any) {
+		
+	}
 </script>
 
 <Editor value={props.markup} onkeydown={handleCtrlSave} onchange={handleChange} />

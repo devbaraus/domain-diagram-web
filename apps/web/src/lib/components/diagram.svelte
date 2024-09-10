@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { diagram } from "$lib/actions/diagram";
+	import { diagram } from '$lib/actions/diagram.svelte';
 
 	type Props = {
 		class?: string;

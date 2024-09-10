@@ -189,6 +189,7 @@ export function extractAggregate(node: SyntaxNode | undefined): Aggregate | unde
         ids: [],
         name: '',
         type: 'aggregate',
+        line: 0,
         properties: [],
         methods: [],
         position: {
@@ -207,6 +208,7 @@ export function extractAggregate(node: SyntaxNode | undefined): Aggregate | unde
         if (child.type === 'identifier') {
             data.name = child.text;
             data.ids.push(child.text);
+            data.line = child.startPosition.row + 1;
         }
 
         if (child.type === 'field') {
@@ -238,6 +240,7 @@ export function extractValueObject(node: SyntaxNode | undefined): ValueObject | 
         id: '',
         name: '',
         type: 'value_object',
+        line: 0,
         properties: [],
         position: {
             fixed: false,
@@ -251,6 +254,7 @@ export function extractValueObject(node: SyntaxNode | undefined): ValueObject | 
         if (child.type === 'identifier') {
             data.name = child.text;
             data.id = child.text;
+            data.line = child.startPosition.row + 1;
         }
 
         if (child.type === 'field') {
@@ -274,6 +278,7 @@ export function extractEntity(node: SyntaxNode | undefined): Entity | undefined 
         ids: [],
         name: '',
         type: 'entity',
+        line: 0,
         properties: [],
         methods: [],
         position: {
@@ -292,6 +297,7 @@ export function extractEntity(node: SyntaxNode | undefined): Entity | undefined 
         if (child.type === 'identifier') {
             data.name = child.text;
             data.ids.push(child.text);
+            data.line = child.startPosition.row + 1;
         }
 
         if (child.type === 'field') {
@@ -323,6 +329,7 @@ export function extractRepository(node: SyntaxNode | undefined): Repository | un
         id: '',
         name: '',
         type: 'repository',
+        line: 0,
         methods: [],
         position: {
             fixed: false,
@@ -336,6 +343,7 @@ export function extractRepository(node: SyntaxNode | undefined): Repository | un
         if (child.type === 'identifier') {
             data.name = child.text;
             data.id = child.text;
+            data.line = child.startPosition.row + 1;
         }
 
 
@@ -360,6 +368,7 @@ export function extractService(node: SyntaxNode | undefined): Service | undefine
         id: '',
         name: '',
         type: 'service',
+        line: 0,
         methods: [],
         position: {
             fixed: false,
@@ -373,6 +382,7 @@ export function extractService(node: SyntaxNode | undefined): Service | undefine
         if (child.type === 'identifier') {
             data.name = child.text;
             data.id = child.text;
+            data.line = child.startPosition.row + 1;
         }
 
 
@@ -397,6 +407,7 @@ export function extractEnum(node: SyntaxNode | undefined): Enum | undefined {
         id: '',
         name: '',
         type: 'enum',
+        line: 0,
         values: [],
         position: {
             fixed: false,
@@ -410,6 +421,7 @@ export function extractEnum(node: SyntaxNode | undefined): Enum | undefined {
         if (child.type === 'identifier') {
             data.name = child.text;
             data.id = child.text;
+            data.line = child.startPosition.row + 1;
         }
 
 

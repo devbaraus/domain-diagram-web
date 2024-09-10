@@ -35,6 +35,7 @@ declare type Aggregate = {
     ids: string[],
     name: string;
     type: string;
+    line: number;
     properties: Property[];
     methods: Method[];
     position: Position
@@ -44,6 +45,7 @@ declare type Entity = {
     ids: string[],
     name: string;
     type: string;
+    line: number;
     properties: Property[];
     methods: Method[];
     position: Position
@@ -53,6 +55,7 @@ declare type ValueObject = {
     id: string,
     name: string;
     type: string;
+    line: number;
     properties: Property[];
     position: Position
 }
@@ -61,6 +64,7 @@ declare type Enum = {
     id: string,
     name: string;
     type: string;
+    line: number;
     values: string[];
     position: Position
 }
@@ -69,6 +73,7 @@ declare type Service = {
     id: string,
     name: string;
     type: string;
+    line: number;
     methods: Method[];
     position: Position
 }
@@ -77,6 +82,7 @@ declare type Repository = {
     id: string,
     name: string;
     type: string;
+    line: number;
     methods: Method[];
     position: Position
 }
@@ -85,6 +91,7 @@ declare type Context = {
     id: string,
     name: string;
     type: string;
+    line: number;
     aggregates: string[];
     entities: string[];
     valueObjects: string[];
