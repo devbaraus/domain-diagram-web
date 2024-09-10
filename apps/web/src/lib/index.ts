@@ -1,36 +1,35 @@
 // place files you want to import through the `$lib` alias in this folder.
 export const grammar = `// This a placeholder grammar
-aggregate<UserID> User {
-    name: String
-    isActive: Boolean
-    currentEvaluation: Float
-    amount: Int
+Aggregate<UserID> User {
+    username: String
+    email: String
 }
 
-value_object TaskFile {
+Aggregate<TaskID> Task {
+    name: String
+    description: String?
+    tags: String[]
+    assignees: UserID[]
+    status: TaskStatus
+}
+
+ValueObject SomeValueObject {
     filename: String
     updatedAt: Date
 }
 
-enum TaskStatus {
+Enum TaskStatus {
     OPEN
     IN_PROGRESS
     DONE
     CANCELED
 }
 
-aggregate<TaskGroupID> TaskGroup {
-    tasks: TaskID[]
-}
-
-aggregate<TeamID> Team {
-    name: String
-}
-
-entity<TaskID> Task {
+Entity<SomeEntityID> SomeEntity {
     dueDate: Date
     status: TaskStatus
-}`;
+}
+`;
 
 export function nameGenerator() {
     var nameList = [
