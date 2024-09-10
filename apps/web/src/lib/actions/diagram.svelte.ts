@@ -111,7 +111,6 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
                 links.attr("stroke", "lightgrey");
             })
             .on("click", function (event, d) {
-                console.log(editor)
                 editor.revealLineInCenter(d.line);
                 editor.setPosition({ lineNumber: d.line, column: 1 });
                 editor.focus();
