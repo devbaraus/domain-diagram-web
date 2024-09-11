@@ -1,4 +1,4 @@
-import { editorInstance } from '$lib/store';
+import { editor } from '$lib/store';
 import * as d3 from 'd3';
 import _ from 'lodash';
 
@@ -7,7 +7,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
     let editor = null
     let fixed = false
 
-    editorInstance.subscribe(value => editor = value);
+    editor?.subscribe(value => editor = value);
 
     const svg = d3.select(el)
         .append("svg")

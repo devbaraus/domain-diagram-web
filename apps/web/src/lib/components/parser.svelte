@@ -4,6 +4,8 @@
 	import Editor from '$lib/components/editor.svelte';
 	import { updateProject } from '$lib/services/project-service.svelte';
 	import { extractDiagram } from '$lib/utils/diagram-extractor';
+	import { lintAST } from '$lib/utils/editor-linter';
+	import { model, monaco } from '$lib/store';
 	import _ from 'lodash';
 	import { onMount } from 'svelte';
 	import TreeSitter, { type Tree } from 'web-tree-sitter';
@@ -26,6 +28,9 @@
 	const updateTree = (value: string) => {
 		tree = parser?.parse(value);
 		diagram = extractDiagram(tree?.rootNode);
+
+		const diagnostic = lintAST(tree);
+		$monaco?.editor.setModelMarkers($model, 'ddd', diagnostic);
 	};
 
 	const debouncedTreeUpdate = _.debounce((value: string) => {
@@ -49,12 +54,10 @@
 
 	onMount(async () => {
 		await initializeParser();
-
-		updateTree(props.markup);
 	});
 
-	function handleChange(event: CustomEvent<string>) {
-		debouncedTreeUpdate(event.detail);
+	function handleChange(value: string) {
+		debouncedTreeUpdate(value);
 	}
 
 	function handleCtrlSave(event: KeyboardEvent) {
@@ -64,6 +67,6 @@
 	}
 </script>
 
-<Editor value={props.markup} onkeydown={handleCtrlSave} onchange={handleChange} />
+<Editor value={props.markup} onchange={handleChange} onkeydown={handleCtrlSave} />
 <!-- <span class="w-96">{tree?.rootNode?.toString()}</span> -->
 <Diagram class="font-fira w-full flex-1 select-none" {diagram} />
