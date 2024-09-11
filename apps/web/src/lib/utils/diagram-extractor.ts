@@ -202,7 +202,17 @@ export function extractAggregate(node: SyntaxNode | undefined): Aggregate | unde
 
     for (let child of node.children) {
         if (child.type === 'generic_type') {
-            data.ids.push(extractGenericType(child));
+            const genericType = extractGenericType(child);
+
+            data.ids.push(genericType);
+            data.properties.push({
+                name: 'id',
+                type: genericType,
+                array: false,
+                kind: 'reference',
+                nullable: false,
+                default: ''
+            })
         }
 
         if (child.type === 'identifier') {
@@ -269,6 +279,44 @@ export function extractValueObject(node: SyntaxNode | undefined): ValueObject | 
     return data
 }
 
+export function extractEvent(node: SyntaxNode | undefined): DomainEvent | undefined {
+    if (!node) {
+        return;
+    }
+
+    const data: DomainEvent = {
+        id: '',
+        name: '',
+        type: 'event',
+        line: 0,
+        properties: [],
+        position: {
+            fixed: false,
+            hidden: false,
+            x: 0,
+            y: 0
+        }
+    }
+
+    for (let child of node.children) {
+        if (child.type === 'identifier') {
+            data.name = child.text;
+            data.id = child.text;
+            data.line = child.startPosition.row + 1;
+        }
+
+        if (child.type === 'field') {
+            const field = extractField(child);
+
+            if (field) {
+                data.properties.push(field);
+            }
+        }
+    }
+
+    return data
+}
+
 export function extractEntity(node: SyntaxNode | undefined): Entity | undefined {
     if (!node) {
         return;
@@ -291,7 +339,17 @@ export function extractEntity(node: SyntaxNode | undefined): Entity | undefined 
 
     for (let child of node.children) {
         if (child.type === 'generic_type') {
-            data.ids.push(extractGenericType(child));
+            const genericType = extractGenericType(child);
+
+            data.ids.push(genericType);
+            data.properties.push({
+                name: 'id',
+                type: genericType,
+                array: false,
+                kind: 'reference',
+                nullable: false,
+                default: ''
+            })
         }
 
         if (child.type === 'identifier') {
@@ -385,7 +443,6 @@ export function extractService(node: SyntaxNode | undefined): Service | undefine
             data.line = child.startPosition.row + 1;
         }
 
-
         if (child.type === 'method') {
             const method = extractMethod(child);
 
@@ -440,6 +497,7 @@ export function extractDiagram(node: SyntaxNode | undefined, context: string = '
         enums: [],
         repositories: [],
         services: [],
+        events: [],
         valueObjects: [],
         contexts: [],
         columns: 4
@@ -458,6 +516,7 @@ export function extractDiagram(node: SyntaxNode | undefined, context: string = '
         valueObjects: [],
         enums: [],
         services: [],
+        events: [],
         repositories: [],
         position: {
             fixed: false,
@@ -493,7 +552,14 @@ export function extractDiagram(node: SyntaxNode | undefined, context: string = '
                 diagram.enums.push(enumData);
                 diagram.contexts.find(c => c.name === context)?.enums.push(enumData.name);
             }
+        }
+        if (child.type === 'event') {
+            const event = extractEvent(child);
 
+            if (event) {
+                diagram.events.push(event);
+                diagram.contexts.find(c => c.name === context)?.events.push(event.name);
+            }
         }
         if (child.type === 'value_object') {
             const valueObject = extractValueObject(child);

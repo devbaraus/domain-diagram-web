@@ -13,6 +13,9 @@ importers:
       '@directus/sdk':
         specifier: ^17.0.0
         version: 17.0.0
+      '@tanstack/svelte-query':
+        specifier: ^5.55.4
+        version: 5.55.4(svelte@5.0.0-next.241)
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -508,6 +511,14 @@ packages:
     peerDependencies:
       svelte: ^5.0.0-next.96 || ^5.0.0
       vite: ^5.0.0
+
+  '@tanstack/query-core@5.55.4':
+    resolution: {integrity: sha512-uoRqNnRfzOH4OMIoxj8E2+Us89UIGXfau981qYJWsNMkFS1GXR4UIyzUTVGq4N7SDLHgFPpo6IOazqUV5gkMZA==}
+
+  '@tanstack/svelte-query@5.55.4':
+    resolution: {integrity: sha512-fs4yDQ6gzZu0dOJPMFNpl+wF4RQNv46UWpVQm0YtU07+QqTjloARmlariIUE52U8h3VQ52zU8X/TwlGSeuzfXA==}
+    peerDependencies:
+      svelte: ^3.54.0 || ^4.0.0 || ^5.0.0-next.0
 
   '@types/cookie@0.6.0':
     resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
@@ -2356,6 +2367,13 @@ snapshots:
       vitefu: 0.2.5(vite@5.4.2)
     transitivePeerDependencies:
       - supports-color
+
+  '@tanstack/query-core@5.55.4': {}
+
+  '@tanstack/svelte-query@5.55.4(svelte@5.0.0-next.241)':
+    dependencies:
+      '@tanstack/query-core': 5.55.4
+      svelte: 5.0.0-next.241
 
   '@types/cookie@0.6.0': {}
 

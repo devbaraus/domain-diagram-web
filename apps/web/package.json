@@ -43,6 +43,7 @@
 	"type": "module",
 	"dependencies": {
 		"@directus/sdk": "^17.0.0",
+		"@tanstack/svelte-query": "^5.55.4",
 		"lodash": "^4.17.21",
 		"lucide-svelte": "^0.438.0",
 		"tree-sitter": "^0.21.1",

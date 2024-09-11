@@ -2,6 +2,11 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+@font-face {
+    font-family: 'Fira Code';
+    src: url('/fonts/FiraCode-Regular.ttf') format('truetype');
+}
+
 .tooltip::before {
     z-index: 9999 !important;
 }

@@ -6,7 +6,8 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				"poppins": ["Poppins", "sans-serif"]
+				"poppins": ["Inter", "sans-serif"],
+				"fira": ["Fira Code", "monospace"]
 			}
 		}
 	},

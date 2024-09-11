@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 
 export function diagram(el: HTMLDivElement, value: Diagram) {
     let editor = null
+    let fixed = false
 
     editorInstance.subscribe(value => editor = value);
 
@@ -12,6 +13,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         .attr("height", '100%')
         .attr("viewBox", `0 0 ${el.getBoundingClientRect().width} ${el.getBoundingClientRect().height}`)
         .call(d3.zoom().on("zoom", function (event) {
+            fixed = true;
             svgGroup.attr("transform", event.transform);
         }))
 
@@ -35,8 +37,76 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         "enum": "#e31a1c",
         "value_object": "#ff7f00",
         "service": "#6a3d9a",
-        "repository": "#b15928"
+        "event": "#99e1d9"
     };
+
+    function formatType(type: Type) {
+        return `${type.type}${type.nullable ? '?' : ''}${type.array ? '[]' : ''}`
+    }
+
+    function drawValues(node: any, values: string[], offset: number) {
+        const valuesGroup = node.append("g")
+            .attr("class", "values")
+            .selectAll("text")
+            .data(values)
+            .enter();
+
+        valuesGroup.append("text")
+            .attr("x", 10)
+            .attr("y", (_: never, i: number) => 40 + (offset + i) * lineHeigth + lineHeigth / 2)
+            .attr("dy", ".35em")
+            .attr("text-anchor", "start")
+            .attr("fill", backgroundColors.property)
+            .text((value: string) => value);
+    }
+
+    function drawProperties(node: any, properties: Property[], offset: number) {
+        const propertiesGroup = node.append("g")
+            .attr("class", "properties")
+            .selectAll("text")
+            .data(properties)
+            .enter();
+
+        propertiesGroup.append("text")
+            .attr("x", 10)
+            .attr("y", (_: never, i: number) => 40 + (offset + i) * lineHeigth + lineHeigth / 2)
+            .attr("dy", ".35em")
+            .attr("text-anchor", "start")
+            .attr("fill", backgroundColors.property)
+            .text((prop: Property) => prop.name);
+
+        propertiesGroup.append("text")
+            .attr("x", 310)
+            .attr("y", (_: never, i: number) => 40 + (offset + i) * lineHeigth + lineHeigth / 2)
+            .attr("dy", ".35em")
+            .attr("text-anchor", "end")
+            .attr("fill", backgroundColors.type)
+            .text((prop: Property) => formatType(prop));
+    }
+
+    function drawMethods(node: any, methods: Method[], offset: number) {
+        const methodsGroup = node.append("g")
+            .attr("class", "methods")
+            .selectAll("text")
+            .data(methods)
+            .enter();
+
+        methodsGroup.append("text")
+            .attr("x", 10)
+            .attr("y", (_: never, i: number) => 40 + (offset + i) * lineHeigth + lineHeigth / 2)
+            .attr("dy", ".35em")
+            .attr("text-anchor", "start")
+            .attr("fill", backgroundColors.property)
+            .text((method: Method) => `${method.name}(${method.parameters.map(p => p.name).join(', ')})`);
+
+        methodsGroup.append("text")
+            .attr("x", 310)
+            .attr("y", (_: never, i: number) => 40 + (offset + i) * lineHeigth + lineHeigth / 2)
+            .attr("dy", ".35em")
+            .attr("text-anchor", "end")
+            .attr("fill", backgroundColors.type)
+            .text((method: Method) => formatType(method.return));
+    }
 
     // Function to zoom and fit the diagram to the viewport
     function zoomToFit() {
@@ -58,12 +128,14 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
     function draw(value: Diagram) {
         // Define links based on entity properties
         // const domainEntities = [value.aggregates, value.entities, value.valueObjects].flat()
-        const domainEntities = [value.aggregates, value.entities, value.valueObjects, value.enums].flat()
+        const domainEntities = [value.aggregates, value.entities, value.valueObjects, value.enums, value.events, value.services].flat()
 
-        const domainLinks = domainEntities.map(domain => {
+        const domainEntitiesToLink = [value.aggregates, value.entities, value.valueObjects, value.enums].flat()
+
+        const domainLinks = domainEntitiesToLink.map(domain => {
             return domain.properties?.map(prop => {
                 return {
-                    source: domain.name, target: domainEntities.find(e => {
+                    source: domain.name, target: domainEntitiesToLink.find(e => {
                         if ('id' in e) return prop.type === e.id;
                         if ('ids' in e) return e.ids.includes(prop.type);
                         return false;
@@ -91,7 +163,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             .enter()
             .append("g")
             .attr("id", d => d.name)
-            .attr("class", (d) => `${d.type} hover:cursor-pointer`)
+            .attr("class", (d) => `${d.type} hover:cursor-pointer tooltip`)
             .on("mouseover", function (event, d) {
                 d3.select(this).select("rect").attr("stroke", "black");
                 links.attr("stroke", l => {
@@ -143,96 +215,35 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             .text(d => d.name);
 
         // Add properties to aggregate nodes
-        svgGroup.selectAll(".aggregate").each(function (d) {
-            const props = d3.select(this).selectAll(".property")
-                .data(d.properties)
-                .enter();
+        svgGroup.selectAll(".aggregate").each(function (d: Aggregate) {
+            drawProperties(d3.select(this), d.properties, 0);
 
-            props.append("text")
-                .attr("class", "property")
-                .attr("x", 10)
-                .attr("y", (prop, i) => 40 + i * lineHeigth + lineHeigth / 2)
-                .attr("dy", ".35em")
-                .attr("text-anchor", "start")
-                .attr("fill", backgroundColors.property)
-                .text(prop => prop.name);
-
-            props.append("text")
-                .attr("class", "property_type")
-                .attr("x", nodeWidth - 10)
-                .attr("y", (prop, i) => 40 + i * lineHeigth + lineHeigth / 2)
-                .attr("dy", ".35em")
-                .attr("text-anchor", "end")
-                .attr("fill", backgroundColors.type)
-                .text(prop => `${prop.type}${prop.nullable ? '?' : ''}${prop.array ? '[]' : ''}`);
+            drawMethods(d3.select(this), d.methods, d.properties.length);
         });
 
         // Add properties to entity nodes
         svgGroup.selectAll(".entity").each(function (d) {
-            const props = d3.select(this).selectAll(".property")
-                .data(d.properties)
-                .enter();
+            drawProperties(d3.select(this), d.properties, 0);
 
-            props.append("text")
-                .attr("class", "property")
-                .attr("x", 10)
-                .attr("y", (prop, i) => 40 + i * lineHeigth + lineHeigth / 2)
-                .attr("dy", ".35em")
-                .attr("text-anchor", "start")
-                .attr("fill", backgroundColors.property)
-                .text(prop => prop.name);
-
-            props.append("text")
-                .attr("class", "property_type")
-                .attr("x", nodeWidth - 10)
-                .attr("y", (prop, i) => 40 + i * lineHeigth + lineHeigth / 2)
-                .attr("dy", ".35em")
-                .attr("text-anchor", "end")
-                .attr("fill", backgroundColors.type)
-                .text(prop => `${prop.type}${prop.nullable ? '?' : ''}${prop.array ? '[]' : ''}`);
-
+            drawMethods(d3.select(this), d.methods, d.properties.length);
         });
 
         // Add properties to value object nodes
         svgGroup.selectAll(".value_object").each(function (d) {
-            const props = d3.select(this).selectAll(".property")
-                .data(d.properties)
-                .enter();
-
-            props.append("text")
-                .attr("class", "property")
-                .attr("x", 10)
-                .attr("y", (prop, i) => 40 + i * lineHeigth + lineHeigth / 2)
-                .attr("dy", ".35em")
-                .attr("text-anchor", "start")
-                .attr("fill", backgroundColors.property)
-                .text(prop => prop.name);
-
-            props.append("text")
-                .attr("class", "property_type")
-                .attr("x", nodeWidth - 10)
-                .attr("y", (prop, i) => 40 + i * lineHeigth + lineHeigth / 2)
-                .attr("dy", ".35em")
-                .attr("text-anchor", "end")
-                .attr("fill", backgroundColors.type)
-                .text(prop => `${prop.type}${prop.nullable ? '?' : ''}${prop.array ? '[]' : ''}`);
-
+            drawProperties(d3.select(this), d.properties, 0);
         });
 
         // Add enum values to nodes
         svgGroup.selectAll(".enum").each(function (d) {
-            const values = d3.select(this).selectAll(".value")
-                .data(d.values ?? [])
-                .enter();
+            drawValues(d3.select(this), d.values, 0);
+        });
 
-            values.append("text")
-                .attr("class", "value")
-                .attr("x", 10)
-                .attr("y", (value, i) => 40 + i * lineHeigth + lineHeigth / 2)
-                .attr("dy", ".35em")
-                .attr("text-anchor", "start")
-                .attr("fill", backgroundColors.property)
-                .text(value => value);
+        svgGroup.selectAll(".event").each(function (d) {
+            drawProperties(d3.select(this), d.properties, 0);
+        });
+
+        svgGroup.selectAll(".service").each(function (d) {
+            drawMethods(d3.select(this), d.methods, 0);
         });
 
         // Manually position nodes in a Masonry layout
@@ -332,8 +343,9 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         //     }
         // });
 
-
-        zoomToFit();
+        if (!fixed) {
+            zoomToFit();
+        }
     }
 
     return {

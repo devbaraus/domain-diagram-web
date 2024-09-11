@@ -1,31 +1,16 @@
 <script>
 	import { page } from '$app/stores';
 	import ProjectCreateButton from '$lib/components/projects/project-create-button.svelte';
+	import { listProjects } from '$lib/services/project-service.svelte';
+	import { createQuery } from '@tanstack/svelte-query';
+	import { getAvatarColor, getAvatarName } from '$lib';
 
-	let projects = $page.data.items;
-
-	function getAvatarName(name) {
-		let res = name.split(' ');
-
-		if (res.length > 1) {
-			return res[0][0] + res[1][0];
-		}
-
-		return res[0][0] + res[0][1];
-	}
-
-	function stringToColour(str) {
-		let hash = 0;
-		str.split('').forEach((char) => {
-			hash = char.charCodeAt(0) + ((hash << 5) - hash);
-		});
-		let colour = '#';
-		for (let i = 0; i < 3; i++) {
-			const value = (hash >> (i * 8)) & 0xff;
-			colour += value.toString(16).padStart(2, '0');
-		}
-		return colour;
-	}
+	$: query = createQuery({
+		queryKey: ['list-projects'],
+		queryFn: async () =>
+			await listProjects($page.data.session, { filter: { user_created: $page.data.user.id } }),
+		initialData: $page.data.items
+	});
 </script>
 
 <svelte:head>
@@ -59,20 +44,15 @@
 	<aside class="h-[calc(100dvh_-_64px)] max-h-[calc(100dvh_-_64px)] w-16 space-y-2 p-2">
 		<ProjectCreateButton />
 
-		{#each projects as project}
+		{#each $query.data as project}
 			<div class="tooltip tooltip-right z-20" data-tip={project.name}>
 				<a href={`/d/${project.id}`}>
 					<div
 						class="mask mask-circle flex size-12 items-center justify-center uppercase"
-						style={`background-color: ${stringToColour(project.name)}50;`}
+						style={`background-color: ${getAvatarColor(project.name)}50;`}
 					>
 						{getAvatarName(project.name)}
 					</div>
-					<!-- <img
-						class="mask mask-circle w-12"
-						alt={`Project Avatar: ${project.name}`}
-						src={`https://avatar.iran.liara.run/username?username=${project.name}`}
-					/> -->
 				</a>
 			</div>
 		{/each}

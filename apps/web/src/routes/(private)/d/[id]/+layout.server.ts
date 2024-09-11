@@ -6,7 +6,6 @@ export const load: PageServerLoad = async ({ locals, parent, depends }) => {
 
     let res = await listProjects(locals.session, { filter: { user_created: locals.user.id } })
 
-    depends('project:created')
 
     return {
         items: res,

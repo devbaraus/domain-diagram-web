@@ -78,6 +78,15 @@ declare type Service = {
     position: Position
 }
 
+declare type DomainEvent = {
+    id: string,
+    name: string;
+    type: string;
+    line: number;
+    properties: Property[];
+    position: Position
+}
+
 declare type Repository = {
     id: string,
     name: string;
@@ -98,6 +107,7 @@ declare type Context = {
     enums: string[];
     services: string[];
     repositories: string[];
+    events: string[];
     position: Position
 }
 
@@ -106,6 +116,7 @@ declare type Diagram = {
     entities: Entity[];
     valueObjects: ValueObject[];
     enums: Enum[];
+    events: DomainEvent[];
     services: Service[];
     repositories: Repository[];
     contexts: Context[];

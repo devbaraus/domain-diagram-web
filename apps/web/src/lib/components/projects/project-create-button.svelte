@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { goto, invalidate, invalidateAll } from '$app/navigation';
-	import { page } from '$app/stores';
-	import { createProject } from '$lib/services/project-service.svelte';
+	import { goto } from '$app/navigation';
 	import { PlusIcon } from 'lucide-svelte';
+	import { createQuery, QueryClient } from '@tanstack/svelte-query';
+	import { queryClient } from '$lib/client';
 
 	let loading = false;
 	let modal: HTMLDialogElement;
-
 </script>
 
 <div class="tooltip tooltip-right" data-tip="New project">
@@ -29,9 +28,10 @@
 					if (result.status === 200) {
 						loading = false;
 						modal.close();
-						goto(`/d/${result.data.item.id}`, {
-							invalidateAll: true
+						await $queryClient.invalidateQueries({
+							queryKey: ['list-projects']
 						});
+						goto(`/d/${result.data.item.id}`);
 					}
 				};
 			}}
