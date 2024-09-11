@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { editor, model, monaco } from '$lib/store';
+	import _ from 'lodash';
 	import { onMount } from 'svelte';
 
 	let el: HTMLDivElement;
@@ -39,6 +40,14 @@
 			$monaco?.editor.getModels().forEach((model) => model.dispose());
 			$editor?.dispose();
 		};
+	});
+
+	$effect(() => {
+		if (_.isEqual($model?.getValue(), data.value)) {
+			return;
+		}
+
+		$model?.setValue(data.value);
 	});
 </script>
 
