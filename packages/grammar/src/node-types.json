@@ -78,6 +78,10 @@
           "named": true
         },
         {
+          "type": "comment",
+          "named": true
+        },
+        {
           "type": "entity",
           "named": true
         },
@@ -91,10 +95,6 @@
         },
         {
           "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "repository",
           "named": true
         },
         {
@@ -289,25 +289,6 @@
     }
   },
   {
-    "type": "repository",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "method",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "service",
     "named": true,
     "fields": {},
@@ -339,6 +320,10 @@
           "named": true
         },
         {
+          "type": "comment",
+          "named": true
+        },
+        {
           "type": "context",
           "named": true
         },
@@ -352,10 +337,6 @@
         },
         {
           "type": "event",
-          "named": true
-        },
-        {
-          "type": "repository",
           "named": true
         },
         {
@@ -535,10 +516,6 @@
     "named": false
   },
   {
-    "type": "Repository",
-    "named": false
-  },
-  {
     "type": "Service",
     "named": false
   },
@@ -565,6 +542,10 @@
   {
     "type": "]",
     "named": false
+  },
+  {
+    "type": "comment",
+    "named": true
   },
   {
     "type": "false",

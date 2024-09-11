@@ -11,13 +11,14 @@ module.exports = grammar({
     // Definitions
     _definition: ($) =>
       choice(
+        $.comment,
         $.aggregate,
         $.entity,
         $.value_object,
         $.enum,
         $.event,
         $.service,
-        $.repository,
+        // $.repository,
         $.context,
       ),
 
@@ -29,17 +30,20 @@ module.exports = grammar({
         "{",
         repeat(
           choice(
+            $.comment,
             $.aggregate,
             $.entity,
             $.value_object,
             $.enum,
             $.event,
             $.service,
-            $.repository,
+            // $.repository,
           ),
         ),
         "}",
       ),
+
+    comment: ($) => token(seq("//", /.*/)),
 
     // Aggregate definition (with optional generic type)
     aggregate: ($) =>
@@ -87,9 +91,9 @@ module.exports = grammar({
         "}",
       ),
 
-    // Repository definition
-    repository: ($) =>
-      seq("Repository", $.identifier, "{", repeat($.method), "}"),
+    // // Repository definition
+    // repository: ($) =>
+    //   seq("Repository", $.identifier, "{", repeat($.method), "}"),
 
     // Enum definition
     enum: ($) => seq("Enum", $.identifier, "{", repeat($.enum_value), "}"),
