@@ -284,64 +284,6 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             return `M${sourceNode.position.x + nodeWidth / 2},${sourceNode.position.y + 30}A${dr},${dr} 0 0,1 ${targetNode.position.x + nodeWidth / 2},${targetNode.position.y + 30}`;
         });
 
-        // link.attr("d", function (d) {
-        //     const sourceNode = entities.find(entity => entity.id === d.source);
-        //     const targetNode = entities.find(entity => entity.id === d.target);
-        //     if (!sourceNode || !targetNode) return '';
-
-        //     const sourceX = sourceNode.x + nodeWidth / 2;
-        //     const sourceY = sourceNode.y + 30;
-        //     const targetX = targetNode.x + nodeWidth / 2;
-        //     const targetY = targetNode.y + 30;
-
-        //     if (sourceX === targetX) {
-        //         // Alinhamento vertical
-        //         return `M${sourceX},${sourceY}L${targetX},${targetY}`;
-        //     } else if (sourceY === targetY) {
-        //         // Alinhamento horizontal
-        //         return `M${sourceX},${sourceY}L${targetX},${targetY}`;
-        //     } else {
-        //         // Link com curvas de 90º
-        //         const midX = (sourceX + targetX) / 2;
-        //         const midY = (sourceY + targetY) / 2;
-        //         return `M${sourceX},${sourceY}L${midX},${sourceY}L${midX},${targetY}L${targetX},${targetY}`;
-        //     }
-        // });
-
-        // link.attr("d", function (d) {
-        //     const sourceNode = entities.find(entity => entity.id === d.source);
-        //     const targetNode = entities.find(entity => entity.id === d.target);
-        //     if (!sourceNode || !targetNode) return '';
-
-        //     const sourceX = sourceNode.x + nodeWidth / 2;
-        //     const sourceY = sourceNode.y + 30;
-        //     const targetX = targetNode.x + nodeWidth / 2;
-        //     const targetY = targetNode.y + 30;
-        //     const radius = 15; // Raio das bordas arredondadas
-
-        //     if (sourceX === targetX) {
-        //         // Alinhamento vertical
-        //         return `M${sourceX},${sourceY}L${targetX},${targetY}`;
-        //     } else if (sourceY === targetY) {
-        //         // Alinhamento horizontal
-        //         return `M${sourceX},${sourceY}L${targetX},${targetY}`;
-        //     } else {
-        //         // Link com curvas de 90º e bordas arredondadas
-        //         const horizontalDir = targetX > sourceX ? 1 : -1;
-        //         const verticalDir = targetY > sourceY ? 1 : -1;
-
-        //         const midX = sourceX + horizontalDir * radius;
-        //         const midY = sourceY + verticalDir * radius;
-
-        //         return `
-        //             M${sourceX},${sourceY}
-        //             L${midX},${sourceY}
-        //             A${radius},${radius} 0 0,${horizontalDir === 1 ? 1 : 0} ${midX},${midY}
-        //             L${midX},${targetY - verticalDir * radius}
-        //             A${radius},${radius} 0 0,${verticalDir === 1 ? 1 : 0} ${midX + horizontalDir * radius},${targetY}
-        //             L${targetX},${targetY}`;
-        //     }
-        // });
 
         if (!fixed) {
             zoomToFit();
