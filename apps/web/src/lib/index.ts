@@ -32,6 +32,10 @@ Entity<SomeEntityID> SomeEntity {
 `;
 
 export function getAvatarName(name: string) {
+    if (!name) {
+        return 'U';
+    }
+
     let res = name.split(' ');
 
     if (res.length > 1) {

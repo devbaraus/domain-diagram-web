@@ -10,7 +10,7 @@
 </script>
 
 <div class="tooltip tooltip-right" data-tip="New project">
-	<button onclick={() => modal.showModal()} class="mask mask-circle btn size-12">
+	<button onclick={() => modal.showModal()} class="mask mask-squircle btn size-12">
 		<PlusIcon class="w-16" />
 	</button>
 </div>

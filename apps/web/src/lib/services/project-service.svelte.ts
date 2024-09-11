@@ -1,6 +1,6 @@
 import { grammar } from "$lib";
 import { directusClient } from "$lib/client";
-import { createItem, readItem, readItems, updateItem, type Query } from "@directus/sdk";
+import { createItem, deleteItem, readItem, readItems, updateItem, type Query } from "@directus/sdk";
 
 export async function createProject(name: string, token: string) {
     await directusClient.setToken(token)
@@ -33,4 +33,10 @@ export async function listProjects(token: string, query?: Query<any, any>) {
         sort: ["-date_updated"],
         ...query
     }));
+}
+
+export async function deleteProject(id: string | number, token: string) {
+    await directusClient.setToken(token)
+
+    return directusClient.request(deleteItem("projects", id));
 }

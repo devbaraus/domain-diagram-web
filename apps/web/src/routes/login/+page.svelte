@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
+	import { goto } from '$app/navigation';
+	import { queryClient } from '$lib/client';
 </script>
 
 <div class="flex min-h-screen items-center justify-center self-center">
@@ -7,7 +10,22 @@
 		<!-- <h3 class="text-base-content/70 mt-2 text-center text-sm">
 			Seamless Access, Secure Connection: Your Gateway to a Personalized Experience.
 		</h3> -->
-		<form method="post" class="mt-6 w-96 md:mt-10">
+		<form
+			method="post"
+			use:enhance={() => {
+				return async ({ result }) => {
+					if (result.status === 302 || result.status === 200) {
+						await $queryClient.invalidateQueries({
+							queryKey: ['list-projects']
+						});
+						goto('/d');
+					} else {
+						alert('Invalid credentials');
+					}
+				};
+			}}
+			class="mt-6 w-96 md:mt-10"
+		>
 			<div>
 				<div class="form-control">
 					<label for="email" class="label"
