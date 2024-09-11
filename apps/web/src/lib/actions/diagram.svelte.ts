@@ -1,7 +1,9 @@
 import { editorInstance } from '$lib/store';
 import * as d3 from 'd3';
+import _ from 'lodash';
 
 export function diagram(el: HTMLDivElement, value: Diagram) {
+    let diagram: Diagram = value;
     let editor = null
     let fixed = false
 
@@ -22,8 +24,8 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
     const nodeWidth = 320; // Width of each node
     const lineHeigth = 30;
-    const columnGap = 40; // Gap between columns
-    const rowGap = 40; // Gap between rows
+    const columnGap = 60; // Gap between columns
+    const rowGap = 60; // Gap between rows
     const columns = 4; // Number of columns
 
 
@@ -125,7 +127,25 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         svgGroup.attr("transform", `translate(${translate[0]}, ${translate[1]}) scale(${scale})`);
     }
 
+    // Helper function to find the closest port based on a target position
+    function findClosestPorts(sourcePorts: any, targetPorts: any) {
+        const distances = Object.keys(sourcePorts).map(sourcePort => {
+            return Object.keys(targetPorts).map(targetPort => {
+                const dx = Math.abs(targetPorts[targetPort].x - sourcePorts[sourcePort].x)
+                const dy = Math.abs(targetPorts[targetPort].y - sourcePorts[sourcePort].y);
+                return { sourcePort, targetPort, distance: Math.sqrt(dx * dx + dy * dy) };
+            });
+        });
+
+        const closest = distances.flat().reduce((acc, curr) => {
+            return acc.distance < curr.distance ? acc : curr;
+        });
+
+        return { source: closest.sourcePort, target: closest.targetPort };
+    }
+
     function draw(value: Diagram) {
+        diagram = value;
         // Define links based on entity properties
         // const domainEntities = [value.aggregates, value.entities, value.valueObjects].flat()
         const domainEntities = [value.aggregates, value.entities, value.valueObjects, value.enums, value.events, value.services].flat()
@@ -154,6 +174,27 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             .attr("stroke", "lightgrey")
             .attr("stroke-width", 1)
             .attr("fill", "none");
+
+        const linkIcons = svgGroup.append("g")
+            .attr("class", "link-icons")
+            .selectAll("circle")
+            .data(domainLinks)
+            .enter()
+            .append("circle")
+            .attr("r", 5)
+            .attr("fill", "red")
+            .attr("cx", d => {
+                const targetNode = domainEntities.find(
+                    entity => entity.name === d.target
+                );
+                return targetNode ? targetNode.position.x + nodeWidth / 2 : 0;
+            })
+            .attr("cy", d => {
+                const targetNode = domainEntities.find(
+                    entity => entity.name === d.target
+                );
+                return targetNode ? targetNode.position.y + 30 : 0;
+            });
 
         // Create nodes
         const nodes = svgGroup.append("g")
@@ -262,27 +303,91 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             return `translate(${x}, ${y})`;
         });
 
-        links.attr("d", function (d) {
-            const sourceNode = domainEntities.find(entity => {
-                if ('id' in entity) return entity.id === d.source;
-                if ('ids' in entity) return entity.ids.includes(d.source);
-                return false;
-            });
+        // Add ports to each node (center-top, middle-right, middle-left, center-bottom)
+        nodes.each(function (d) {
+            const bounds = d3.select(this).node().getBBox();
+            const position = d.position;
 
-            const targetNode = domainEntities.find(
-                entity => {
-                    if ('id' in entity) return entity.id === d.target;
-                    if ('ids' in entity) return entity.ids.includes(d.target);
-                    return false;
-                }
-            );
-            if (!sourceNode || !targetNode) return '';
+            // Define ports
+            const ports = {
+                top: { x: bounds.width / 2, y: 0 },
+                right: { x: bounds.width, y: bounds.height / 2 },
+                bottom: { x: bounds.width / 2, y: bounds.height },
+                left: { x: 0, y: bounds.height / 2 }
+            };
 
-            const dx = targetNode.position.x - sourceNode.position.x;
-            const dy = targetNode.position.y - sourceNode.position.y;
-            const dr = Math.sqrt(dx * dx + dy * dy);
-            return `M${sourceNode.position.x + nodeWidth / 2},${sourceNode.position.y + 30}A${dr},${dr} 0 0,1 ${targetNode.position.x + nodeWidth / 2},${targetNode.position.y + 30}`;
+            // Append ports to the node
+            // const portsGroup = d3.select(this).append("g").attr("class", "ports");
+            // portsGroup.append("circle").attr("cx", ports.top.x).attr("cy", ports.top.y).attr("r", 4).attr("fill", "blue");
+            // portsGroup.append("circle").attr("cx", ports.right.x).attr("cy", ports.right.y).attr("r", 4).attr("fill", "blue");
+            // portsGroup.append("circle").attr("cx", ports.bottom.x).attr("cy", ports.bottom.y).attr("r", 4).attr("fill", "blue");
+            // portsGroup.append("circle").attr("cx", ports.left.x).attr("cy", ports.left.y).attr("r", 4).attr("fill", "blue");
+
+            const absolutePorts = {
+                top: { x: position.x + ports.top.x, y: position.y + ports.top.y },
+                right: { x: position.x + ports.right.x, y: position.y + ports.right.y },
+                bottom: { x: position.x + ports.bottom.x, y: position.y + ports.bottom.y },
+                left: { x: position.x + ports.left.x, y: position.y + ports.left.y }
+            }
+
+            // Store the port positions in the node data for easy access later
+            d.ports = absolutePorts;
         });
+
+
+        // links.attr("d", function (d) {
+        //     const sourceNode = domainEntities.find(entity => {
+        //         if ('id' in entity) return entity.id === d.source;
+        //         if ('ids' in entity) return entity.ids.includes(d.source);
+        //         return false;
+        //     });
+
+        //     const targetNode = domainEntities.find(
+        //         entity => {
+        //             if ('id' in entity) return entity.id === d.target;
+        //             if ('ids' in entity) return entity.ids.includes(d.target);
+        //             return false;
+        //         }
+        //     );
+        //     if (!sourceNode || !targetNode) return '';
+
+        //     const dx = targetNode.position.x - sourceNode.position.x;
+        //     const dy = targetNode.position.y - sourceNode.position.y;
+        //     const dr = Math.sqrt(dx * dx + dy * dy);
+        //     return `M${sourceNode.position.x + nodeWidth / 2},${sourceNode.position.y + 30}A${dr},${dr} 0 0,1 ${targetNode.position.x + nodeWidth / 2},${targetNode.position.y + 30}`;
+        // });
+
+        links.attr("d", function (d) {
+            const sourceNode = d3.select(`#${d.source}`).datum();
+            const targetNode = d3.select(`#${d.target}`).datum();
+
+            // // Get source and target port positions and reajust to the node position
+            const sourcePorts = sourceNode.ports
+            const targetPorts = targetNode.ports;
+
+
+            const closestPorts = findClosestPorts(sourcePorts, targetPorts); // Calculate distances between ports to find the closest connection points
+
+
+            // // Return a straight path between the nearest source and target ports
+            return `M${sourcePorts[closestPorts.source].x},${sourcePorts[closestPorts.source].y}L${targetPorts[closestPorts.target].x},${targetPorts[closestPorts.target].y}`;
+
+            // Return a curved path between the nearest source and target ports
+            return `M${sourcePorts[closestPorts.source].x},${sourcePorts[closestPorts.source].y}A${sourcePorts[closestPorts.source].x},${sourcePorts[closestPorts.source].y + 50} ${targetPorts[closestPorts.target].x},${targetPorts[closestPorts.target].y}`;
+        });
+
+        // linkIcons.attr("cx", d => {
+        //     const targetNode = domainEntities.find(
+        //         entity => entity.name === d.target
+        //     );
+        //     return targetNode ? targetNode.position.x + nodeWidth / 2 : 0;
+        // }
+        // ).attr("cy", d => {
+        //     const targetNode = domainEntities.find(
+        //         entity => entity.name === d.target
+        //     );
+        //     return targetNode ? targetNode.position.y + 30 : 0;
+        // });
 
 
         if (!fixed) {
@@ -292,6 +397,10 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
     return {
         update(value: Diagram) {
+            if (_.isEqual(value, diagram)) {
+                return;
+            }
+
             svgGroup.selectAll('*').remove();
             draw(value);
         },
