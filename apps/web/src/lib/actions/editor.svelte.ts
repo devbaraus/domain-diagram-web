@@ -1,6 +1,6 @@
 import { editorInstance } from '$lib/store';
 import type * as Monaco from 'monaco-editor/esm/vs/editor/editor.api';
-import { getContext, onMount, setContext } from 'svelte';
+import { onMount } from 'svelte';
 
 export function editor(el: HTMLElement, value: string) {
     let editor: Monaco.editor.IStandaloneCodeEditor = $state(null);
@@ -15,6 +15,7 @@ export function editor(el: HTMLElement, value: string) {
         editor = monaco.editor.create(el, {
             theme: 'default',
             wordWrap: 'on',
+            fontFamily: 'Fira Code',
             scrollBeyondLastLine: false,
             minimap: { enabled: false },
         });

@@ -1,49 +1,248 @@
 import * as monaco from 'monaco-editor';
 
-// Import the workers in a production-safe way.
-// This is different than in Monaco's documentation for Vite,
-// but avoids a weird error ("Unexpected usage") at runtime
-// import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-// import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
-// import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
-// import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
-// import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
-
-// self.MonacoEnvironment = {
-//     getWorker: function (_: string, label: string) {
-//         switch (label) {
-//             case 'json':
-//                 return new jsonWorker();
-//             case 'css':
-//             case 'scss':
-//             case 'less':
-//                 return new cssWorker();
-//             case 'html':
-//             case 'handlebars':
-//             case 'razor':
-//                 return new htmlWorker();
-//             case 'typescript':
-//             case 'javascript':
-//                 return new tsWorker();
-//             default:
-//                 return new editorWorker();
-//         }
-//     }
-// };
-
 monaco.languages.register({ id: 'ddd' });
-
 
 monaco.languages.setMonarchTokensProvider('ddd', {
   tokenizer: {
     root: [
-      [/\b(AggregateRoot|Aggregate|Entity|ValueObject|Enum|DomainEvente|Event|BoundedContext|Context|DomainService|Service|Repository)\b/, 'keyword'],
-      [/\b(UUID|String|Boolean|Float|Int|Date|Null)\b/, 'type'],
-      [/\b[a-zA-Z_][a-zA-Z0-9_]*\b/, 'identifier'],
-      [/{|}/, 'delimiter.bracket'],
-      [/:/, 'delimiter'],
-      [/\[|\]/, 'delimiter.square'],
+      // Keywords
+      [/\b(Context|BoundedContext|Aggregate|AggregateRoot|Entity|ValueObject|DomainEvent|Event|DomainService|Service|Enum)\b/, "keyword"],
+
+      // Types (String, Int, UUID, etc.)
+      [/\b(String|Int|UUID|Boolean|Float|Date|Null)\b/, "type"],
+
+      // Identifiers (variables, types)
+      [/[a-zA-Z_]\w*/, "identifier"],
+
+      // Operators
+      [/\{|\}|\(|\)|\?|\[|\]/, "delimiter"],
+
+      // Values (strings, numbers, booleans, null)
+      [/"[^"]*"/, "string"],
+      [/\b-?\d+(\.\d+)?\b/, "number"],
+      [/\b(true|false|null)\b/, "constant"],
+
+      // Comments
+      [/\/\/.*$/, "comment"],
     ],
+  },
+});
+
+monaco.languages.registerCompletionItemProvider("ddd", {
+  provideCompletionItems: () => {
+    const suggestions = [
+      // Keywords
+      {
+        label: 'Context',
+        kind: monaco.languages.CompletionItemKind.Keyword,
+        insertText: 'Context ${1:ContextName} {\n\t$0\n}',
+        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        documentation: 'Defines a new context',
+      },
+      {
+        label: 'Aggregate',
+        kind: monaco.languages.CompletionItemKind.Keyword,
+        insertText: 'Aggregate<${1:AggregateIdentifier}> ${2:AggregateName} {\n\t$0\n}',
+        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        documentation: 'Defines a new aggregate',
+      },
+      {
+        label: 'Entity',
+        kind: monaco.languages.CompletionItemKind.Keyword,
+        insertText: 'Entity<${1:EntityIdentifier}> ${2:EntityName} {\n\t$0\n}',
+        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        documentation: 'Defines a new entity',
+      },
+      {
+        label: 'ValueObject',
+        kind: monaco.languages.CompletionItemKind.Keyword,
+        insertText: 'ValueObject ${1:ValueObjectName} {\n\t$0\n}',
+        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        documentation: 'Defines a new value object',
+      },
+      {
+        label: 'Enum',
+        kind: monaco.languages.CompletionItemKind.Keyword,
+        insertText: 'Enum ${1:EnumName} {\n\t$0\n}',
+        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        documentation: 'Defines a new enum',
+      },
+      {
+        label: 'Event',
+        kind: monaco.languages.CompletionItemKind.Keyword,
+        insertText: 'Event ${1:EventName} {\n\t$0\n}',
+        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        documentation: 'Defines a new domain event',
+      },
+      {
+        label: 'Service',
+        kind: monaco.languages.CompletionItemKind.Keyword,
+        insertText: 'Service ${1:ServiceName} {\n\t$0\n}',
+        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        documentation: 'Defines a new service',
+      },
+      // Primitive types
+      {
+        label: 'String',
+        kind: monaco.languages.CompletionItemKind.TypeParameter,
+        insertText: 'String',
+        documentation: 'Primitive type: String',
+      },
+      {
+        label: 'Int',
+        kind: monaco.languages.CompletionItemKind.TypeParameter,
+        insertText: 'Int',
+        documentation: 'Primitive type: Int',
+      },
+      {
+        label: 'UUID',
+        kind: monaco.languages.CompletionItemKind.TypeParameter,
+        insertText: 'UUID',
+        documentation: 'Primitive type: UUID',
+      },
+      {
+        label: 'Boolean',
+        kind: monaco.languages.CompletionItemKind.TypeParameter,
+        insertText: 'Boolean',
+        documentation: 'Primitive type: Boolean',
+      },
+      {
+        label: 'Float',
+        kind: monaco.languages.CompletionItemKind.TypeParameter,
+        insertText: 'Float',
+        documentation: 'Primitive type: Float',
+      },
+      {
+        label: 'Date',
+        kind: monaco.languages.CompletionItemKind.TypeParameter,
+        insertText: 'Date',
+        documentation: 'Primitive type: Date',
+      },
+      {
+        label: 'Null',
+        kind: monaco.languages.CompletionItemKind.TypeParameter,
+        insertText: 'Null',
+        documentation: 'Primitive type: Null',
+      },
+      // Additional elements like methods, fields, and more can be added here...
+    ];
+
+    return { suggestions: suggestions };
+  },
+});
+
+monaco.languages.registerHoverProvider("ddd", {
+  provideHover: function (model, position) {
+    const word = model.getWordAtPosition(position);
+
+    // Define hover content for domain-specific keywords
+    const hoverContent = {
+      Context: {
+        contents: [
+          { value: "**Context**" },
+          { value: "Defines a bounded context where aggregates, entities, value objects, etc. reside." },
+          { value: "`Context ContextName { ... }`" }
+        ],
+      },
+      Aggregate: {
+        contents: [
+          { value: "**Aggregate**" },
+          { value: "Represents a cluster of associated objects treated as a unit." },
+          { value: "`Aggregate<AggregateIdentifier> AggregateName { ... }`" }
+        ],
+      },
+      Entity: {
+        contents: [
+          { value: "**Entity**" },
+          { value: "An object with identity that persists over time." },
+          { value: "`Entity<EntityIdentifier> EntityName { ... }`" }
+        ],
+      },
+      ValueObject: {
+        contents: [
+          { value: "**ValueObject**" },
+          { value: "An object that has no identity but represents a conceptual value." },
+          { value: "`ValueObject ValueObjectName { ... }`" }
+        ],
+      },
+      Enum: {
+        contents: [
+          { value: "**Enum**" },
+          { value: "Defines an enumeration, a fixed set of constant values." },
+          { value: "`Enum EnumName { Value1, Value2, ... }`" }
+        ],
+      },
+      Event: {
+        contents: [
+          { value: "**Event**" },
+          { value: "Represents a domain event, something that happened in the domain." },
+          { value: "`Event EventName { ... }`" }
+        ],
+      },
+      Service: {
+        contents: [
+          { value: "**Service**" },
+          { value: "Defines a domain service that handles business logic." },
+          { value: "`Service ServiceName { ... }`" }
+        ],
+      },
+      String: {
+        contents: [
+          { value: "**String**" },
+          { value: "A primitive data type representing textual data." }
+        ],
+      },
+      Int: {
+        contents: [
+          { value: "**Int**" },
+          { value: "A primitive data type representing an integer number." }
+        ],
+      },
+      UUID: {
+        contents: [
+          { value: "**UUID**" },
+          { value: "A universally unique identifier, commonly used for identifying entities." }
+        ],
+      },
+      Boolean: {
+        contents: [
+          { value: "**Boolean**" },
+          { value: "A primitive data type representing true/false values." }
+        ],
+      },
+      Float: {
+        contents: [
+          { value: "**Float**" },
+          { value: "A primitive data type representing a floating-point number." }
+        ],
+      },
+      Date: {
+        contents: [
+          { value: "**Date**" },
+          { value: "A primitive data type representing a calendar date." }
+        ],
+      },
+      Null: {
+        contents: [
+          { value: "**Null**" },
+          { value: "Represents a null or undefined value." }
+        ],
+      },
+    };
+
+    // Return the hover content for the word if it exists
+    if (word && hoverContent[word.word]) {
+      return {
+        range: new monaco.Range(
+          position.lineNumber,
+          word.startColumn,
+          position.lineNumber,
+          word.endColumn
+        ),
+        contents: hoverContent[word.word].contents,
+      };
+    }
+    return null;
   },
 });
 
