@@ -136,28 +136,23 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             return { x: 0, y: 0, width: layout.nodeWidth, height: 0 };
         }
 
-        // Initialize values for the combined bounding box
         let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
 
-        // Iterate over each selected element
         elements.each(function (d) {
             const bbox = d3.select(this).node().getBBox();
 
-            // Update the boundaries
             minX = Math.min(minX, bbox.x + d.position.x);
             minY = Math.min(minY, bbox.y + d.position.y);
             maxX = Math.max(maxX, bbox.x + bbox.width + d.position.x);
             maxY = Math.max(maxY, bbox.y + bbox.height + d.position.y);
         });
 
-        // Calculate the combined width and height
         const combinedWidth = maxX - minX;
         const combinedHeight = maxY - minY;
 
         return { x: minX, y: minY, width: combinedWidth, height: combinedHeight };
     }
 
-    // Function to zoom and fit the diagram to the viewport
     function zoomToFit() {
         const bounds = svgGroup.node().getBBox();
         const parent = svg.node().getBoundingClientRect();
@@ -174,7 +169,6 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         svgGroup.attr("transform", `translate(${translate[0]}, ${translate[1]}) scale(${scale})`);
     }
 
-    // Helper function to find the closest port based on a target position
     function findClosestPorts(sourcePorts: any, targetPorts: any) {
         const distances = Object.keys(sourcePorts).map(sourcePort => {
             return Object.keys(targetPorts).map(targetPort => {
@@ -194,7 +188,6 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
     function drawDomain(value: Diagram) {
         const domainEntities = [value.aggregates, value.entities, value.valueObjects, value.enums, value.events, value.services].flat()
 
-        // Create nodes
         nodes = svgGroup.append("g")
             .attr("class", "nodes")
             .selectAll("g")
@@ -227,7 +220,6 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
                 editor.focus();
             })
 
-        // Add rectangles for nodes
         nodes.append("rect")
             .attr("width", layout.nodeWidth)
             .attr("height", d => 50 + ((d.properties?.length ?? 0) + (d.methods?.length ?? 0) + (d.values?.length ?? 0)) * layout.lineHeigth)
@@ -235,7 +227,6 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             .attr("rx", 4)
             .attr("ry", 4);
 
-        // Add node headers
         nodes.append("rect")
             .attr("width", layout.nodeWidth - 2)
             .attr("height", 30)
@@ -253,26 +244,22 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             .attr("fill", backgroundColors.text)
             .text(d => d.name);
 
-        // Add properties to aggregate nodes
         svgGroup.selectAll(".aggregate").each(function (d: Aggregate) {
             drawProperties(d3.select(this), d.properties, 0);
 
             drawMethods(d3.select(this), d.methods, d.properties.length);
         });
 
-        // Add properties to entity nodes
         svgGroup.selectAll(".entity").each(function (d) {
             drawProperties(d3.select(this), d.properties, 0);
 
             drawMethods(d3.select(this), d.methods, d.properties.length);
         });
 
-        // Add properties to value object nodes
         svgGroup.selectAll(".value_object").each(function (d) {
             drawProperties(d3.select(this), d.properties, 0);
         });
 
-        // Add enum values to nodes
         svgGroup.selectAll(".enum").each(function (d) {
             drawValues(d3.select(this), d.values, 0);
         });
@@ -284,73 +271,23 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         svgGroup.selectAll(".service").each(function (d) {
             drawMethods(d3.select(this), d.methods, 0);
         });
-
-        // links.attr("d", function (d) {
-        //     const sourceNode = domainEntities.find(entity => {
-        //         if ('id' in entity) return entity.id === d.source;
-        //         if ('ids' in entity) return entity.ids.includes(d.source);
-        //         return false;
-        //     });
-
-        //     const targetNode = domainEntities.find(
-        //         entity => {
-        //             if ('id' in entity) return entity.id === d.target;
-        //             if ('ids' in entity) return entity.ids.includes(d.target);
-        //             return false;
-        //         }
-        //     );
-        //     if (!sourceNode || !targetNode) return '';
-
-        //     const dx = targetNode.position.x - sourceNode.position.x;
-        //     const dy = targetNode.position.y - sourceNode.position.y;
-        //     const dr = Math.sqrt(dx * dx + dy * dy);
-        //     return `M${sourceNode.position.x + nodeWidth / 2},${sourceNode.position.y + 30}A${dr},${dr} 0 0,1 ${targetNode.position.x + nodeWidth / 2},${targetNode.position.y + 30}`;
-        // });
-
-
-
-        // linkIcons.attr("cx", d => {
-        //     const targetNode = domainEntities.find(
-        //         entity => entity.name === d.target
-        //     );
-        //     return targetNode ? targetNode.position.x + nodeWidth / 2 : 0;
-        // }
-        // ).attr("cy", d => {
-        //     const targetNode = domainEntities.find(
-        //         entity => entity.name === d.target
-        //     );
-        //     return targetNode ? targetNode.position.y + 30 : 0;
-        // });
-
-
-
     }
 
     function positionDiagram(value: Diagram) {
         for (const context of value.contexts) {
             const nodes = svgGroup.selectAll(`.context-${context.name}`);
-            // Manually position nodes in a Masonry layout
-            let columnHeights = new Array(layout.columns).fill(0); // Track the height of each column
-
+            let columnHeights = new Array(layout.columns).fill(0);
             nodes.attr("transform", function (d, i) {
-                // const nextColumnIndex = columnHeights.indexOf(Math.min(...columnHeights)); // Find the column with the minimum height
                 const nextColumnIndex = i % layout.columns;
-                const x = nextColumnIndex * (layout.nodeWidth + layout.columnGap); // Calculate x position
-                const y = columnHeights[nextColumnIndex]; // Calculate y position
-
-                columnHeights[nextColumnIndex] += d3.select(this).node().getBBox().height + layout.rowGap; // Update the column height
-
+                const x = nextColumnIndex * (layout.nodeWidth + layout.columnGap); const y = columnHeights[nextColumnIndex];
+                columnHeights[nextColumnIndex] += d3.select(this).node().getBBox().height + layout.rowGap;
                 d.position.x = x;
                 d.position.y = y;
                 return `translate(${x}, ${y})`;
             });
         }
 
-        // Manually position nodes in a Masonry layout
-        let cColPos = new Array(layout.contextColumns).fill(0); // Track the width of each column
-        let cColWidth = new Array(layout.contextColumns).fill(0); // Track the height of each column
-        let cColHeight = new Array(layout.contextColumns).fill(0); // Track the height of each column
-
+        let cColPos = new Array(layout.contextColumns).fill(0); let cColWidth = new Array(layout.contextColumns).fill(0); let cColHeight = new Array(layout.contextColumns).fill(0);
         contexts.each(function (context: Context, index: number) {
             const sel = d3.select(this);
 
@@ -371,11 +308,8 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
         contexts.attr("transform", function (d, i) {
             const nextColumnIndex = i % layout.contextColumns;
-            const x = cColPos[nextColumnIndex]; // Calculate x position
-            const y = cColHeight[nextColumnIndex]; // Calculate y position
-
-            cColHeight[nextColumnIndex] += d3.select(this).node().getBBox().height + layout.rowGap * 2; // Update the column height
-
+            const x = cColPos[nextColumnIndex]; const y = cColHeight[nextColumnIndex];
+            cColHeight[nextColumnIndex] += d3.select(this).node().getBBox().height + layout.rowGap * 2;
             d.position.x = x
             d.position.y = y
 
@@ -391,25 +325,16 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
                 return `translate(${d.position.x}, ${d.position.y})`;
             });
 
-            // Add ports to each node (center-top, middle-right, middle-left, center-bottom)
             nodes.each(function (d) {
                 const bounds = d3.select(this).node().getBBox();
                 const position = d.position;
 
-                // Define ports
                 const ports = {
                     top: { x: bounds.width / 2, y: 0 },
                     right: { x: bounds.width, y: bounds.height / 2 },
                     bottom: { x: bounds.width / 2, y: bounds.height },
                     left: { x: 0, y: bounds.height / 2 }
                 };
-
-                // // Append ports to the node
-                // const portsGroup = d3.select(this).append("g").attr("class", "ports");
-                // portsGroup.append("circle").attr("cx", ports.top.x).attr("cy", ports.top.y).attr("r", 4).attr("fill", "blue");
-                // portsGroup.append("circle").attr("cx", ports.right.x).attr("cy", ports.right.y).attr("r", 4).attr("fill", "blue");
-                // portsGroup.append("circle").attr("cx", ports.bottom.x).attr("cy", ports.bottom.y).attr("r", 4).attr("fill", "blue");
-                // portsGroup.append("circle").attr("cx", ports.left.x).attr("cy", ports.left.y).attr("r", 4).attr("fill", "blue");
 
                 const absolutePorts = {
                     top: { x: position.x + ports.top.x, y: position.y + ports.top.y },
@@ -418,7 +343,6 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
                     left: { x: position.x + ports.left.x, y: position.y + ports.left.y }
                 }
 
-                // Store the port positions in the node data for easy access later
                 d.ports = absolutePorts;
             });
         })
@@ -490,7 +414,6 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
         drawContexts(value);
 
-        // Create links with curved paths
         links = svgGroup.append("g")
             .attr("class", "links")
             .selectAll("path")
