@@ -197,6 +197,24 @@ export function extractAggregate(node: SyntaxNode | undefined): Aggregate | unde
             hidden: false,
             x: 0,
             y: 0
+        },
+        ports: {
+            top: {
+                x: 0,
+                y: 0
+            },
+            right: {
+                x: 0,
+                y: 0
+            },
+            bottom: {
+                x: 0,
+                y: 0
+            },
+            left: {
+                x: 0,
+                y: 0
+            }
         }
     }
 
@@ -257,6 +275,24 @@ export function extractValueObject(node: SyntaxNode | undefined): ValueObject | 
             hidden: false,
             x: 0,
             y: 0
+        },
+        ports: {
+            top: {
+                x: 0,
+                y: 0
+            },
+            right: {
+                x: 0,
+                y: 0
+            },
+            bottom: {
+                x: 0,
+                y: 0
+            },
+            left: {
+                x: 0,
+                y: 0
+            }
         }
     }
 
@@ -295,6 +331,24 @@ export function extractEvent(node: SyntaxNode | undefined): DomainEvent | undefi
             hidden: false,
             x: 0,
             y: 0
+        },
+        ports: {
+            top: {
+                x: 0,
+                y: 0
+            },
+            right: {
+                x: 0,
+                y: 0
+            },
+            bottom: {
+                x: 0,
+                y: 0
+            },
+            left: {
+                x: 0,
+                y: 0
+            }
         }
     }
 
@@ -334,6 +388,24 @@ export function extractEntity(node: SyntaxNode | undefined): Entity | undefined 
             hidden: false,
             x: 0,
             y: 0
+        },
+        ports: {
+            top: {
+                x: 0,
+                y: 0
+            },
+            right: {
+                x: 0,
+                y: 0
+            },
+            bottom: {
+                x: 0,
+                y: 0
+            },
+            left: {
+                x: 0,
+                y: 0
+            }
         }
     }
 
@@ -394,6 +466,24 @@ export function extractRepository(node: SyntaxNode | undefined): Repository | un
             hidden: false,
             x: 0,
             y: 0
+        },
+        ports: {
+            top: {
+                x: 0,
+                y: 0
+            },
+            right: {
+                x: 0,
+                y: 0
+            },
+            bottom: {
+                x: 0,
+                y: 0
+            },
+            left: {
+                x: 0,
+                y: 0
+            }
         }
     }
 
@@ -433,6 +523,24 @@ export function extractService(node: SyntaxNode | undefined): Service | undefine
             hidden: false,
             x: 0,
             y: 0
+        },
+        ports: {
+            top: {
+                x: 0,
+                y: 0
+            },
+            right: {
+                x: 0,
+                y: 0
+            },
+            bottom: {
+                x: 0,
+                y: 0
+            },
+            left: {
+                x: 0,
+                y: 0
+            }
         }
     }
 
@@ -471,6 +579,24 @@ export function extractEnum(node: SyntaxNode | undefined): Enum | undefined {
             hidden: false,
             x: 0,
             y: 0
+        },
+        ports: {
+            top: {
+                x: 0,
+                y: 0
+            },
+            right: {
+                x: 0,
+                y: 0
+            },
+            bottom: {
+                x: 0,
+                y: 0
+            },
+            left: {
+                x: 0,
+                y: 0
+            }
         }
     }
 
@@ -490,7 +616,7 @@ export function extractEnum(node: SyntaxNode | undefined): Enum | undefined {
     return data
 }
 
-export function extractDiagram(node: SyntaxNode | undefined, context: string = 'DEFAULT', passDiagram: Diagram): Diagram {
+export function extractDiagram(node: SyntaxNode | undefined, context: string = 'DEFAULT', line: number = 0, passDiagram: Diagram): Diagram {
     const diagram: Diagram = passDiagram || {
         aggregates: [],
         entities: [],
@@ -511,6 +637,7 @@ export function extractDiagram(node: SyntaxNode | undefined, context: string = '
         id: context,
         name: context,
         type: 'context',
+        line,
         aggregates: [],
         entities: [],
         valueObjects: [],
@@ -523,6 +650,24 @@ export function extractDiagram(node: SyntaxNode | undefined, context: string = '
             hidden: false,
             x: 0,
             y: 0
+        },
+        ports: {
+            top: {
+                x: 0,
+                y: 0
+            },
+            right: {
+                x: 0,
+                y: 0
+            },
+            bottom: {
+                x: 0,
+                y: 0
+            },
+            left: {
+                x: 0,
+                y: 0
+            }
         }
     }
 
@@ -587,15 +732,17 @@ export function extractDiagram(node: SyntaxNode | undefined, context: string = '
         }
         if (child.type === 'context') {
             let name = ''
+            let line = 0;
 
             for (let children of child.children) {
                 if (children.type === 'identifier') {
                     name = children.text;
+                    line = children.startPosition.row + 1;
                 }
             }
 
 
-            extractDiagram(child, name, diagram);
+            extractDiagram(child, name, line, diagram);
         }
     }
 
