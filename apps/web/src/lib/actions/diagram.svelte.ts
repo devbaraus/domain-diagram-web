@@ -42,8 +42,8 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         contextPadding: 20,
         nodeWidth: 320,
         lineHeigth: 30,
-        columnGap: 60,
-        rowGap: 60,
+        columnGap: 30,
+        rowGap: 30,
         columns: 4,
         contextColumns: 1
     }
@@ -361,12 +361,12 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             cColWidth[relIndex] = Math.max(box.width, cColWidth[relIndex]);
 
             if (relIndex > 0) {
-                cColPos[relIndex] = cColPos[relIndex - 1] + cColWidth[relIndex - 1] + layout.columnGap;
+                cColPos[relIndex] = cColPos[relIndex - 1] + cColWidth[relIndex - 1] + layout.columnGap * 2;
             }
 
             sel.selectChild('rect')
-                .attr('width', box.width + 40)
-                .attr('height', box.height + 40)
+                .attr('width', box.width + layout.columnGap)
+                .attr('height', box.height + layout.rowGap)
         })
 
         contexts.attr("transform", function (d, i) {
@@ -374,7 +374,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             const x = cColPos[nextColumnIndex]; // Calculate x position
             const y = cColHeight[nextColumnIndex]; // Calculate y position
 
-            cColHeight[nextColumnIndex] += d3.select(this).node().getBBox().height + layout.rowGap; // Update the column height
+            cColHeight[nextColumnIndex] += d3.select(this).node().getBBox().height + layout.rowGap * 2; // Update the column height
 
             d.position.x = x
             d.position.y = y
@@ -455,16 +455,16 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
                     .attr("fill", `${colors[index % colors.length]}30`)
                     .attr("stroke", `${colors[index % colors.length]}`)
                     .attr("stroke-dasharray", "3 3")
-                    .attr("x", -20)
-                    .attr("y", -20)
+                    .attr("x", -layout.columnGap / 2)
+                    .attr("y", -layout.columnGap / 2)
                     .attr("rx", 4)
                     .attr("ry", 4);
             } else {
                 sel.append("rect")
                     .attr("fill", 'none')
                     .attr("stroke", 'none')
-                    .attr("x", -20)
-                    .attr("y", -20)
+                    .attr("x", -layout.columnGap / 2)
+                    .attr("y", -layout.columnGap / 2)
                     .attr("rx", 4)
                     .attr("ry", 4);
             }
