@@ -1,4 +1,4 @@
-import { editor } from '$lib/store';
+import { editor as editorInstance } from '$lib/store';
 import * as d3 from 'd3';
 import _ from 'lodash';
 
@@ -7,7 +7,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
     let editor = null
     let fixed = false
 
-    editor?.subscribe(value => editor = value);
+    editorInstance?.subscribe(value => editor = value);
 
     const svg = d3.select(el)
         .append("svg")
@@ -427,10 +427,12 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
     function drawContexts(value: Diagram) {
         layout.contextColumns = Math.ceil(Math.sqrt(value.contexts.length));
 
+        const contextsToRender = value.contexts.filter(c => [c.aggregates, c.entities, c.valueObjects, c.enums, c.services, c.events].flat().length > 0);
+
         contexts = svgGroup.append("g")
             .attr("class", "contexts")
             .selectAll("g")
-            .data(value.contexts)
+            .data(contextsToRender)
             .enter()
             .append("g")
             .attr("id", d => `context-${d.name}`)
