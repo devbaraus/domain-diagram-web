@@ -25,6 +25,7 @@ type Common = {
     id: string;
     name: string;
     type: string;
+    context: string;
     line: number;
     position: Position
     ports: {
@@ -92,7 +93,7 @@ declare type Domain = {
     repositories: Repository[];
 }
 
-declare type Context = Common & {
+declare type Context = Omit<Common, 'context'> & {
     id: string,
     name: string;
     type: string;

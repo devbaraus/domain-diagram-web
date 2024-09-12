@@ -29,8 +29,8 @@
 		tree = parser?.parse(value);
 		diagram = extractDiagram(tree?.rootNode);
 
-		const diagnostic = lintAST(tree);
-		$monaco?.editor.setModelMarkers($model, 'ddd', diagnostic);
+		// const diagnostic = lintAST(tree);
+		// $monaco?.editor.setModelMarkers($model, 'ddd', diagnostic);
 	};
 
 	const debouncedTreeUpdate = _.debounce((value: string) => {
