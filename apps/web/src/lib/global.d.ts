@@ -16,6 +16,26 @@ declare type Property = {
     default: string;
 }
 
+declare type Port = {
+    x: number;
+    y: number;
+}
+
+type Common = {
+    id: string;
+    name: string;
+    type: string;
+    context: string;
+    line: number;
+    position: Position
+    ports: {
+        top: Port;
+        right: Port;
+        bottom: Port;
+        left: Port;
+    }
+}
+
 declare type Parameter = Property
 
 declare type Method = {
@@ -31,72 +51,49 @@ declare type Position = {
     y: number;
 }
 
-declare type Aggregate = {
+declare type Aggregate = Omit<Common, 'id'> & {
     ids: string[],
-    name: string;
-    type: string;
-    line: number;
     properties: Property[];
     methods: Method[];
-    position: Position
 };
 
-declare type Entity = {
+declare type Entity = Omit<Common, 'id'> & {
     ids: string[],
-    name: string;
-    type: string;
-    line: number;
     properties: Property[];
     methods: Method[];
-    position: Position
 }
 
-declare type ValueObject = {
-    id: string,
-    name: string;
-    type: string;
-    line: number;
+declare type ValueObject = Common & {
     properties: Property[];
-    position: Position
 }
 
-declare type Enum = {
-    id: string,
-    name: string;
-    type: string;
-    line: number;
+declare type Enum = Common & {
     values: string[];
-    position: Position
 }
 
-declare type Service = {
-    id: string,
-    name: string;
-    type: string;
-    line: number;
+declare type Service = Common & {
     methods: Method[];
-    position: Position
 }
 
-declare type DomainEvent = {
-    id: string,
-    name: string;
-    type: string;
-    line: number;
+declare type DomainEvent = Common & {
     properties: Property[];
-    position: Position
 }
 
-declare type Repository = {
-    id: string,
-    name: string;
-    type: string;
-    line: number;
+declare type Repository = Common & {
     methods: Method[];
-    position: Position
 }
 
-declare type Context = {
+declare type Domain = {
+    aggregates: Aggregate[];
+    entities: Entity[];
+    valueObjects: ValueObject[];
+    enums: Enum[];
+    events: DomainEvent[];
+    services: Service[];
+    repositories: Repository[];
+}
+
+declare type Context = Omit<Common, 'context'> & {
     id: string,
     name: string;
     type: string;

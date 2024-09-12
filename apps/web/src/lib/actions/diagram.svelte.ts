@@ -20,19 +20,39 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         }))
 
     const svgGroup = svg.append("g");
+    let links, nodes, contexts
 
 
-    const nodeWidth = 320; // Width of each node
-    const lineHeigth = 30;
-    const columnGap = 60; // Gap between columns
-    const rowGap = 60; // Gap between rows
-    const columns = 4; // Number of columns
 
+    const colors = [
+        "#dd6b66",
+        "#759aa0",
+        "#e69d87",
+        "#8dc1a9",
+        "#ea7e53",
+        "#eedd78",
+        "#73a373",
+        "#73b9bc",
+        "#7289ab",
+        "#91ca8c",
+        "#f49f42"
+    ]
+
+    const layout = {
+        contextPadding: 20,
+        nodeWidth: 320,
+        lineHeigth: 30,
+        columnGap: 60,
+        rowGap: 60,
+        columns: 4,
+        contextColumns: 1
+    }
 
     const backgroundColors = {
         'text': 'white',
         'node': '#F3F3F3',
         'property': '#595959',
+        'context': '#FDFDFD',
         'type': '#8c8c8c',
         "aggregate": "#1f78b4",
         "entity": "#33a02c",
@@ -55,7 +75,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
         valuesGroup.append("text")
             .attr("x", 10)
-            .attr("y", (_: never, i: number) => 40 + (offset + i) * lineHeigth + lineHeigth / 2)
+            .attr("y", (_: never, i: number) => 40 + (offset + i) * layout.lineHeigth + layout.lineHeigth / 2)
             .attr("dy", ".35em")
             .attr("text-anchor", "start")
             .attr("fill", backgroundColors.property)
@@ -71,7 +91,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
         propertiesGroup.append("text")
             .attr("x", 10)
-            .attr("y", (_: never, i: number) => 40 + (offset + i) * lineHeigth + lineHeigth / 2)
+            .attr("y", (_: never, i: number) => 40 + (offset + i) * layout.lineHeigth + layout.lineHeigth / 2)
             .attr("dy", ".35em")
             .attr("text-anchor", "start")
             .attr("fill", backgroundColors.property)
@@ -79,7 +99,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
         propertiesGroup.append("text")
             .attr("x", 310)
-            .attr("y", (_: never, i: number) => 40 + (offset + i) * lineHeigth + lineHeigth / 2)
+            .attr("y", (_: never, i: number) => 40 + (offset + i) * layout.lineHeigth + layout.lineHeigth / 2)
             .attr("dy", ".35em")
             .attr("text-anchor", "end")
             .attr("fill", backgroundColors.type)
@@ -95,7 +115,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
         methodsGroup.append("text")
             .attr("x", 10)
-            .attr("y", (_: never, i: number) => 40 + (offset + i) * lineHeigth + lineHeigth / 2)
+            .attr("y", (_: never, i: number) => 40 + (offset + i) * layout.lineHeigth + layout.lineHeigth / 2)
             .attr("dy", ".35em")
             .attr("text-anchor", "start")
             .attr("fill", backgroundColors.property)
@@ -103,11 +123,38 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
         methodsGroup.append("text")
             .attr("x", 310)
-            .attr("y", (_: never, i: number) => 40 + (offset + i) * lineHeigth + lineHeigth / 2)
+            .attr("y", (_: never, i: number) => 40 + (offset + i) * layout.lineHeigth + layout.lineHeigth / 2)
             .attr("dy", ".35em")
             .attr("text-anchor", "end")
             .attr("fill", backgroundColors.type)
             .text((method: Method) => formatType(method.return));
+    }
+
+
+    function getBBox(elements) {
+        if (elements.size() === 0) {
+            return { x: 0, y: 0, width: layout.nodeWidth, height: 0 };
+        }
+
+        // Initialize values for the combined bounding box
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+        // Iterate over each selected element
+        elements.each(function (d) {
+            const bbox = d3.select(this).node().getBBox();
+
+            // Update the boundaries
+            minX = Math.min(minX, bbox.x + d.position.x);
+            minY = Math.min(minY, bbox.y + d.position.y);
+            maxX = Math.max(maxX, bbox.x + bbox.width + d.position.x);
+            maxY = Math.max(maxY, bbox.y + bbox.height + d.position.y);
+        });
+
+        // Calculate the combined width and height
+        const combinedWidth = maxX - minX;
+        const combinedHeight = maxY - minY;
+
+        return { x: minX, y: minY, width: combinedWidth, height: combinedHeight };
     }
 
     // Function to zoom and fit the diagram to the viewport
@@ -144,67 +191,18 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         return { source: closest.sourcePort, target: closest.targetPort };
     }
 
-    function draw(value: Diagram) {
-        diagram = value;
-        // Define links based on entity properties
-        // const domainEntities = [value.aggregates, value.entities, value.valueObjects].flat()
+    function drawDomain(value: Diagram) {
         const domainEntities = [value.aggregates, value.entities, value.valueObjects, value.enums, value.events, value.services].flat()
 
-        const domainEntitiesToLink = [value.aggregates, value.entities, value.valueObjects, value.enums].flat()
-
-        const domainLinks = domainEntitiesToLink.map(domain => {
-            return domain.properties?.map(prop => {
-                return {
-                    source: domain.name, target: domainEntitiesToLink.find(e => {
-                        if ('id' in e) return prop.type === e.id;
-                        if ('ids' in e) return e.ids.includes(prop.type);
-                        return false;
-                    })?.name
-                };
-            })
-        }).flat().filter(link => Boolean(link) && Boolean(link.target) && link.source !== link.target);
-
-        // Create links with curved paths
-        const links = svgGroup.append("g")
-            .attr("class", "links")
-            .selectAll("path")
-            .data(domainLinks)
-            .enter()
-            .append("path")
-            .attr("stroke", "lightgrey")
-            .attr("stroke-width", 1)
-            .attr("fill", "none");
-
-        const linkIcons = svgGroup.append("g")
-            .attr("class", "link-icons")
-            .selectAll("circle")
-            .data(domainLinks)
-            .enter()
-            .append("circle")
-            .attr("r", 5)
-            .attr("fill", "red")
-            .attr("cx", d => {
-                const targetNode = domainEntities.find(
-                    entity => entity.name === d.target
-                );
-                return targetNode ? targetNode.position.x + nodeWidth / 2 : 0;
-            })
-            .attr("cy", d => {
-                const targetNode = domainEntities.find(
-                    entity => entity.name === d.target
-                );
-                return targetNode ? targetNode.position.y + 30 : 0;
-            });
-
         // Create nodes
-        const nodes = svgGroup.append("g")
+        nodes = svgGroup.append("g")
             .attr("class", "nodes")
             .selectAll("g")
             .data(domainEntities)
             .enter()
             .append("g")
-            .attr("id", d => d.name)
-            .attr("class", (d) => `${d.type} hover:cursor-pointer tooltip`)
+            .attr("id", d => `node-${d.name}`)
+            .attr("class", (d) => `${d.type} context-${d.context}`)
             .on("mouseover", function (event, d) {
                 d3.select(this).select("rect").attr("stroke", "black");
                 links.attr("stroke", l => {
@@ -231,15 +229,15 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
         // Add rectangles for nodes
         nodes.append("rect")
-            .attr("width", nodeWidth)
-            .attr("height", d => 50 + ((d.properties?.length ?? 0) + (d.methods?.length ?? 0) + (d.values?.length ?? 0)) * lineHeigth)
+            .attr("width", layout.nodeWidth)
+            .attr("height", d => 50 + ((d.properties?.length ?? 0) + (d.methods?.length ?? 0) + (d.values?.length ?? 0)) * layout.lineHeigth)
             .attr("fill", backgroundColors.node)
             .attr("rx", 4)
             .attr("ry", 4);
 
         // Add node headers
         nodes.append("rect")
-            .attr("width", nodeWidth - 2)
+            .attr("width", layout.nodeWidth - 2)
             .attr("height", 30)
             .attr("x", "1")
             .attr("y", "1")
@@ -248,7 +246,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             .attr("fill", d => backgroundColors[d.type]);
 
         nodes.append("text")
-            .attr("x", nodeWidth / 2)
+            .attr("x", layout.nodeWidth / 2)
             .attr("y", 20)
             .attr("text-anchor", "middle")
             .attr("font-weight", "bold")
@@ -287,54 +285,6 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             drawMethods(d3.select(this), d.methods, 0);
         });
 
-        // Manually position nodes in a Masonry layout
-        let columnHeights = new Array(columns).fill(0); // Track the height of each column
-
-        nodes.attr("transform", function (d, i) {
-            // const nextColumnIndex = columnHeights.indexOf(Math.min(...columnHeights)); // Find the column with the minimum height
-            const nextColumnIndex = i % columns;
-            const x = nextColumnIndex * (nodeWidth + columnGap); // Calculate x position
-            const y = columnHeights[nextColumnIndex]; // Calculate y position
-
-            columnHeights[nextColumnIndex] += d3.select(this).node().getBBox().height + rowGap; // Update the column height
-
-            d.position.x = x;
-            d.position.y = y;
-            return `translate(${x}, ${y})`;
-        });
-
-        // Add ports to each node (center-top, middle-right, middle-left, center-bottom)
-        nodes.each(function (d) {
-            const bounds = d3.select(this).node().getBBox();
-            const position = d.position;
-
-            // Define ports
-            const ports = {
-                top: { x: bounds.width / 2, y: 0 },
-                right: { x: bounds.width, y: bounds.height / 2 },
-                bottom: { x: bounds.width / 2, y: bounds.height },
-                left: { x: 0, y: bounds.height / 2 }
-            };
-
-            // Append ports to the node
-            // const portsGroup = d3.select(this).append("g").attr("class", "ports");
-            // portsGroup.append("circle").attr("cx", ports.top.x).attr("cy", ports.top.y).attr("r", 4).attr("fill", "blue");
-            // portsGroup.append("circle").attr("cx", ports.right.x).attr("cy", ports.right.y).attr("r", 4).attr("fill", "blue");
-            // portsGroup.append("circle").attr("cx", ports.bottom.x).attr("cy", ports.bottom.y).attr("r", 4).attr("fill", "blue");
-            // portsGroup.append("circle").attr("cx", ports.left.x).attr("cy", ports.left.y).attr("r", 4).attr("fill", "blue");
-
-            const absolutePorts = {
-                top: { x: position.x + ports.top.x, y: position.y + ports.top.y },
-                right: { x: position.x + ports.right.x, y: position.y + ports.right.y },
-                bottom: { x: position.x + ports.bottom.x, y: position.y + ports.bottom.y },
-                left: { x: position.x + ports.left.x, y: position.y + ports.left.y }
-            }
-
-            // Store the port positions in the node data for easy access later
-            d.ports = absolutePorts;
-        });
-
-
         // links.attr("d", function (d) {
         //     const sourceNode = domainEntities.find(entity => {
         //         if ('id' in entity) return entity.id === d.source;
@@ -357,24 +307,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         //     return `M${sourceNode.position.x + nodeWidth / 2},${sourceNode.position.y + 30}A${dr},${dr} 0 0,1 ${targetNode.position.x + nodeWidth / 2},${targetNode.position.y + 30}`;
         // });
 
-        links.attr("d", function (d) {
-            const sourceNode = d3.select(`#${d.source}`).datum();
-            const targetNode = d3.select(`#${d.target}`).datum();
 
-            // // Get source and target port positions and reajust to the node position
-            const sourcePorts = sourceNode.ports
-            const targetPorts = targetNode.ports;
-
-
-            const closestPorts = findClosestPorts(sourcePorts, targetPorts); // Calculate distances between ports to find the closest connection points
-
-
-            // // Return a straight path between the nearest source and target ports
-            return `M${sourcePorts[closestPorts.source].x},${sourcePorts[closestPorts.source].y}L${targetPorts[closestPorts.target].x},${targetPorts[closestPorts.target].y}`;
-
-            // Return a curved path between the nearest source and target ports
-            return `M${sourcePorts[closestPorts.source].x},${sourcePorts[closestPorts.source].y}A${sourcePorts[closestPorts.source].x},${sourcePorts[closestPorts.source].y + 50} ${targetPorts[closestPorts.target].x},${targetPorts[closestPorts.target].y}`;
-        });
 
         // linkIcons.attr("cx", d => {
         //     const targetNode = domainEntities.find(
@@ -390,9 +323,205 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         // });
 
 
+
+    }
+
+    function positionDiagram(value: Diagram) {
+        for (const context of value.contexts) {
+            const nodes = svgGroup.selectAll(`.context-${context.name}`);
+            // Manually position nodes in a Masonry layout
+            let columnHeights = new Array(layout.columns).fill(0); // Track the height of each column
+
+            nodes.attr("transform", function (d, i) {
+                // const nextColumnIndex = columnHeights.indexOf(Math.min(...columnHeights)); // Find the column with the minimum height
+                const nextColumnIndex = i % layout.columns;
+                const x = nextColumnIndex * (layout.nodeWidth + layout.columnGap); // Calculate x position
+                const y = columnHeights[nextColumnIndex]; // Calculate y position
+
+                columnHeights[nextColumnIndex] += d3.select(this).node().getBBox().height + layout.rowGap; // Update the column height
+
+                d.position.x = x;
+                d.position.y = y;
+                return `translate(${x}, ${y})`;
+            });
+        }
+
+        // Manually position nodes in a Masonry layout
+        let cColPos = new Array(layout.contextColumns).fill(0); // Track the width of each column
+        let cColWidth = new Array(layout.contextColumns).fill(0); // Track the height of each column
+        let cColHeight = new Array(layout.contextColumns).fill(0); // Track the height of each column
+
+        contexts.each(function (context: Context, index: number) {
+            const sel = d3.select(this);
+
+            const relIndex = index % layout.contextColumns;
+
+            const box = getBBox(svgGroup.selectAll(`.context-${context.name}`));
+
+            cColWidth[relIndex] = Math.max(box.width, cColWidth[relIndex]);
+
+            if (relIndex > 0) {
+                cColPos[relIndex] = cColPos[relIndex - 1] + cColWidth[relIndex - 1] + layout.columnGap;
+            }
+
+            sel.selectChild('rect')
+                .attr('width', box.width + 40)
+                .attr('height', box.height + 40)
+        })
+
+        contexts.attr("transform", function (d, i) {
+            const nextColumnIndex = i % layout.contextColumns;
+            const x = cColPos[nextColumnIndex]; // Calculate x position
+            const y = cColHeight[nextColumnIndex]; // Calculate y position
+
+            cColHeight[nextColumnIndex] += d3.select(this).node().getBBox().height + layout.rowGap; // Update the column height
+
+            d.position.x = x
+            d.position.y = y
+
+            return `translate(${x}, ${y})`;
+        });
+
+        contexts.each(function (context: Context, index: number) {
+            const nodes = svgGroup.selectAll(`.context-${context.name}`);
+
+            nodes.attr("transform", function (d, i) {
+                d.position.x = d.position.x + context.position.x
+                d.position.y = d.position.y + context.position.y
+                return `translate(${d.position.x}, ${d.position.y})`;
+            });
+
+            // Add ports to each node (center-top, middle-right, middle-left, center-bottom)
+            nodes.each(function (d) {
+                const bounds = d3.select(this).node().getBBox();
+                const position = d.position;
+
+                // Define ports
+                const ports = {
+                    top: { x: bounds.width / 2, y: 0 },
+                    right: { x: bounds.width, y: bounds.height / 2 },
+                    bottom: { x: bounds.width / 2, y: bounds.height },
+                    left: { x: 0, y: bounds.height / 2 }
+                };
+
+                // // Append ports to the node
+                // const portsGroup = d3.select(this).append("g").attr("class", "ports");
+                // portsGroup.append("circle").attr("cx", ports.top.x).attr("cy", ports.top.y).attr("r", 4).attr("fill", "blue");
+                // portsGroup.append("circle").attr("cx", ports.right.x).attr("cy", ports.right.y).attr("r", 4).attr("fill", "blue");
+                // portsGroup.append("circle").attr("cx", ports.bottom.x).attr("cy", ports.bottom.y).attr("r", 4).attr("fill", "blue");
+                // portsGroup.append("circle").attr("cx", ports.left.x).attr("cy", ports.left.y).attr("r", 4).attr("fill", "blue");
+
+                const absolutePorts = {
+                    top: { x: position.x + ports.top.x, y: position.y + ports.top.y },
+                    right: { x: position.x + ports.right.x, y: position.y + ports.right.y },
+                    bottom: { x: position.x + ports.bottom.x, y: position.y + ports.bottom.y },
+                    left: { x: position.x + ports.left.x, y: position.y + ports.left.y }
+                }
+
+                // Store the port positions in the node data for easy access later
+                d.ports = absolutePorts;
+            });
+        })
+    }
+
+    function drawContexts(value: Diagram) {
+        layout.contextColumns = Math.ceil(Math.sqrt(value.contexts.length));
+
+        contexts = svgGroup.append("g")
+            .attr("class", "contexts")
+            .selectAll("g")
+            .data(value.contexts)
+            .enter()
+            .append("g")
+            .attr("id", d => `context-${d.name}`)
+            .attr("class", (d) => d.type)
+
+        contexts.each(function (context: Context, index: number) {
+            const sel = d3.select(this);
+
+            if (context.id !== 'DEFAULT') {
+                sel.append("text")
+                    .attr("y", -25)
+                    .attr("text-anchor", "start")
+                    .attr("font-weight", "bold")
+                    .attr("fill", backgroundColors.property)
+                    .text(d => d.name);
+            }
+
+            if (context.id !== 'DEFAULT') {
+                sel.append("rect")
+                    .attr("fill", `${colors[index % colors.length]}30`)
+                    .attr("stroke", `${colors[index % colors.length]}`)
+                    .attr("stroke-dasharray", "3 3")
+                    .attr("x", -20)
+                    .attr("y", -20)
+                    .attr("rx", 4)
+                    .attr("ry", 4);
+            } else {
+                sel.append("rect")
+                    .attr("fill", 'none')
+                    .attr("stroke", 'none')
+                    .attr("x", -20)
+                    .attr("y", -20)
+                    .attr("rx", 4)
+                    .attr("ry", 4);
+            }
+        })
+    }
+
+    function draw(value: Diagram) {
+        diagram = value
+
+        const domainEntitiesToLink = [value.aggregates, value.entities, value.valueObjects, value.enums].flat()
+
+        const domainLinks = domainEntitiesToLink.map(domain => {
+            return domain.properties?.map(prop => {
+                return {
+                    source: domain.name, target: domainEntitiesToLink.find(e => {
+                        if ('id' in e) return prop.type === e.id;
+                        if ('ids' in e) return e.ids.includes(prop.type);
+                        return false;
+                    })?.name
+                };
+            })
+        }).flat().filter(link => Boolean(link) && Boolean(link.target) && link.source !== link.target);
+
+        drawContexts(value);
+
+        // Create links with curved paths
+        links = svgGroup.append("g")
+            .attr("class", "links")
+            .selectAll("path")
+            .data(domainLinks)
+            .enter()
+            .append("path")
+            .attr("stroke", "lightgrey")
+            .attr("stroke-width", 1)
+            .attr("fill", "none");
+
+        drawDomain(value);
+
+        positionDiagram(value);
+
+        links.attr("d", function (d) {
+            const sourceNode = d3.select(`#node-${d.source}`).datum();
+            const targetNode = d3.select(`#node-${d.target}`).datum();
+
+            const sourcePorts = sourceNode.ports
+            const targetPorts = targetNode.ports;
+
+            const closestPorts = findClosestPorts(sourcePorts, targetPorts);
+
+            return `M${sourcePorts[closestPorts.source].x},${sourcePorts[closestPorts.source].y}L${targetPorts[closestPorts.target].x},${targetPorts[closestPorts.target].y}`;
+        });
+
         if (!fixed) {
             zoomToFit();
         }
+    }
+
+    if (value) {
+        draw(value);
     }
 
     return {
