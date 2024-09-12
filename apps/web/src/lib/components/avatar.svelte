@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { getAvatarName } from '$lib';
+	import { cn } from '$lib/utils';
 
 	type Props = {
+		class?: string;
 		name: string;
 	};
 
@@ -10,7 +12,10 @@
 
 <div class="avatar placeholder">
 	<div
-		class="mask mask-squircle bg-neutral text-neutral-content flex size-12 items-center justify-center uppercase"
+		class={cn(
+			'mask mask-squircle bg-base-200 text-base-200-content flex size-12 items-center justify-center uppercase ',
+			props.class
+		)}
 	>
 		{getAvatarName(props.name)}
 	</div>
