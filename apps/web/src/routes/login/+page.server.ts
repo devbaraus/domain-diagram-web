@@ -7,7 +7,7 @@ export const load: PageServerLoad = async ({ locals, url, parent }) => {
     await parent()
 
     if (locals.user) {
-        throw redirect(302, '/')
+        throw redirect(302, '/d')
     }
 }
 

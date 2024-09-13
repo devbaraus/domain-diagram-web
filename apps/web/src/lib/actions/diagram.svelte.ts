@@ -277,8 +277,10 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         for (const context of value.contexts) {
             const nodes = svgGroup.selectAll(`.context-${context.name}`);
             let columnHeights = new Array(layout.columns).fill(0);
+            
             nodes.attr("transform", function (d, i) {
-                const nextColumnIndex = i % layout.columns;
+                const nextColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
+                // const nextColumnIndex = i % layout.columns;
                 const x = nextColumnIndex * (layout.nodeWidth + layout.columnGap); const y = columnHeights[nextColumnIndex];
                 columnHeights[nextColumnIndex] += d3.select(this).node().getBBox().height + layout.rowGap;
                 d.position.x = x;
@@ -287,7 +289,9 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             });
         }
 
-        let cColPos = new Array(layout.contextColumns).fill(0); let cColWidth = new Array(layout.contextColumns).fill(0); let cColHeight = new Array(layout.contextColumns).fill(0);
+        let cColWidth = new Array(layout.contextColumns).fill(0);
+        let cColHeight = new Array(layout.contextColumns).fill(0);
+
         contexts.each(function (context: Context, index: number) {
             const sel = d3.select(this);
 
@@ -295,21 +299,23 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
             const box = getBBox(svgGroup.selectAll(`.context-${context.name}`));
 
-            cColWidth[relIndex] = Math.max(box.width, cColWidth[relIndex]);
 
-            if (relIndex > 0) {
-                cColPos[relIndex] = cColPos[relIndex - 1] + cColWidth[relIndex - 1] + layout.columnGap * 2;
-            }
+            cColWidth[relIndex] = Math.max(box.width, cColWidth[relIndex]);
 
             sel.selectChild('rect')
                 .attr('width', box.width + layout.columnGap)
                 .attr('height', box.height + layout.rowGap)
         })
 
+
+
         contexts.attr("transform", function (d, i) {
             const nextColumnIndex = i % layout.contextColumns;
-            const x = cColPos[nextColumnIndex]; const y = cColHeight[nextColumnIndex];
+            const x = cColWidth.slice(0, nextColumnIndex).reduce((acc, curr) => acc + curr, 0) + nextColumnIndex * layout.columnGap * 2
+            const y = cColHeight[nextColumnIndex];
+
             cColHeight[nextColumnIndex] += d3.select(this).node().getBBox().height + layout.rowGap * 2;
+
             d.position.x = x
             d.position.y = y
 

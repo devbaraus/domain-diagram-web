@@ -4,6 +4,10 @@ import type { LayoutServerLoad } from "./$types"
 export const load: LayoutServerLoad = async ({ locals, url, parent }) => {
     await parent()
 
+    if (url.pathname.startsWith('/docs')) {
+        return {}
+    }
+
     if (!locals.session && url.pathname !== '/login') {
         throw redirect(302, '/login')
     }

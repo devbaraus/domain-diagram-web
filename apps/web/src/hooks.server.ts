@@ -21,7 +21,9 @@ export const handle: Handle = async ({ event, resolve }) => {
             event.locals.session = session
         }
     } catch (error) {
-        console.error(error)
+        event.cookies.delete('session', {
+            path: '/',
+        })
     } finally {
         return await resolve(event)
     }
