@@ -43,3 +43,27 @@ export function lintAST(ast) {
     });
     return diagnostics;
 }
+
+export function checkForSyntaxErrors(ast) {
+    const errors = [];
+
+    // Recursively check the tree for error nodes
+    function walk(node) {
+        if (node.type === 'ERROR') {
+            errors.push({
+                message: 'Syntax error found',
+                startLineNumber: node.startPosition.row + 1,
+                startColumn: node.startPosition.column + 1,
+                endLineNumber: node.endPosition.row + 1,
+                endColumn: node.endPosition.column + 1,
+            });
+        } else if (node.hasError) {
+            // hasError() will return true if there are errors anywhere within this node's subtree
+            node.children.forEach(walk);
+        }
+    }
+
+    walk(ast);
+
+    return errors;
+}

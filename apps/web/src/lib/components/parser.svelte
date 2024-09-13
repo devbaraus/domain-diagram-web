@@ -4,7 +4,7 @@
 	import Editor from '$lib/components/editor.svelte';
 	import { updateProject } from '$lib/services/project-service.svelte';
 	import { extractDiagram } from '$lib/utils/diagram-extractor';
-	import { lintAST } from '$lib/utils/editor-linter';
+	import { checkForSyntaxErrors, lintAST } from '$lib/utils/linter';
 	import { model, monaco } from '$lib/store';
 	import _ from 'lodash';
 	import { onMount } from 'svelte';
@@ -27,10 +27,17 @@
 
 	const updateTree = (value: string) => {
 		tree = parser?.parse(value);
-		diagram = extractDiagram(tree?.rootNode);
 
-		// const diagnostic = lintAST(tree);
-		// $monaco?.editor.setModelMarkers($model, 'ddd', diagnostic);
+		const errors = checkForSyntaxErrors(tree?.rootNode);
+
+		if (errors.length) {
+			$monaco?.editor.setModelMarkers($model, 'ddd', errors);
+			return;
+		}
+
+		diagram = extractDiagram(tree?.rootNode);
+		const diagnostic = lintAST(tree);
+		$monaco?.editor.setModelMarkers($model, 'ddd', diagnostic);
 	};
 
 	const debouncedTreeUpdate = _.debounce((value: string) => {
@@ -54,6 +61,7 @@
 
 	onMount(async () => {
 		await initializeParser();
+		updateTree(props.markup);
 	});
 
 	function handleChange(value: string) {

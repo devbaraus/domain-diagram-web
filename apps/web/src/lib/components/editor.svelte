@@ -18,9 +18,13 @@
 		// Your monaco instance is ready, let's display some code!
 		$editor = $monaco.editor.create(el, {
 			theme: 'default',
-			wordWrap: 'on',
+			wordWrap: 'wordWrapColumn',
+			wordWrapColumn: 60,
+			wrappingIndent: 'indent',
+			lineNumbers: 'on',
 			fontFamily: 'Fira Code',
 			fontSize: 14,
+			tabSize: 2,
 			fontLigatures: "'zero', 'ss02', 'ss03', 'ss04', 'ss05', 'calt'",
 			scrollBeyondLastLine: false,
 			minimap: { enabled: false }

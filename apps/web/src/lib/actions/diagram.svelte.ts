@@ -39,10 +39,10 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
     ]
 
     const layout = {
-        contextPadding: 20,
+        contextPadding: 60,
         nodeWidth: 320,
         lineHeigth: 30,
-        columnGap: 30,
+        columnGap: 60,
         rowGap: 30,
         columns: 4,
         contextColumns: 1
@@ -277,7 +277,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         for (const context of value.contexts) {
             const nodes = svgGroup.selectAll(`.context-${context.name}`);
             let columnHeights = new Array(layout.columns).fill(0);
-            
+
             nodes.attr("transform", function (d, i) {
                 const nextColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
                 // const nextColumnIndex = i % layout.columns;
@@ -303,8 +303,8 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             cColWidth[relIndex] = Math.max(box.width, cColWidth[relIndex]);
 
             sel.selectChild('rect')
-                .attr('width', box.width + layout.columnGap)
-                .attr('height', box.height + layout.rowGap)
+                .attr('width', box.width + layout.contextPadding)
+                .attr('height', box.height + layout.contextPadding)
         })
 
 
@@ -314,7 +314,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             const x = cColWidth.slice(0, nextColumnIndex).reduce((acc, curr) => acc + curr, 0) + nextColumnIndex * layout.columnGap * 2
             const y = cColHeight[nextColumnIndex];
 
-            cColHeight[nextColumnIndex] += d3.select(this).node().getBBox().height + layout.rowGap * 2;
+            cColHeight[nextColumnIndex] += d3.select(this).node().getBBox().height + layout.contextPadding * 2;
 
             d.position.x = x
             d.position.y = y
@@ -372,31 +372,31 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             const sel = d3.select(this);
 
             if (context.id !== 'DEFAULT') {
-                sel.append("text")
-                    .attr("y", -25)
-                    .attr("text-anchor", "start")
-                    .attr("font-weight", "bold")
-                    .attr("fill", backgroundColors.property)
-                    .text(d => d.name);
-            }
-
-            if (context.id !== 'DEFAULT') {
                 sel.append("rect")
                     .attr("fill", `${colors[index % colors.length]}30`)
                     .attr("stroke", `${colors[index % colors.length]}`)
                     .attr("stroke-dasharray", "3 3")
-                    .attr("x", -layout.columnGap / 2)
-                    .attr("y", -layout.columnGap / 2)
+                    .attr("x", -layout.contextPadding / 2)
+                    .attr("y", -layout.contextPadding / 2)
                     .attr("rx", 4)
                     .attr("ry", 4);
             } else {
                 sel.append("rect")
                     .attr("fill", 'none')
                     .attr("stroke", 'none')
-                    .attr("x", -layout.columnGap / 2)
-                    .attr("y", -layout.columnGap / 2)
+                    .attr("x", -layout.contextPadding / 2)
+                    .attr("y", -layout.contextPadding / 2)
                     .attr("rx", 4)
                     .attr("ry", 4);
+            }
+
+            if (context.id !== 'DEFAULT') {
+                sel.append("text")
+                    .attr("y", -(layout.contextPadding / 2) + 5)
+                    .attr("text-anchor", "start")
+                    .attr("font-weight", "bold")
+                    .attr("fill", backgroundColors.property)
+                    .text(d => d.name);
             }
         })
     }

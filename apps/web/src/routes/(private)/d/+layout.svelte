@@ -8,7 +8,8 @@
 		new QueryClient({
 			defaultOptions: {
 				queries: {
-					enabled: browser
+					enabled: browser,
+					refetchOnWindowFocus: false
 				}
 			}
 		})
