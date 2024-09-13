@@ -52,7 +52,7 @@ module.exports = grammar({
         $.generic_type,
         $.identifier,
         "{",
-        repeat(choice($.field, $.method)),
+        repeat(choice($.field, $.method, $.comment)),
         "}",
       ),
 
@@ -63,13 +63,13 @@ module.exports = grammar({
         $.generic_type,
         $.identifier,
         "{",
-        repeat(choice($.field, $.method)),
+        repeat(choice($.field, $.method, $.comment)),
         "}",
       ),
 
     // Value Object definition
     value_object: ($) =>
-      seq("ValueObject", $.identifier, "{", repeat($.field), "}"),
+      seq("ValueObject", $.identifier, "{", repeat(choice($.field, $.comment)), "}"),
 
     // Event definition
     event: ($) =>
@@ -77,7 +77,7 @@ module.exports = grammar({
         choice("DomainEvent", "Event"),
         $.identifier,
         "{",
-        repeat($.field),
+        repeat(choice($.field, $.comment)),
         "}",
       ),
 
@@ -87,7 +87,7 @@ module.exports = grammar({
         choice("DomainService", "Service"),
         $.identifier,
         "{",
-        repeat($.method),
+        repeat(choice($.method, $.comment)),
         "}",
       ),
 
@@ -96,7 +96,7 @@ module.exports = grammar({
     //   seq("Repository", $.identifier, "{", repeat($.method), "}"),
 
     // Enum definition
-    enum: ($) => seq("Enum", $.identifier, "{", repeat($.enum_value), "}"),
+    enum: ($) => seq("Enum", $.identifier, "{", repeat(choice($.enum_value, $.comment)), "}"),
 
     // Enum values inside enum definition
     enum_value: ($) => $.identifier,
