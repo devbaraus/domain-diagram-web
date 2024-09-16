@@ -215,8 +215,8 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
                 links.attr("stroke", "lightgrey");
             })
             .on("click", function (event, d) {
-                editor.revealLineInCenter(d.line);
-                editor.setPosition({ lineNumber: d.line, column: 1 });
+                editor.revealLineInCenter(d.markup.start.row + 1);
+                editor.setPosition({ lineNumber: d.markup.start.row + 1, column: d.markup.start.column + 1 });
                 editor.focus();
             })
 
@@ -276,13 +276,13 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
     function positionDiagram(value: Diagram) {
         for (const context of value.contexts) {
             const nodes = svgGroup.selectAll(`.context-${context.name}`);
-            let columnHeights = new Array(layout.columns).fill(0);
+            let heights = new Array(layout.columns).fill(0);
 
             nodes.attr("transform", function (d, i) {
-                const nextColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
+                const nextColumnIndex = heights.indexOf(Math.min(...heights));
                 // const nextColumnIndex = i % layout.columns;
-                const x = nextColumnIndex * (layout.nodeWidth + layout.columnGap); const y = columnHeights[nextColumnIndex];
-                columnHeights[nextColumnIndex] += d3.select(this).node().getBBox().height + layout.rowGap;
+                const x = nextColumnIndex * (layout.nodeWidth + layout.columnGap); const y = heights[nextColumnIndex];
+                heights[nextColumnIndex] += d3.select(this).node().getBBox().height + layout.rowGap;
                 d.position.x = x;
                 d.position.y = y;
                 return `translate(${x}, ${y})`;

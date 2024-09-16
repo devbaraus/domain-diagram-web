@@ -1,3 +1,7 @@
+import _ from 'lodash';
+import * as TreeSitter from 'web-tree-sitter';
+import type * as Monaco from 'monaco-editor/esm/vs/editor/editor.api';
+
 enum MarkerSeverity {
     Hint = 1,
     Info = 2,
@@ -66,4 +70,57 @@ export function checkForSyntaxErrors(ast) {
     walk(ast);
 
     return errors;
+}
+
+export function updateDefinitionMarkers(monaco, diagram: Diagram) {
+    monaco?.languages.registerDefinitionProvider('ddd', {
+        provideDefinition: function (model, position) {
+            const word = model.getWordAtPosition(position);
+
+            if (!word || !diagram) return;
+
+            const definitionPosition = findDefinition(word.word, diagram);
+
+            if (!definitionPosition) return;
+
+            return {
+                uri: model.uri,
+                range: new monaco.Range(
+                    definitionPosition.start.row + 1,
+                    definitionPosition.start.column + 1,
+                    definitionPosition.end.row + 1,
+                    definitionPosition.end.column + 1
+                )
+            };
+        }
+    });
+}
+
+export function updateModelMarkers(monaco, model, markers) {
+    monaco?.editor.setModelMarkers(model, 'ddd', markers);
+}
+
+export function findDefinition(word, diagram: Diagram) {
+    const items = [diagram.aggregates, diagram.entities, diagram.valueObjects, diagram.enums, diagram.services, diagram.events, diagram.repositories].flat();
+
+    let definitionNode = null;
+
+    for (const item of items) {
+        if ('id' in item && item.id === word) {
+            definitionNode = item;
+            break;
+        }
+
+        if ('ids' in item && item.ids.includes(word)) {
+            definitionNode = item;
+            break;
+        }
+    }
+
+    console.log('Definition node:', definitionNode);
+
+    return definitionNode ? {
+        start: definitionNode.markup.start,
+        end: definitionNode.markup.start
+    } : null;
 }

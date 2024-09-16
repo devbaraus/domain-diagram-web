@@ -1,4 +1,5 @@
 import * as monaco from 'monaco-editor';
+import { findDefinition } from './utils/editor-utils';
 
 monaco.languages.register({ id: 'ddd' });
 

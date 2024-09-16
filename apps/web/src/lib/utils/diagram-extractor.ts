@@ -190,7 +190,16 @@ export function extractAggregate(node: SyntaxNode | undefined): Aggregate | unde
         name: '',
         type: 'aggregate',
         context: '',
-        line: 0,
+        markup: {
+            start: {
+                row: 0,
+                column: 0
+            },
+            end: {
+                row: 0,
+                column: 0
+            }
+        },
         properties: [],
         methods: [],
         position: {
@@ -237,7 +246,16 @@ export function extractAggregate(node: SyntaxNode | undefined): Aggregate | unde
         if (child.type === 'identifier') {
             data.name = child.text;
             data.ids.push(child.text);
-            data.line = child.startPosition.row + 1;
+            data.markup = {
+                start: {
+                    row: child.startPosition.row,
+                    column: child.startPosition.column
+                },
+                end: {
+                    row: child.endPosition.row,
+                    column: child.endPosition.column
+                }
+            }
         }
 
         if (child.type === 'field') {
@@ -270,7 +288,16 @@ export function extractValueObject(node: SyntaxNode | undefined): ValueObject | 
         name: '',
         type: 'value_object',
         context: '',
-        line: 0,
+        markup: {
+            start: {
+                row: 0,
+                column: 0
+            },
+            end: {
+                row: 0,
+                column: 0
+            }
+        },
         properties: [],
         position: {
             fixed: false,
@@ -302,7 +329,16 @@ export function extractValueObject(node: SyntaxNode | undefined): ValueObject | 
         if (child.type === 'identifier') {
             data.name = child.text;
             data.id = child.text;
-            data.line = child.startPosition.row + 1;
+            data.markup = {
+                start: {
+                    row: child.startPosition.row,
+                    column: child.startPosition.column
+                },
+                end: {
+                    row: child.endPosition.row,
+                    column: child.endPosition.column
+                }
+            }
         }
 
         if (child.type === 'field') {
@@ -327,7 +363,16 @@ export function extractEvent(node: SyntaxNode | undefined): DomainEvent | undefi
         name: '',
         type: 'event',
         context: '',
-        line: 0,
+        markup: {
+            start: {
+                row: 0,
+                column: 0
+            },
+            end: {
+                row: 0,
+                column: 0
+            }
+        },
         properties: [],
         position: {
             fixed: false,
@@ -359,7 +404,16 @@ export function extractEvent(node: SyntaxNode | undefined): DomainEvent | undefi
         if (child.type === 'identifier') {
             data.name = child.text;
             data.id = child.text;
-            data.line = child.startPosition.row + 1;
+            data.markup = {
+                start: {
+                    row: child.startPosition.row,
+                    column: child.startPosition.column
+                },
+                end: {
+                    row: child.endPosition.row,
+                    column: child.endPosition.column
+                }
+            }
         }
 
         if (child.type === 'field') {
@@ -384,7 +438,16 @@ export function extractEntity(node: SyntaxNode | undefined): Entity | undefined 
         name: '',
         type: 'entity',
         context: '',
-        line: 0,
+        markup: {
+            start: {
+                row: 0,
+                column: 0
+            },
+            end: {
+                row: 0,
+                column: 0
+            }
+        },
         properties: [],
         methods: [],
         position: {
@@ -431,7 +494,16 @@ export function extractEntity(node: SyntaxNode | undefined): Entity | undefined 
         if (child.type === 'identifier') {
             data.name = child.text;
             data.ids.push(child.text);
-            data.line = child.startPosition.row + 1;
+            data.markup = {
+                start: {
+                    row: child.startPosition.row,
+                    column: child.startPosition.column
+                },
+                end: {
+                    row: child.endPosition.row,
+                    column: child.endPosition.column
+                }
+            }
         }
 
         if (child.type === 'field') {
@@ -464,7 +536,16 @@ export function extractRepository(node: SyntaxNode | undefined): Repository | un
         name: '',
         type: 'repository',
         context: '',
-        line: 0,
+        markup: {
+            start: {
+                row: 0,
+                column: 0
+            },
+            end: {
+                row: 0,
+                column: 0
+            }
+        },
         methods: [],
         position: {
             fixed: false,
@@ -496,7 +577,16 @@ export function extractRepository(node: SyntaxNode | undefined): Repository | un
         if (child.type === 'identifier') {
             data.name = child.text;
             data.id = child.text;
-            data.line = child.startPosition.row + 1;
+            data.markup = {
+                start: {
+                    row: child.startPosition.row,
+                    column: child.startPosition.column
+                },
+                end: {
+                    row: child.endPosition.row,
+                    column: child.endPosition.column
+                }
+            }
         }
 
 
@@ -521,7 +611,16 @@ export function extractService(node: SyntaxNode | undefined): Service | undefine
         id: '',
         name: '',
         type: 'service',
-        line: 0,
+        markup: {
+            start: {
+                row: 0,
+                column: 0
+            },
+            end: {
+                row: 0,
+                column: 0
+            }
+        },
         context: '',
         methods: [],
         position: {
@@ -554,7 +653,16 @@ export function extractService(node: SyntaxNode | undefined): Service | undefine
         if (child.type === 'identifier') {
             data.name = child.text;
             data.id = child.text;
-            data.line = child.startPosition.row + 1;
+            data.markup = {
+                start: {
+                    row: child.startPosition.row,
+                    column: child.startPosition.column
+                },
+                end: {
+                    row: child.endPosition.row,
+                    column: child.endPosition.column
+                }
+            }
         }
 
         if (child.type === 'method') {
@@ -579,7 +687,16 @@ export function extractEnum(node: SyntaxNode | undefined): Enum | undefined {
         name: '',
         type: 'enum',
         context: '',
-        line: 0,
+        markup: {
+            start: {
+                row: 0,
+                column: 0
+            },
+            end: {
+                row: 0,
+                column: 0
+            }
+        },
         values: [],
         position: {
             fixed: false,
@@ -611,7 +728,16 @@ export function extractEnum(node: SyntaxNode | undefined): Enum | undefined {
         if (child.type === 'identifier') {
             data.name = child.text;
             data.id = child.text;
-            data.line = child.startPosition.row + 1;
+            data.markup = {
+                start: {
+                    row: child.startPosition.row,
+                    column: child.startPosition.column
+                },
+                end: {
+                    row: child.endPosition.row,
+                    column: child.endPosition.column
+                }
+            }
         }
 
 
@@ -623,7 +749,7 @@ export function extractEnum(node: SyntaxNode | undefined): Enum | undefined {
     return data
 }
 
-export function extractDiagram(node: SyntaxNode | undefined, context: string = 'DEFAULT', line: number = 0, passDiagram: Diagram): Diagram {
+export function extractDiagram(node: SyntaxNode | undefined, context?: string = 'DEFAULT', line?: number = 0, passDiagram?: Diagram = undefined): Diagram {
     const diagram: Diagram = passDiagram || {
         aggregates: [],
         entities: [],
@@ -644,7 +770,16 @@ export function extractDiagram(node: SyntaxNode | undefined, context: string = '
         id: context,
         name: context,
         type: 'context',
-        line,
+        markup: {
+            start: {
+                row: 0,
+                column: 0
+            },
+            end: {
+                row: 0,
+                column: 0
+            }
+        },
         aggregates: [],
         entities: [],
         valueObjects: [],

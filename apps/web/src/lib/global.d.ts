@@ -26,7 +26,7 @@ type Common = {
     name: string;
     type: string;
     context: string;
-    line: number;
+    markup: MarkupPosition;
     position: Position
     ports: {
         top: Port;
@@ -42,6 +42,17 @@ declare type Method = {
     name: string;
     parameters: Parameter[];
     return: Type;
+}
+
+declare type Markup = {
+    start: {
+        row: number;
+        column: number;
+    };
+    end: {
+        row: number;
+        column: number;
+    };
 }
 
 declare type Position = {
@@ -97,7 +108,6 @@ declare type Context = Omit<Common, 'context'> & {
     id: string,
     name: string;
     type: string;
-    line: number;
     aggregates: string[];
     entities: string[];
     valueObjects: string[];
