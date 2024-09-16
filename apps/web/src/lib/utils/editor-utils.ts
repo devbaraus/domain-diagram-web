@@ -117,8 +117,6 @@ export function findDefinition(word, diagram: Diagram) {
         }
     }
 
-    console.log('Definition node:', definitionNode);
-
     return definitionNode ? {
         start: definitionNode.markup.start,
         end: definitionNode.markup.start
