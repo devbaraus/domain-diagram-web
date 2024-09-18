@@ -11,6 +11,7 @@ type User struct {
 	Name     string
 	Email    string `gorm:"unique"`
 	Password string
+	Super    bool `gorm:"default:false"`
 	Active   bool `gorm:"default:true"`
 }
 
