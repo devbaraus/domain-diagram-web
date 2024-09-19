@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"main/controllers"
+	"main/database"
 	"main/models"
 	"net/http"
 )
@@ -25,7 +26,9 @@ func main() {
 		panic("Failed to connect database")
 	}
 
-	errDb := db.AutoMigrate(&models.User{}, &models.Project{})
+	database.Conn = db
+
+	errDb := db.AutoMigrate(&models.User{}, &models.Project{}, &models.ProjectMember{})
 	if errDb != nil {
 		panic("Failed to migrate database")
 	}
@@ -35,8 +38,9 @@ func main() {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 
-	r.Mount("/auth", controllers.AuthRouter(db))
-	r.Mount("/projects", controllers.ProjectRouter(db))
+	r.Mount("/auth", controllers.AuthRouter())
+	r.Mount("/users", controllers.UserRouter())
+	r.Mount("/projects", controllers.ProjectRouter())
 
 	fmt.Println("Server is running on http://localhost:3000")
 	http.ListenAndServe(":3000", r)

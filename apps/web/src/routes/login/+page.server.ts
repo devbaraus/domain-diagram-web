@@ -1,6 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit"
 import type { Actions, PageServerLoad } from "./$types"
-import { directusClient } from "$lib/client"
+import { client } from "$lib/client"
 import { goto } from "$app/navigation"
 
 export const load: PageServerLoad = async ({ locals, url, parent }) => {
@@ -21,7 +21,7 @@ export const actions: Actions = {
             return fail(400, { invalid: true })
         }
 
-        const data = await directusClient.login(email, password)
+        const { data } = await client.post('/auth/login', { email, password })
 
         if (!data.access_token || !data.expires_at) {
             return fail(401, { invalid: true })

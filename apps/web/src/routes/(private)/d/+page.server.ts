@@ -5,7 +5,7 @@ import type { PageServerLoad } from "./$types"
 export const load: PageServerLoad = async ({ locals, parent }) => {
     await parent()
 
-    let res = await listProjects(locals.session, { limit: 1, filter: { user_created: locals.user.id } })
+    let res = await listProjects(locals.session)
 
     if (!res.length) {
         res = await createProject(locals.user.first_name + '\'s project', locals.session)

@@ -2,16 +2,21 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
-	"gorm.io/gorm"
 	"log"
-	"main/middlewares"
+	"main/database"
 	"main/models"
 	"main/utils"
 	"net/http"
-	"time"
 )
+
+type ProjectCreateRequest struct {
+	Name    string `json:"name"`
+	Markup  string `json:"markup"`
+	Diagram string `json:"diagram"`
+}
 
 type ProjectResponse struct {
 	ID      uint   `json:"id"`
@@ -28,65 +33,75 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func ProjectRouter(db *gorm.DB) http.Handler {
+func ProjectRouter() http.Handler {
 	r := chi.NewRouter()
-	r.Use(middlewares.JWTAuthMiddleware(db))
+	//r.Use(middlewares.JwtMiddleware)
 
 	r.Post("/", func(w http.ResponseWriter, r *http.Request) {
-		CreateProject(w, r, db)
+		CreateProject(w, r)
 	})
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		ListProjects(w, r, db)
+		ListProjects(w, r)
 	})
 
 	r.Get("/{id}", func(w http.ResponseWriter, r *http.Request) {
-		GetProject(w, r, db)
+		GetProject(w, r)
 	})
 
-	r.Get("/{id}", func(w http.ResponseWriter, r *http.Request) {
-		UpdateProject(w, r, db)
+	r.Put("/{id}", func(w http.ResponseWriter, r *http.Request) {
+		UpdateProject(w, r)
 	})
 
 	// Rota para WebSocket
-	r.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
-		SocketProject(w, r, db)
+	r.Get("/{id}/ws", func(w http.ResponseWriter, r *http.Request) {
+		SocketProject(w, r)
 	})
 
 	return r
 }
 
 // Função para criar um projeto
-func CreateProject(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+func CreateProject(w http.ResponseWriter, r *http.Request) {
 	user := utils.GetUserFromContext(r)
-	if user == nil {
+	if user.ID == 0 {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	project := models.Project{}
+	body := ProjectCreateRequest{}
 	response := ProjectResponse{}
-	json.NewDecoder(r.Body).Decode(&project)
+	json.NewDecoder(r.Body).Decode(&body)
 
-	project.Members = append(project.Members, *user)
+	project := models.Project{
+		Name:    body.Name,
+		Markup:  body.Markup,
+		Diagram: body.Diagram,
+	}
 
-	db.Create(&project).Scan(&response)
+	project.Members = append(project.Members, models.ProjectMember{
+		UserID: user.ID,
+		Role:   models.Owner,
+	})
+
+	database.Conn.Create(&project).Scan(&response)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
 
 // Função para listar projetos
-func ListProjects(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+func ListProjects(w http.ResponseWriter, r *http.Request) {
 	user := utils.GetUserFromContext(r)
-	if user == nil {
+	if user.ID == 0 {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
 	projects := []models.Project{}
 	response := []ProjectResponse{}
-	db.Joins("JOIN project_members ON project_members.project_id = projects.id").
+
+	database.Conn.Joins("JOIN project_members ON project_members.project_id = projects.id").
 		Where("project_members.user_id = ?", user.ID).
 		Find(&projects)
 
@@ -104,56 +119,99 @@ func ListProjects(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 }
 
 // Função para obter um projeto específico
-func GetProject(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+func GetProject(w http.ResponseWriter, r *http.Request) {
+	user := utils.GetUserFromContext(r)
+	if user.ID == 0 {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	id := chi.URLParam(r, "id")
 	response := ProjectResponse{}
-	project := models.Project{}
 
-	db.First(&project, id).Scan(&response)
+	database.Conn.Joins("JOIN project_members ON project_members.project_id = projects.id").
+		Where("project_members.user_id = ?", user.ID).First(&models.Project{}, id).Scan(&response)
+
+	if response.ID == 0 {
+		http.Error(w, "Project not found", http.StatusNotFound)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
 
-func UpdateProject(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+func UpdateProject(w http.ResponseWriter, r *http.Request) {
+	user := utils.GetUserFromContext(r)
+	if user.ID == 0 {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	id := chi.URLParam(r, "id")
+	body := ProjectCreateRequest{}
+	json.NewDecoder(r.Body).Decode(&body)
+
 	project := models.Project{}
 
-	db.First(&project, id)
+	database.Conn.First(&project, id)
 
-	json.NewDecoder(r.Body).Decode(&project)
+	project.Name = body.Name
+	project.Markup = body.Markup
+	project.Diagram = body.Diagram
 
-	db.Save(&project)
+	database.Conn.Save(&project)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(project)
 }
 
-// Função WebSocket para enviar atualizações de projeto em tempo real
-func SocketProject(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+// Função para atualizar um projeto via WebSocket
+func SocketProject(w http.ResponseWriter, r *http.Request) {
+	//id := chi.URLParam(r, "id")
+	//user := utils.GetUserFromContext(r)
+	//project := models.Project{}
+	//
+	//database.Conn.Joins("JOIN project_members ON project_members.project_id = projects.id").
+	//	Where("project_members.user_id = ?", user.ID).First(&project, id)
+	//
+	//if project.ID == 0 {
+	//	http.Error(w, "Project not found", http.StatusNotFound)
+	//	return
+	//}
+
 	// Atualizar a conexão HTTP para WebSocket
-	conn, err := upgrader.Upgrade(w, r, nil)
+	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("Erro ao conectar WebSocket:", err)
 		return
 	}
-	defer conn.Close()
+	defer ws.Close()
 
-	// Simulando um loop de envio de atualizações (você pode modificar conforme necessário)
+	log.Println("Client Connected")
+	err = ws.WriteMessage(1, []byte("Hi Client!"))
+	if err != nil {
+		log.Println(err)
+	}
+
+	reader(ws)
+}
+
+func reader(conn *websocket.Conn) {
 	for {
-		// Aqui você pode buscar os dados atualizados do projeto
-		projects := []models.Project{}
-		db.Find(&projects)
-
-		// Enviar os projetos atualizados para o cliente WebSocket
-		err := conn.WriteJSON(projects)
+		// read in a message
+		messageType, p, err := conn.ReadMessage()
 		if err != nil {
-			log.Println("Erro ao enviar dados via WebSocket:", err)
-			break
+			log.Println(err)
+			return
+		}
+		// print out that message for clarity
+		fmt.Println(string(p))
+
+		if err := conn.WriteMessage(messageType, p); err != nil {
+			log.Println(err)
+			return
 		}
 
-		// Adicione algum tempo de espera para simular atualizações contínuas
-		// ou conecte com eventos reais de atualização de projetos
-		time.Sleep(5 * time.Second)
 	}
 }

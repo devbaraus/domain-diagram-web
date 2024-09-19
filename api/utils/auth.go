@@ -2,6 +2,7 @@ package utils
 
 import (
 	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
 	"main/models"
 	"net/http"
 	"os"
@@ -72,4 +73,9 @@ func GetUserFromContext(r *http.Request) *models.User {
 		return nil
 	}
 	return user
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }

@@ -3,47 +3,39 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
-	"gorm.io/gorm"
+	"main/database"
 	"main/models"
 	"main/utils"
 	"net/http"
 )
 
-func AuthRouter(db *gorm.DB) http.Handler {
+func AuthRouter() http.Handler {
 	r := chi.NewRouter()
 
-	r.Post("/login", func(w http.ResponseWriter, r *http.Request) {
-		LoginUser(w, r, db)
-	})
+	r.Post("/login", LoginUser)
 
-	r.Post("/register", func(w http.ResponseWriter, r *http.Request) {
-		CreateUser(w, r, db)
-	})
-
-	r.Get("/me", func(w http.ResponseWriter, r *http.Request) {
-		GetProject(w, r, db)
-	})
+	r.Post("/register", CreateUser)
 
 	return r
 }
 
-type AuthCredentialsRequest struct {
+type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-func LoginUser(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
-	credentials := AuthCredentialsRequest{}
+func LoginUser(w http.ResponseWriter, r *http.Request) {
+	body := LoginRequest{}
 
-	json.NewDecoder(r.Body).Decode(&credentials)
+	json.NewDecoder(r.Body).Decode(&body)
 
 	user := models.User{}
-	db.Where("email = ?", credentials.Email).First(&user)
+	database.Conn.Where("email = ?", body.Email).First(&user)
 
-	isValid := models.CheckPasswordHash(credentials.Password, user.Password)
+	isValid := utils.CheckPasswordHash(body.Password, user.Password)
 
 	if !isValid {
-		http.Error(w, "Email or password is not valid", http.StatusUnauthorized)
+		http.Error(w, "Credentials invalid", http.StatusUnauthorized)
 		return
 	}
 
