@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import Diagram from '$lib/components/diagram.svelte';
 	import Editor from '$lib/components/editor.svelte';
-	import { updateProject } from '$lib/services/project-service.svelte';
+	import { PUBLIC_WS_URL } from '$env/static/public';
 	import { model, monaco } from '$lib/store';
 	import { extractDiagram } from '$lib/utils/diagram-extractor';
 	import {
@@ -15,14 +15,7 @@
 	import { onMount } from 'svelte';
 	import TreeSitter, { type Tree } from 'web-tree-sitter';
 
-	type Props = {
-		// diagram: Diagram;
-		// markup: string;
-		id: string;
-	};
-	let props: Props = $props();
 	let ws: WebSocket | undefined;
-
 	let parser: TreeSitter | undefined;
 	let tree = $state<Tree>();
 	let diagram = $state<Diagram>();
@@ -61,7 +54,7 @@
 		await initializeParser();
 
 		ws = new WebSocket(
-			`ws://localhost:3000/projects/${$page.params.id}/ws?access_token=${$page.data.session}`
+			`${PUBLIC_WS_URL}/projects/${$page.params.id}/ws?access_token=${$page.data.session}`
 		);
 		ws.onmessage = (event) => {
 			if (event.data !== $model?.getValue()) {
@@ -72,7 +65,9 @@
 
 	function handleChange(value: string) {
 		debouncedTreeUpdate(value);
-		ws?.send(value);
+		if (ws?.readyState === WebSocket.OPEN) {
+			ws?.send(value);
+		}
 	}
 
 	function handleCtrlSave(event: KeyboardEvent) {
