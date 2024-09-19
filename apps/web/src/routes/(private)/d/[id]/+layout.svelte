@@ -66,7 +66,7 @@
 			<div class="flex-none items-center">
 				<div class="dropdown dropdown-end">
 					<div tabindex="0" role="button" class="avatar">
-						<Avatar name={`${$page.data.user?.first_name} ${$page.data.user?.last_name}`} />
+						<Avatar name={$page.data.user?.name} />
 					</div>
 					<ul class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
 						<li>

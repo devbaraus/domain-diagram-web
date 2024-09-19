@@ -10,6 +10,7 @@ import (
 	"main/models"
 	"main/utils"
 	"net/http"
+	"sync"
 )
 
 type ProjectCreateRequest struct {
@@ -173,6 +174,9 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(project)
 }
 
+var projectConnections = make(map[uint][]*websocket.Conn)
+var mutex = &sync.Mutex{}
+
 // Função para atualizar um projeto via WebSocket
 func SocketProject(w http.ResponseWriter, r *http.Request) {
 	user := utils.GetUserFromContext(r)
@@ -200,6 +204,30 @@ func SocketProject(w http.ResponseWriter, r *http.Request) {
 	}
 	defer ws.Close()
 
+	// Adicionar conexão ao mapa de conexões do projeto
+	mutex.Lock()
+	projectConnections[project.ID] = append(projectConnections[project.ID], ws)
+	mutex.Unlock()
+
+	// Remover a conexão ao sair
+	defer func() {
+		mutex.Lock()
+		conns := projectConnections[project.ID]
+		for i, conn := range conns {
+			if conn == ws {
+				projectConnections[project.ID] = append(conns[:i], conns[i+1:]...)
+				break
+			}
+		}
+		mutex.Unlock()
+		log.Println("Client Disconnected")
+	}()
+
+	log.Println("Client Connected")
+	if err := ws.WriteMessage(1, []byte(project.Markup)); err != nil {
+		log.Println(err)
+	}
+
 	for {
 		// read in a message
 		messageType, p, err := ws.ReadMessage()
@@ -208,14 +236,17 @@ func SocketProject(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// Atualizar o markup do projeto no banco de dados
 		project.Markup = string(p)
-
-		// print out that message for clarity
 		database.Conn.Save(&project)
 
-		if err := ws.WriteMessage(messageType, p); err != nil {
-			log.Println(err)
-			return
+		// Enviar a mensagem para todas as conexões ativas do projeto
+		mutex.Lock()
+		for _, conn := range projectConnections[project.ID] {
+			if err := conn.WriteMessage(messageType, p); err != nil {
+				log.Println("Erro ao enviar mensagem para cliente:", err)
+			}
 		}
+		mutex.Unlock()
 	}
 }

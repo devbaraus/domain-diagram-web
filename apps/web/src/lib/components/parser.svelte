@@ -16,20 +16,17 @@
 	import TreeSitter, { type Tree } from 'web-tree-sitter';
 
 	type Props = {
-		diagram: Diagram;
-		markup: string;
+		// diagram: Diagram;
+		// markup: string;
 		id: string;
 	};
 	let props: Props = $props();
-	let ws;
+	let ws: WebSocket | undefined;
 
 	let parser: TreeSitter | undefined;
 	let tree = $state<Tree>();
-	let diagram = $state<Diagram>(props.diagram);
-
-	const updateMarkup = async (markup: string, diagram: Diagram) => {
-		return updateProject(props.id, { markup, diagram }, $page.data.session);
-	};
+	let diagram = $state<Diagram>();
+	let markup = $state<string>('');
 
 	const updateTree = (value: string) => {
 		tree = parser?.parse(value);
@@ -50,14 +47,7 @@
 
 	const debouncedTreeUpdate = _.debounce((value: string) => {
 		updateTree(value);
-
-		debouncedMarkupUpdate(value, diagram);
-	}, 1500);
-
-	const debouncedMarkupUpdate = _.debounce(
-		(markup: string, diagram: Diagram) => updateMarkup(markup, diagram),
-		500
-	);
+	}, 300);
 
 	async function initializeParser() {
 		await TreeSitter.init();
@@ -69,17 +59,13 @@
 
 	onMount(async () => {
 		await initializeParser();
-		updateTree(props.markup);
 
 		ws = new WebSocket(
 			`ws://localhost:3000/projects/${$page.params.id}/ws?access_token=${$page.data.session}`
 		);
-		ws.onopen = () => {
-			console.log('connected');
-		};
 		ws.onmessage = (event) => {
 			if (event.data !== $model?.getValue()) {
-				$model?.setValue(event.data);
+				markup = event.data;
 			}
 		};
 	});
@@ -96,6 +82,6 @@
 	}
 </script>
 
-<Editor value={props.markup} onchange={handleChange} onkeydown={handleCtrlSave} />
+<Editor value={markup} onchange={handleChange} onkeydown={handleCtrlSave} />
 <!-- <span class="w-96">{tree?.rootNode?.toString()}</span> -->
 <Diagram class="font-fira w-full flex-1 select-none" {diagram} />

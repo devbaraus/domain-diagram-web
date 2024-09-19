@@ -457,6 +457,10 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
     return {
         update(value: Diagram) {
+            if (_.isUndefined(value)) {
+                return;
+            }
+
             if (_.isEqual(value, diagram)) {
                 return;
             }

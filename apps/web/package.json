@@ -43,7 +43,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@directus/sdk": "^17.0.0",
 		"@tanstack/svelte-query": "^5.55.4",
 		"axios": "^1.7.7",
 		"clsx": "^2.1.1",

@@ -1,4 +1,3 @@
-import { authentication, createDirectus, rest } from '@directus/sdk';
 import { PUBLIC_API_URL } from '$env/static/public'
 import { QueryClient } from '@tanstack/svelte-query';
 import { writable } from 'svelte/store';

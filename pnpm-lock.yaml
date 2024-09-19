@@ -10,9 +10,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@directus/sdk':
-        specifier: ^17.0.0
-        version: 17.0.0
       '@tanstack/svelte-query':
         specifier: ^5.55.4
         version: 5.55.4(svelte@5.0.0-next.241)
@@ -148,10 +145,6 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
-
-  '@directus/sdk@17.0.0':
-    resolution: {integrity: sha512-ADKoFrLjWPVVsYNK0EffVFstl/ZHVaQbiUp4NCueKfvFaOSLQ16xSVNj5O//rP5+rU8t1HkjwC6JDh02rao7ZQ==}
-    engines: {node: '>=18.0.0'}
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -2148,8 +2141,6 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
-
-  '@directus/sdk@17.0.0': {}
 
   '@esbuild/aix-ppc64@0.21.5':
     optional: true
