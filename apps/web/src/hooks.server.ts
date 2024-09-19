@@ -16,8 +16,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 
         const { data } = await client.get("/users/me")
 
-        console.log('data', data)
-
         if (data) {
             event.locals.user = data as any
             event.locals.session = session

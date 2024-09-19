@@ -4,7 +4,7 @@ import type { PageServerLoad } from "../$types"
 export const load: PageServerLoad = async ({ locals, parent, depends }) => {
     await parent()
 
-    let res = await listProjects(locals.session, { filter: { user_created: locals.user.id } })
+    let res = await listProjects(locals.session)
 
 
     return {

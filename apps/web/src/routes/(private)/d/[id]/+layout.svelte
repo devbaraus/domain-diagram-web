@@ -1,20 +1,18 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import Avatar from '$lib/components/avatar.svelte';
 	import ProjectCreateButton from '$lib/components/projects/project-create-button.svelte';
 	import { deleteProject, listProjects } from '$lib/services/project-service.svelte';
-	import { createMutation, createQuery } from '@tanstack/svelte-query';
-	import { getAvatarColor, getAvatarName } from '$lib';
 	import { project } from '$lib/store';
-	import { goto } from '$app/navigation';
+	import { createMutation, createQuery } from '@tanstack/svelte-query';
 	import { TrashIcon } from 'lucide-svelte';
-	import Avatar from '$lib/components/avatar.svelte';
 
 	let modal;
 
 	const query = createQuery({
 		queryKey: ['list-projects'],
-		queryFn: async () =>
-			await listProjects($page.data.session, { filter: { user_created: $page.data.user.id } }),
+		queryFn: async () => await listProjects($page.data.session),
 		initialData: $page.data.items
 	});
 

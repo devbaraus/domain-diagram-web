@@ -31,7 +31,7 @@ export async function getProject(id: string | number, token: string) {
 export async function listProjects(token: string) {
     await client.setToken(token)
 
-    const { data } = client.get("/projects");
+    const { data } = await client.get("/projects");
     return data
 }
 

@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
 	"log"
 	"main/database"
+	"main/middlewares"
 	"main/models"
 	"main/utils"
 	"net/http"
@@ -35,7 +35,8 @@ var upgrader = websocket.Upgrader{
 
 func ProjectRouter() http.Handler {
 	r := chi.NewRouter()
-	//r.Use(middlewares.JwtMiddleware)
+
+	r.Use(middlewares.JwtMiddleware)
 
 	r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 		CreateProject(w, r)
@@ -156,9 +157,15 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
 	database.Conn.First(&project, id)
 
-	project.Name = body.Name
-	project.Markup = body.Markup
-	project.Diagram = body.Diagram
+	if body.Name != "" {
+		project.Name = body.Name
+	}
+	if body.Markup != "" {
+		project.Markup = body.Markup
+	}
+	if body.Diagram != "" {
+		project.Diagram = body.Diagram
+	}
 
 	database.Conn.Save(&project)
 
@@ -168,17 +175,22 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
 // Função para atualizar um projeto via WebSocket
 func SocketProject(w http.ResponseWriter, r *http.Request) {
-	//id := chi.URLParam(r, "id")
-	//user := utils.GetUserFromContext(r)
-	//project := models.Project{}
-	//
-	//database.Conn.Joins("JOIN project_members ON project_members.project_id = projects.id").
-	//	Where("project_members.user_id = ?", user.ID).First(&project, id)
-	//
-	//if project.ID == 0 {
-	//	http.Error(w, "Project not found", http.StatusNotFound)
-	//	return
-	//}
+	user := utils.GetUserFromContext(r)
+	if user.ID == 0 {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	id := chi.URLParam(r, "id")
+	project := models.Project{}
+
+	database.Conn.Joins("JOIN project_members ON project_members.project_id = projects.id").
+		Where("project_members.user_id = ?", user.ID).First(&project, id)
+
+	if project.ID == 0 {
+		http.Error(w, "Project not found", http.StatusNotFound)
+		return
+	}
 
 	// Atualizar a conexão HTTP para WebSocket
 	ws, err := upgrader.Upgrade(w, r, nil)
@@ -188,30 +200,22 @@ func SocketProject(w http.ResponseWriter, r *http.Request) {
 	}
 	defer ws.Close()
 
-	log.Println("Client Connected")
-	err = ws.WriteMessage(1, []byte("Hi Client!"))
-	if err != nil {
-		log.Println(err)
-	}
-
-	reader(ws)
-}
-
-func reader(conn *websocket.Conn) {
 	for {
 		// read in a message
-		messageType, p, err := conn.ReadMessage()
+		messageType, p, err := ws.ReadMessage()
 		if err != nil {
 			log.Println(err)
 			return
 		}
-		// print out that message for clarity
-		fmt.Println(string(p))
 
-		if err := conn.WriteMessage(messageType, p); err != nil {
+		project.Markup = string(p)
+
+		// print out that message for clarity
+		database.Conn.Save(&project)
+
+		if err := ws.WriteMessage(messageType, p); err != nil {
 			log.Println(err)
 			return
 		}
-
 	}
 }

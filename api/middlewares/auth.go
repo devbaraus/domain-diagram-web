@@ -12,13 +12,20 @@ func JwtMiddleware(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		// Verificar se o cabeçalho Authorization está presente
 		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" {
+		authQuery := r.URL.Query().Get("access_token")
+		var token string
+
+		if authHeader == "" && authQuery == "" {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
 		// Extrair o token do cabeçalho Authorization
-		token := authHeader[7:]
+		if authHeader != "" {
+			token = authHeader[7:]
+		} else {
+			token = authQuery
+		}
 
 		// Decodificar o token JWT
 		claims, err := utils.DecodeToken(token)

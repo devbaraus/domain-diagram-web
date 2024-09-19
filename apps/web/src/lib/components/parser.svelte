@@ -3,6 +3,7 @@
 	import Diagram from '$lib/components/diagram.svelte';
 	import Editor from '$lib/components/editor.svelte';
 	import { updateProject } from '$lib/services/project-service.svelte';
+	import { model, monaco } from '$lib/store';
 	import { extractDiagram } from '$lib/utils/diagram-extractor';
 	import {
 		checkForSyntaxErrors,
@@ -10,7 +11,6 @@
 		updateDefinitionMarkers,
 		updateModelMarkers
 	} from '$lib/utils/editor-utils';
-	import { model, monaco } from '$lib/store';
 	import _ from 'lodash';
 	import { onMount } from 'svelte';
 	import TreeSitter, { type Tree } from 'web-tree-sitter';
@@ -21,6 +21,7 @@
 		id: string;
 	};
 	let props: Props = $props();
+	let ws;
 
 	let parser: TreeSitter | undefined;
 	let tree = $state<Tree>();
@@ -69,10 +70,23 @@
 	onMount(async () => {
 		await initializeParser();
 		updateTree(props.markup);
+
+		ws = new WebSocket(
+			`ws://localhost:3000/projects/${$page.params.id}/ws?access_token=${$page.data.session}`
+		);
+		ws.onopen = () => {
+			console.log('connected');
+		};
+		ws.onmessage = (event) => {
+			if (event.data !== $model?.getValue()) {
+				$model?.setValue(event.data);
+			}
+		};
 	});
 
 	function handleChange(value: string) {
 		debouncedTreeUpdate(value);
+		ws?.send(value);
 	}
 
 	function handleCtrlSave(event: KeyboardEvent) {
