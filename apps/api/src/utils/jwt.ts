@@ -2,7 +2,7 @@ import * as jose from 'jose'
 import { createSecretKey } from 'crypto';
 import { User } from '@prisma/client';
 
-const secretKey = createSecretKey('secret' as string, 'utf-8');
+const secretKey = createSecretKey(process.env.JWT_SECRET as string, 'utf-8');
 
 
 export async function signToken(user: User) {

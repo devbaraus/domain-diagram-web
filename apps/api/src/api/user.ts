@@ -1,15 +1,14 @@
-import { prisma } from '@/db';
-import MessageResponse from '@/interfaces/MessageResponse';
-import { Project } from '@prisma/client';
+import { jwtMiddleware } from '@/middlewares';
+import { User } from '@prisma/client';
 import express from 'express';
-import { z } from 'zod';
+import _ from 'lodash';
 
 const router = express.Router();
 
-router.get<{}, MessageResponse>('/me', (req, res) => {
-    res.json({
-        message: 'User profile',
-    });
+router.get<{}, Omit<User, 'password'>>('/me', jwtMiddleware, (req, res) => {
+    const { user } = res.locals
+
+    res.json(_.omit(user, ['password']) as Omit<User, 'password'>);
 })
 
 // router.post<{}, Project | MessageResponse, ProjectCreateRequest>('/', async (req, res) => {

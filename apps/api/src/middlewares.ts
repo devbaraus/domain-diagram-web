@@ -48,9 +48,6 @@ export async function jwtMiddleware(req: Request, res: Response, next: NextFunct
     });
   }
 
-  console.log(isValid)
-
-
   const user = await prisma.user.findUnique({
     where: {
       id: Number(isValid.payload.sub)
@@ -66,4 +63,33 @@ export async function jwtMiddleware(req: Request, res: Response, next: NextFunct
   res.locals.user = user;
 
   next();
+}
+
+export async function jwtWsMiddleware(ws: WebSocket, req: Request) {
+  const token = req.url?.split('/')[1];
+
+  if (!token) {
+    ws.close();
+    return;
+  }
+
+  // Verifica se o token é válido
+  const isValid = await verifyToken(token);
+
+  if (!isValid) {
+    ws.close();
+    return;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: Number(isValid.payload.sub)
+    }
+  })
+
+  if (!user) {
+    ws.close();
+    return;
+  }
+
 }

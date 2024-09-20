@@ -1,4 +1,13 @@
 services:
+  api:
+    image: devsbaraus/ddd-api:latest
+    build: .
+    container_name: ddd_api
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+
   db:
     image: postgres:latest
     container_name: ddd_db

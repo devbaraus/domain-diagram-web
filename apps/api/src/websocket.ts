@@ -1,12 +1,13 @@
-import WebSocket from 'ws';
+import { WebSocketServer } from 'ws';
 import * as Y from 'yjs';
-import { setupWSConnection } from 'y-websocket/bin/utils';
+const setupWSConnection = require('y-websocket/bin/utils').setupWSConnection;
 
 // Mapa para armazenar os documentos Yjs compartilhados
 const docs = new Map<string, Y.Doc>();
 
 export const startWebSocketServer = (server: any) => {
-    const wss = new WebSocket.Server({ server });
+    const wss = new WebSocketServer({ server });
+
 
     wss.on('connection', (ws, req) => {
         // Pega o docId da URL, caso esteja sendo utilizado.
@@ -15,7 +16,7 @@ export const startWebSocketServer = (server: any) => {
 
         console.log('Connection to Yjs WebSocket established', projectId);
 
-        let doc: Y.Doc;
+        let doc: Y.Doc | undefined;
 
         if (projectId) {
             doc = docs.get(projectId);
@@ -29,7 +30,7 @@ export const startWebSocketServer = (server: any) => {
         }
 
         // Monitorar atualizações no documento Yjs
-        doc.on('update', async () => {
+        doc?.on('update', async () => {
             // Quando o documento for atualizado, salvar no banco de dados
             const text = doc.getText('content');
             // const updatedContent = convertYjsDocToString(doc);

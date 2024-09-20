@@ -10,6 +10,7 @@ import { signToken } from '@/utils/jwt';
 
 const router = express.Router();
 
+
 type LoginRequest = {
     email: string;
     password: string;
