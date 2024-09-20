@@ -1,0 +1,31 @@
+services:
+  api:
+    image: devsbaraus/ddd-api:latest
+    build: 
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: ddd_api
+    env_file:
+      - .env
+    labels:
+      traefik.enabled: "true"
+      traefik.http.routers.ddd-api.rule: Host(`ddd.lab.baraus.dev`)
+      traefik.http.routers.ddd-api.entrypoints: web,websecure
+      traefik.http.routers.ddd-api.tls.certresolver: letsencrypt
+      traefik.http.routers.ddd-api.service: ddd-api
+      traefik.http.services.ddd-api.loadbalancer.server.port: 3000
+    networks:
+      - proxy
+      - default
+
+  db:
+    image: postgres:latest
+    container_name: ddd_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ddd
+
+networks:
+  proxy:
+    external: true

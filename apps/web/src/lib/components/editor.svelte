@@ -1,11 +1,14 @@
 <script lang="ts">
+	import { page } from '$app/stores';
+	import { PUBLIC_WS_URL } from '$env/static/public';
 	import { editor, model, monaco } from '$lib/store';
 	import _ from 'lodash';
+	import * as Y from 'yjs';
 	import { onMount } from 'svelte';
 
 	let el: HTMLDivElement;
 
-	let data: {
+	let props: {
 		value: string;
 		class?: string;
 		onchange?: (value: string) => void;
@@ -13,6 +16,8 @@
 	} = $props();
 
 	onMount(async () => {
+		const { WebsocketProvider } = await import('y-websocket');
+		const { MonacoBinding } = await import('y-monaco');
 		$monaco = (await import('$lib/monaco')).default;
 
 		// Your monaco instance is ready, let's display some code!
@@ -30,15 +35,46 @@
 			minimap: { enabled: false }
 		});
 
-		$model = $monaco.editor.createModel(data.value, 'ddd');
-
+		$model = $monaco.editor.createModel('dawdw', 'ddd');
 		$editor.setModel($model);
 
-		$model.onDidChangeContent((e) => {
-			data.onchange?.($model.getValue());
+		const doc = new Y.Doc();
+		const provider = new WebsocketProvider(`${PUBLIC_WS_URL}`, $page.params.id, doc, {
+			params: {
+				access_token: $page.data.session
+			}
 		});
 
-		data.onchange?.($model.getValue());
+		const type = doc.getText('monaco');
+		const binding = new MonacoBinding(
+			type,
+			$editor?.getModel()!,
+			new Set([$editor]),
+			provider.awareness
+		);
+
+		provider.awareness.setLocalStateField('user', {
+			name: $page.data.user.name,
+			color: '#f3c2d8'
+		});
+
+		// provider.awareness.on('change', () => {
+		// 	// Map each awareness state to a dom-string
+		// 	const strings = [];
+		// 	provider.awareness.getStates().forEach((state) => {
+		// 		console.log(state);
+		// 		if (state.user) {
+		// 			strings.push(`<div style="color:${state.user.color};">• ${state.user.name}</div>`);
+		// 		}
+		// 		document.querySelector('#users').innerHTML = strings.join('');
+		// 	});
+		// });
+
+		$model.onDidChangeContent((e) => {
+			props.onchange?.($model.getValue());
+		});
+
+		props.onchange?.($model.getValue());
 
 		return () => {
 			$monaco?.editor.getModels().forEach((model) => model.dispose());
@@ -47,19 +83,19 @@
 	});
 
 	$effect(() => {
-		if (_.isEqual($model?.getValue(), data.value)) {
+		if (_.isEqual($model?.getValue(), props.value)) {
 			return;
 		}
 
-		$model?.setValue(data.value);
+		$model?.setValue(props.value);
 	});
 </script>
 
 <div
 	id="editor"
 	bind:this={el}
-	class={data.class}
-	onkeydown={data.onkeydown}
+	class={props.class}
+	onkeydown={props.onkeydown}
 	role="textbox"
 	aria-label="Code editor"
 	aria-multiline="true"
