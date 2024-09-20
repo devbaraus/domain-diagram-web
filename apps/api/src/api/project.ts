@@ -36,15 +36,12 @@ router.post<{}, Project | MessageResponse, ProjectCreateRequest>('/', async (req
     const project = await prisma.project.create({
         data: {
             name,
-            markup: markup || '',
-            diagram: {},
             members: {
                 create: {
                     userId: user.id,
                     role: 'OWNER',
                 }
-            },
-            data: Buffer.from(''),
+            }
         }
     })
 
@@ -97,8 +94,6 @@ router.put<{ id: string }, Project | MessageResponse, ProjectCreateRequest>('/:i
 
     const schema = z.object({
         name: z.string().min(3).max(32),
-        markup: z.string(),
-        diagram: z.object({}),
     }).partial();
 
     const parsed = schema.safeParse(req.body);
@@ -122,9 +117,7 @@ router.put<{ id: string }, Project | MessageResponse, ProjectCreateRequest>('/:i
             }
         },
         data: {
-            name,
-            markup,
-            diagram
+            name
         }
     })
 
