@@ -1,30 +1,56 @@
 {
   "name": "api",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "1.2.0",
+  "description": " A basic starter for an express.js API with Typescript",
+  "main": "src/index.ts",
   "scripts": {
-    "dev": "tsx --watch index.ts"
+    "start": "tsx src/index.ts",
+    "dev": "tsx --watch src/index.ts",
+    "build": "tsx",
+    "start:dist": "node dist/src/index.js",
+    "lint": "eslint --fix src test",
+    "typecheck": "tsx --noEmit"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "CJ R. <cj@null.computer> (https://w3cj.now.sh)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/w3cj/express-api-starter.git"
+  },
+  "license": "MIT",
   "dependencies": {
-    "knex": "^3.1.0",
-    "koa": "^2.15.3",
-    "koa-bodyparser": "^4.4.1",
-    "koa-router": "^13.0.1",
-    "pg": "^8.13.0",
+    "@prisma/client": "^5.19.1",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "helmet": "^7.1.0",
+    "jose": "^5.9.2",
+    "lodash": "^4.17.21",
+    "morgan": "^1.10.0",
     "ws": "^8.18.0",
     "y-websocket": "^2.0.4",
-    "yjs": "^13.6.19"
+    "yjs": "^13.6.19",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/koa": "^2.15.0",
-    "@types/koa-router": "^7.4.8",
-    "@types/pg": "^8.11.10",
-    "@types/ws": "^8.5.12",
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.5.5",
+    "@types/supertest": "^6.0.2",
+    "@typescript-eslint/eslint-plugin": "^7.16.1",
+    "@typescript-eslint/parser": "^7.16.1",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-typescript": "^18.0.0",
+    "eslint-import-resolver-typescript": "^3.6.3",
+    "eslint-plugin-import": "^2.30.0",
+    "prisma": "^5.19.1",
     "tsx": "^4.19.1",
-    "typescript": "^5.0.0"
+    "typescript": "^5.6.2"
+  },
+  "prisma": {
+    "schema": "src/db/schema.prisma"
   }
 }
