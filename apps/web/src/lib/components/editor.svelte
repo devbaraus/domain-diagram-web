@@ -4,9 +4,13 @@
 	import { editor, model, monaco } from '$lib/store';
 	import _ from 'lodash';
 	import * as Y from 'yjs';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	let el: HTMLDivElement;
+	let provider;
+	let type;
+	let doc;
+	let binding;
 
 	let props: {
 		value: string;
@@ -15,7 +19,7 @@
 		onkeydown?: (e: KeyboardEvent) => void;
 	} = $props();
 
-	onMount(async () => {
+	async function setup() {
 		const { WebsocketProvider } = await import('y-websocket');
 		const { MonacoBinding } = await import('y-monaco');
 		$monaco = (await import('$lib/monaco')).default;
@@ -35,23 +39,18 @@
 			minimap: { enabled: false }
 		});
 
-		$model = $monaco.editor.createModel('dawdw', 'ddd');
+		$model = $monaco.editor.createModel('', 'ddd');
 		$editor.setModel($model);
 
-		const doc = new Y.Doc();
-		const provider = new WebsocketProvider(`${PUBLIC_WS_URL}`, $page.params.id, doc, {
+		doc = new Y.Doc();
+		provider = new WebsocketProvider(`${PUBLIC_WS_URL}`, $page.params.id, doc, {
 			params: {
 				access_token: $page.data.session
 			}
 		});
 
-		const type = doc.getText('monaco');
-		const binding = new MonacoBinding(
-			type,
-			$editor?.getModel()!,
-			new Set([$editor]),
-			provider.awareness
-		);
+		type = doc.getText('monaco');
+		binding = new MonacoBinding(type, $editor?.getModel()!, new Set([$editor]), provider.awareness);
 
 		provider.awareness.setLocalStateField('user', {
 			name: $page.data.user.name,
@@ -75,15 +74,29 @@
 		});
 
 		props.onchange?.($model.getValue());
+	}
 
-		return () => {
-			$monaco?.editor.getModels().forEach((model) => model.dispose());
-			$editor?.dispose();
-		};
+	function dispose() {
+		provider?.disconnect();
+		binding?.destroy();
+		doc?.destroy();
+
+		$model?.dispose();
+		$editor?.dispose();
+	}
+
+	onMount(() => {
+		setup();
+
+		return dispose;
+	});
+
+	onDestroy(() => {
+		dispose();
 	});
 
 	$effect(() => {
-		if (_.isEqual($model?.getValue(), props.value)) {
+		if (!$model || $model?.isDisposed() || _.isEqual($model?.getValue(), props.value)) {
 			return;
 		}
 
