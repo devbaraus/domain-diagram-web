@@ -1,6 +1,6 @@
-import { prisma } from '@/db';
-import MessageResponse from '@/interfaces/MessageResponse';
-import { jwtMiddleware } from '@/middlewares';
+import { prisma } from '../db';
+import MessageResponse from '../interfaces/MessageResponse';
+import { jwtMiddleware } from '../middlewares';
 import { Project } from '@prisma/client';
 import express from 'express';
 import { z } from 'zod';
@@ -43,7 +43,8 @@ router.post<{}, Project | MessageResponse, ProjectCreateRequest>('/', async (req
                     userId: user.id,
                     role: 'OWNER',
                 }
-            }
+            },
+            data: Buffer.from(''),
         }
     })
 

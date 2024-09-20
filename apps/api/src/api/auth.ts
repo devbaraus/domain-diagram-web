@@ -1,12 +1,12 @@
-import { prisma } from '@/db';
+import { prisma } from '../db';
 import { User } from '@prisma/client';
 import express from 'express';
 import { z } from 'zod';
 import * as bcrypt from 'bcrypt';
-import MessageResponse from '@/interfaces/MessageResponse';
+import MessageResponse from '../interfaces/MessageResponse';
 
 import _ from 'lodash';
-import { signToken } from '@/utils/jwt';
+import { signToken } from '../utils/jwt';
 
 const router = express.Router();
 

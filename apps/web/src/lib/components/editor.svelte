@@ -8,7 +8,7 @@
 
 	let el: HTMLDivElement;
 
-	let data: {
+	let props: {
 		value: string;
 		class?: string;
 		onchange?: (value: string) => void;
@@ -35,7 +35,7 @@
 			minimap: { enabled: false }
 		});
 
-		$model = $monaco.editor.createModel(data.value, 'ddd');
+		$model = $monaco.editor.createModel('dawdw', 'ddd');
 		$editor.setModel($model);
 
 		const doc = new Y.Doc();
@@ -44,14 +44,37 @@
 				access_token: $page.data.session
 			}
 		});
-		const type = doc.getText('monaco');
-		const binding = new MonacoBinding(type, $editor?.getModel()!, new Set([$editor]));
 
-		$model.onDidChangeContent((e) => {
-			data.onchange?.($model.getValue());
+		const type = doc.getText('monaco');
+		const binding = new MonacoBinding(
+			type,
+			$editor?.getModel()!,
+			new Set([$editor]),
+			provider.awareness
+		);
+
+		provider.awareness.setLocalStateField('user', {
+			name: $page.data.user.name,
+			color: '#f3c2d8'
 		});
 
-		data.onchange?.($model.getValue());
+		// provider.awareness.on('change', () => {
+		// 	// Map each awareness state to a dom-string
+		// 	const strings = [];
+		// 	provider.awareness.getStates().forEach((state) => {
+		// 		console.log(state);
+		// 		if (state.user) {
+		// 			strings.push(`<div style="color:${state.user.color};">• ${state.user.name}</div>`);
+		// 		}
+		// 		document.querySelector('#users').innerHTML = strings.join('');
+		// 	});
+		// });
+
+		$model.onDidChangeContent((e) => {
+			props.onchange?.($model.getValue());
+		});
+
+		props.onchange?.($model.getValue());
 
 		return () => {
 			$monaco?.editor.getModels().forEach((model) => model.dispose());
@@ -60,19 +83,19 @@
 	});
 
 	$effect(() => {
-		if (_.isEqual($model?.getValue(), data.value)) {
+		if (_.isEqual($model?.getValue(), props.value)) {
 			return;
 		}
 
-		$model?.setValue(data.value);
+		$model?.setValue(props.value);
 	});
 </script>
 
 <div
 	id="editor"
 	bind:this={el}
-	class={data.class}
-	onkeydown={data.onkeydown}
+	class={props.class}
+	onkeydown={props.onkeydown}
 	role="textbox"
 	aria-label="Code editor"
 	aria-multiline="true"

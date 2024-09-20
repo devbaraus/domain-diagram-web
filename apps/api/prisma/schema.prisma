@@ -43,12 +43,10 @@ enum ProjectStatus {
 }
 
 model Project {
-  id      Int     @id @default(autoincrement())
-  name    String
-  markup  String
-  diagram Json
-  public  Boolean @default(false)
-  embed   Boolean @default(false)
+  id     Int     @id @default(autoincrement())
+  name   String
+  public Boolean @default(false)
+  embed  Boolean @default(false)
 
   status  ProjectStatus   @default(ACTIVE)
   members ProjectMember[]

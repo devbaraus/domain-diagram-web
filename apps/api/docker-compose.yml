@@ -1,8 +1,12 @@
 services:
   api:
     image: devsbaraus/ddd-api:latest
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: ddd_api
+    volumes:
+      - .:/app
     env_file:
       - .env
     ports:

@@ -2,6 +2,8 @@ import app from './app';
 import { createServer } from 'http';
 import { startWebSocketServer } from './websocket';
 
+require('dotenv').config();
+
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 

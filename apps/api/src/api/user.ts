@@ -1,4 +1,4 @@
-import { jwtMiddleware } from '@/middlewares';
+import { jwtMiddleware } from '../middlewares';
 import { User } from '@prisma/client';
 import express from 'express';
 import _ from 'lodash';

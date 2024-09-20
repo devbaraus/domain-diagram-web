@@ -9,14 +9,10 @@
     "noImplicitAny": true,
     "strict": true,
     "skipLibCheck": true,
-    "rootDir": "./src",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
   },
   "include": [
     "./*.js",
     "src/**/*.ts",
-    "test/**/*.ts",
+    "test/**/*.ts", 
   ],
 }
