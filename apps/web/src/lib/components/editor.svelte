@@ -36,22 +36,16 @@
 		});
 
 		$model = $monaco.editor.createModel(data.value, 'ddd');
+		$editor.setModel($model);
 
 		const doc = new Y.Doc();
-		const provider = new WebsocketProvider(
-			`${PUBLIC_WS_URL}/projects/${$page.params.id}`,
-			'ws',
-			doc,
-			{
-				params: {
-					access_token: $page.data.session
-				}
+		const provider = new WebsocketProvider(`${PUBLIC_WS_URL}`, $page.params.id, doc, {
+			params: {
+				access_token: $page.data.session
 			}
-		);
+		});
 		const type = doc.getText('monaco');
 		const binding = new MonacoBinding(type, $editor?.getModel()!, new Set([$editor]));
-
-		$editor.setModel($model);
 
 		$model.onDidChangeContent((e) => {
 			data.onchange?.($model.getValue());

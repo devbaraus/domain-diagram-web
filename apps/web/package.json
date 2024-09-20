@@ -50,6 +50,9 @@
 		"lucide-svelte": "^0.438.0",
 		"tailwind-merge": "^2.5.2",
 		"tree-sitter": "^0.21.1",
-		"web-tree-sitter": "^0.23.0"
+		"web-tree-sitter": "^0.23.0",
+		"y-monaco": "^0.1.6",
+		"y-websocket": "^2.0.4",
+		"yjs": "^13.6.19"
 	}
 }

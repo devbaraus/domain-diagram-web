@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 import * as Y from 'yjs';
-import { WebsocketProvider } from 'y-websocket';
+import { setupWSConnection } from 'y-websocket/bin/utils';
 
 // Mapa para armazenar os documentos Yjs compartilhados
 const docs = new Map<string, Y.Doc>();
@@ -9,43 +9,21 @@ export const startYjsWebSocketServer = (server: any) => {
     const wss = new WebSocket.Server({ server });
 
     wss.on('connection', (ws, req) => {
+        // Pega o docId da URL, caso esteja sendo utilizado.
         const urlParts = req.url?.split('/');
-        const docId = urlParts && urlParts[1]; // Assumindo que o docId será enviado na URL
+        const docId = urlParts && urlParts[1]; // Exemplo: /my-doc-id
 
-        if (!docId) {
-            ws.close();
-            return;
-        }
+        console.log('Connection to Yjs WebSocket established', docId);
 
-        // Obtenha ou crie um novo documento Yjs para o docId
-        let doc = docs.get(docId);
-        if (!doc) {
-            doc = new Y.Doc();
-            docs.set(docId, doc);
-        }
-
-        // Conectar o WebSocket ao documento Yjs
-        const wsProvider = new WebsocketProvider(`ws://localhost:${process.env.PORT || 3000}`, docId, doc);
-
-        wsProvider.on('status', (event: { status: string }) => {
-            console.log(event.status); // Logs 'connected' or 'disconnected'
-        });
-
-        // Enviar atualizações para o documento
-        ws.on('message', (message) => {
-            const decodedMessage = JSON.parse(message.toString());
-            if (decodedMessage && decodedMessage.update) {
-                Y.applyUpdate(doc, decodedMessage.update);
+        if (docId) {
+            let doc = docs.get(docId);
+            if (!doc) {
+                doc = new Y.Doc();
+                docs.set(docId, doc);
             }
-        });
 
-        // Enviar atualizações aos clientes
-        doc.on('update', (update) => {
-            ws.send(JSON.stringify({ update }));
-        });
-
-        ws.on('close', () => {
-            console.log('Client disconnected');
-        });
+            // Setup da conexão WebSocket com Yjs
+            setupWSConnection(ws, doc, { docName: docId });
+        }
     });
 };

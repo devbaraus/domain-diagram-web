@@ -80,6 +80,15 @@ importers:
       web-tree-sitter:
         specifier: ^0.23.0
         version: 0.23.0
+      y-monaco:
+        specifier: ^0.1.6
+        version: 0.1.6(monaco-editor@0.51.0)(yjs@13.6.19)
+      y-websocket:
+        specifier: ^2.0.4
+        version: 2.0.4(yjs@13.6.19)
+      yjs:
+        specifier: ^13.6.19
+        version: 13.6.19
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^3.0.0
@@ -2954,6 +2963,13 @@ packages:
     peerDependencies:
       yjs: ^13.0.0
 
+  y-monaco@0.1.6:
+    resolution: {integrity: sha512-sYRywMmcylt+Nupl+11AvizD2am06ST8lkVbUXuaEmrtV6Tf+TD4rsEm6u9YGGowYue+Vfg1IJ97SUP2J+PVXg==}
+    engines: {node: '>=12.0.0', npm: '>=6.0.0'}
+    peerDependencies:
+      monaco-editor: '>=0.20.0'
+      yjs: ^13.3.1
+
   y-protocols@1.0.6:
     resolution: {integrity: sha512-vHRF2L6iT3rwj1jub/K5tYcTT/mEYDUppgNPXwp8fmLpui9f7Yeq3OEtTLVF012j39QnV+KEQpNqoN7CWU7Y9Q==}
     engines: {node: '>=16.0.0', npm: '>=8.0.0'}
@@ -5655,6 +5671,12 @@ snapshots:
       lib0: 0.2.97
       yjs: 13.6.19
     optional: true
+
+  y-monaco@0.1.6(monaco-editor@0.51.0)(yjs@13.6.19):
+    dependencies:
+      lib0: 0.2.97
+      monaco-editor: 0.51.0
+      yjs: 13.6.19
 
   y-protocols@1.0.6(yjs@13.6.19):
     dependencies:

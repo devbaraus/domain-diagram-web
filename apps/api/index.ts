@@ -4,12 +4,12 @@ import { startWebSocketServer } from './servers/wsServer';
 import { startYjsWebSocketServer } from './servers/yjsWsServer';
 
 const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || 'localhost';
+const HOST = process.env.HOST || '0.0.0.0';
 
 const server = createServer(app.callback());
 
 // Inicializa WebSocket regular
-startWebSocketServer(server);
+// startWebSocketServer(server);
 
 // Inicializa WebSocket para Yjs
 startYjsWebSocketServer(server);

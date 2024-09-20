@@ -52,22 +52,10 @@
 
 	onMount(async () => {
 		await initializeParser();
-
-		ws = new WebSocket(
-			`${PUBLIC_WS_URL}/projects/${$page.params.id}/ws?access_token=${$page.data.session}`
-		);
-		ws.onmessage = (event) => {
-			if (event.data !== $model?.getValue()) {
-				markup = event.data;
-			}
-		};
 	});
 
 	function handleChange(value: string) {
 		debouncedTreeUpdate(value);
-		if (ws?.readyState === WebSocket.OPEN) {
-			ws?.send(value);
-		}
 	}
 
 	function handleCtrlSave(event: KeyboardEvent) {
