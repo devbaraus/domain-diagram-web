@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "web": "pnpm --filter web",
-    "grammar": "pnpm --filter grammar"
+    "grammar": "pnpm --filter grammar",
+    "api": "pnpm --filter api"
   },
   "keywords": [],
   "author": "",
