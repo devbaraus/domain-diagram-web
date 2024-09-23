@@ -18,7 +18,7 @@ type ProjectCreateRequest = {
 router.post<{}, Project | MessageResponse, ProjectCreateRequest>('/', async (req, res) => {
     const schema = z.object({
         name: z.string().min(3).max(32),
-        markup: z.string().optional(),
+        markup: z.string(),
     });
 
     const parsed = schema.safeParse(req.body);
@@ -36,6 +36,8 @@ router.post<{}, Project | MessageResponse, ProjectCreateRequest>('/', async (req
     const project = await prisma.project.create({
         data: {
             name,
+            markup,
+            diagram: {},
             members: {
                 create: {
                     userId: user.id,
@@ -63,7 +65,7 @@ router.get<{}, Project[] | MessageResponse>('/', async (req, res) => {
     res.json(projects);
 })
 
-router.get<{ id: string }, Project | MessageResponse>('/:id', async (req, res) => {
+router.get<{ id: string }, Omit<Project, 'markup' | 'diagram'> | MessageResponse>('/:id', async (req, res) => {
     const { user } = res.locals;
     const { id } = req.params;
 
@@ -113,7 +115,7 @@ const updateSchema = z.object({
 
 type ProjectUpdateRequest = z.infer<typeof updateSchema>;
 
-router.put<{ id: string }, Project | MessageResponse, ProjectCreateRequest>('/:id', async (req, res) => {
+router.put<{ id: string }, Project | MessageResponse, ProjectUpdateRequest>('/:id', async (req, res) => {
     const { user } = res.locals;
     const { id } = req.params;
 

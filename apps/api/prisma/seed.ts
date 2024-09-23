@@ -17,6 +17,8 @@ async function main() {
                     project: {
                         create: {
                             name: 'My First Project',
+                            markup: '',
+                            diagram: {},
                         }
                     }
                 }
