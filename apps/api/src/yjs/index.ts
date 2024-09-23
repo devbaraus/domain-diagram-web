@@ -78,13 +78,15 @@ export class WSSharedDoc extends Y.Doc {
     }
 }
 
-export const getYDoc = (docname, gc = true) =>
+export const getYDoc = (docname, content, gc = true) =>
     map.setIfUndefined(docs, docname, () => {
         const doc = new WSSharedDoc(docname);
         doc.gc = gc;
+
         if (persistence !== null) {
-            persistence.bindState(docname, doc);
+            persistence.bindState(docname, content, doc);
         }
+
         docs.set(docname, doc);
         return doc;
     });
@@ -153,10 +155,10 @@ const pingTimeout = 30000;
 export const setupWSConnection = (
     conn,
     req,
-    { docName = req.url.slice(1).split('?')[0], gc = true } = {},
+    { docName = req.url.slice(1).split('?')[0], content = '', gc = true } = {},
 ) => {
     conn.binaryType = 'arraybuffer';
-    const doc = getYDoc(docName, gc);
+    const doc = getYDoc(docName, content, gc);
     doc.conns.set(conn, new Set());
     conn.on('message', (message) => messageListener(conn, doc, new Uint8Array(message)));
 

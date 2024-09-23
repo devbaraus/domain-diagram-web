@@ -2,23 +2,43 @@ import * as yjs from './yjs'
 import { WebSocketServer } from 'ws';
 import { LeveldbPersistence } from 'y-leveldb';
 import * as Y from 'yjs';
+import { prisma } from './db';
 
 // Mapa para armazenar os documentos Yjs compartilhados
 const db = new LeveldbPersistence('persistence');
 const persistence = {
-    bindState: async (docName: any, ydoc: any) => {
+    bindState: async (docName: any, content: string, ydoc: any) => {
         const persistedYdoc = await db.getYDoc(docName);
         const newUpdates = Y.encodeStateAsUpdate(ydoc);
+
         db.storeUpdate(docName, newUpdates);
         Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc));
+
+        if (ydoc.share.size === 0) {
+            ydoc.getText('monaco').insert(0, content);
+        }
+
         ydoc.on('update', async (update: any) => {
             db.storeUpdate(docName, update);
         });
     },
-    writeState: () => {
-        return new Promise((resolve) => {
-            resolve(true);
-        });
+    writeState: async (docName: any, ydoc: any) => {
+        try {
+            const content = ydoc.getText('monaco').toJSON();
+
+            await prisma.project.update({
+                where: { id: Number(docName) },
+                data: {
+                    markup: content,
+                },
+            });
+        } catch (e) {
+            if (e.code == 'P2025') {
+                return;
+            }
+
+            throw e;
+        }
     },
 }
 
@@ -35,12 +55,23 @@ export const startWebSocketServer = (server: any) => {
         const urlParts = url.pathname.match(/\/([^\/]+)/);
         const docName = urlParts && urlParts[1];
 
-        if (!docName) {
+        if (docName == null) {
             ws.close();
+            return;
         }
 
-        // Setup da conexão WebSocket com Yjs
-        yjs.setupWSConnection(ws, req, { docName: docName });
+        const project = await prisma.project.findUnique({
+            where: {
+                id: Number(docName),
+            },
+        });
+
+        if (project == null) {
+            ws.close();
+            return;
+        }
+
+        yjs.setupWSConnection(ws, req, { docName: docName, content: project.markup });
     })
 };
 

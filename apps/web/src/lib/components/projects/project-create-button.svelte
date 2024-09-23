@@ -38,7 +38,7 @@
 		>
 			<label class="input input-bordered flex items-center gap-2">
 				Name
-				<input name="name" type="text" class="grow" placeholder="Daisy" />
+				<input name="name" minlength="3" type="text" class="grow" placeholder="Daisy" />
 			</label>
 
 			<div class="modal-action">
