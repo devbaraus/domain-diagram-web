@@ -14,9 +14,9 @@ const persistence = {
         db.storeUpdate(docName, newUpdates);
         Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc));
 
-        if (ydoc.share.size === 0) {
-            ydoc.getText('monaco').insert(0, content);
-        }
+        // if (ydoc.share.size === 0) {
+        //     ydoc.getText('monaco').insert(0, content);
+        // }
 
         ydoc.on('update', async (update: any) => {
             db.storeUpdate(docName, update);
