@@ -4,19 +4,28 @@
 
 	type Props = {
 		class?: string;
+		borderColor?: string;
 		name: string;
 	};
 
-	let props: Props = $props();
+	let { borderColor, class: className, name, ...rest }: Props = $props();
 </script>
 
-<div class="avatar placeholder">
+<div class="avatar placeholder select-none">
 	<div
+		style="--border-color: {borderColor};"
 		class={cn(
-			'mask mask-squircle bg-base-200 text-base-200-content flex size-12 items-center justify-center uppercase ',
-			props.class
+			'mask mask-squircle bg-base-200 text-base-200-content flex size-12 items-center justify-center uppercase',
+			className
 		)}
+		{...rest}
 	>
-		{getAvatarName(props.name)}
+		{getAvatarName(name)}
 	</div>
 </div>
+
+<style>
+	.ddd-avatar {
+		border-color: var(--border-color);
+	}
+</style>

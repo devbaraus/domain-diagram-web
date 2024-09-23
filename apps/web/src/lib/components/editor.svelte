@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { PUBLIC_WS_URL } from '$env/static/public';
-	import { getAvatarColor } from '$lib';
-	import { editor, model, monaco } from '$lib/store';
-	import { color } from 'd3';
-	import _ from 'lodash';
+	import { connections, editor, model, monaco } from '$lib/store';
 	import { onDestroy, onMount } from 'svelte';
 	import * as Y from 'yjs';
 
@@ -17,6 +14,17 @@
 		'bg-purple-500',
 		'bg-pink-500',
 		'bg-gray-500'
+	];
+
+	const colors = [
+		'#ef4444',
+		'#3b82f6',
+		'#22c55e',
+		'#eab308',
+		'#6366f1',
+		'#a855f7',
+		'#ec4899',
+		'#6b7280'
 	];
 
 	const borders = [
@@ -89,11 +97,17 @@
 		type = doc.getText('monaco');
 		binding = new MonacoBinding(type, $editor?.getModel()!, new Set([$editor]), provider.awareness);
 
+		// TODO Aproveitar na versão embed
+		// doc.on('update', (update) => {
+		// 	console.log(doc.getText('monaco').toJSON());
+		// });
+
 		awareness = provider.awareness;
 		awareness.setLocalState({
 			user: {
 				id: $page.data.user.id,
-				name: $page.data.user.name
+				name: $page.data.user.name,
+				color: colors[$page.data.user.id % colors.length]
 			}
 		});
 
@@ -118,10 +132,10 @@
 			});
 		});
 
-		awareness.on('change', () => {
+		awareness.on('change', (e) => {
 			decorations?.clear();
-
 			decorateCursors();
+			connections.set(awareness.getStates().values());
 		});
 
 		function decorateCursors() {
@@ -136,7 +150,6 @@
 				const user = deco.user;
 				const cursor = deco.cursor;
 				const selection = deco.selection;
-				console.log('cursor', user);
 
 				if (cursor) {
 					r.push({
@@ -165,11 +178,7 @@
 							selection.endColumn
 						),
 						options: {
-							className: `${backgrounds[user.id % backgrounds.length]} opacity-50 rounded`,
-							hoverMessage: {
-								value: user.name,
-								isTrusted: true
-							}
+							className: `${backgrounds[user.id % backgrounds.length]} opacity-50 rounded`
 						}
 					});
 				}

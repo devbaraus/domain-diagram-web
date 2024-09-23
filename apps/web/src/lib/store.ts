@@ -5,8 +5,7 @@ export const editor: Writable<Monaco.editor.IStandaloneCodeEditor> = writable(nu
 export const monaco: Writable<typeof Monaco> = writable(null);
 export const model: Writable<Monaco.editor.ITextModel> = writable(null);
 export const project: Writable<any> = writable(null);
-export const session: Writable<string> = writable(null);
-export const user: Writable<any> = writable(null);
+export const connections: Writable<any[]> = writable([]);
 
 export type DiagramStore = {
     fixed: boolean,

@@ -11,8 +11,12 @@ export async function createProject(name: string, token: string) {
 
 export async function updateProject(id: string | number, params: {
     name?: string;
-    markup?: string;
-    diagram?: object
+    members?: {
+        role: string,
+        userId: string
+    }[],
+    public: boolean,
+    embed: boolean,
 }, token: string) {
     await client.setToken(token)
 

@@ -3,12 +3,18 @@
 	import { page } from '$app/stores';
 	import Avatar from '$lib/components/avatar.svelte';
 	import ProjectCreateButton from '$lib/components/projects/project-create-button.svelte';
-	import { deleteProject, listProjects } from '$lib/services/project-service.svelte';
-	import { project } from '$lib/store';
+	import { deleteProject, listProjects, updateProject } from '$lib/services/project-service.svelte';
+	import { project, connections } from '$lib/store';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
-	import { TrashIcon } from 'lucide-svelte';
+	import { TrashIcon, Share2Icon } from 'lucide-svelte';
 
-	let modal;
+	let deleteModal;
+	let shareModal;
+	let members = $state([]);
+
+	$effect(() => {
+		members = $project?.members.map((i) => ({ email: i.user.email, role: i.role }));
+	});
 
 	const query = createQuery({
 		queryKey: ['list-projects'],
@@ -19,7 +25,17 @@
 	const deletion = createMutation({
 		mutationFn: async () => await deleteProject($page.params.id, $page.data.session),
 		onSuccess: () => {
-			modal?.close();
+			deleteModal?.close();
+			$query.refetch();
+			goto('/d');
+		}
+	});
+
+	const update = createMutation({
+		mutationFn: async ({ members }) =>
+			await updateProject($page.params.id, { members }, $page.data.session),
+		onSuccess: () => {
+			shareModal?.close();
 			$query.refetch();
 			goto('/d');
 		}
@@ -46,24 +62,87 @@
 		{/each}
 	</aside>
 	<div class="w-full">
+		<dialog bind:this={deleteModal} class="modal">
+			<div class="modal-box">
+				<p>Are you sure you want to delete this project?</p>
+				<div class="modal-action">
+					<button class="btn" onclick={() => deleteModal?.close()}> No </button>
+					<button class="btn btn-error" onclick={() => $deletion.mutate()}> Yes </button>
+				</div>
+			</div>
+		</dialog>
+
+		<dialog bind:this={shareModal} class="modal">
+			<div class="modal-box space-y-2">
+				<p>Update who can see this project?</p>
+
+				<div class="grid border-collapse grid-cols-2 gap-2">
+					{#if members}
+						{#each members as member}
+							<input
+								class="input input-sm input-bordered"
+								type="text"
+								disabled={member.role === 'OWNER'}
+								value={member.email}
+							/>
+							<button
+								class="btn btn-sm"
+								disabled={member.role === 'OWNER'}
+								onclick={() => (members = members.filter((i) => i.email !== member.email))}
+								>Remove
+							</button>
+						{/each}
+					{/if}
+				</div>
+				<div>
+					<form
+						onsubmit={(e) => {
+							e.preventDefault();
+							const email = e.target.email.value;
+							e.target.reset();
+							if (members.find((i) => i.email === email)) return;
+							members.push({ email: email, role: 'MEMBER' });
+						}}
+					>
+						<input class="input input-bordered input-sm w-full" type="text" name="email" />
+					</form>
+				</div>
+
+				<div class="modal-action">
+					<button class="btn" onclick={() => shareModal?.close()}> No </button>
+					<button class="btn btn-error" onclick={() => $update.mutate({ members })}> Yes </button>
+				</div>
+			</div>
+		</dialog>
 		<div class="navbar bg-base-100 h-12 border-b">
 			<div class="flex-1 space-x-2 px-2">
-				<button onclick={() => modal?.showModal()}>
-					<TrashIcon class="text-error size-5" />
-				</button>
 				<span class="text-xl">{$project?.name}</span>
-
-				<dialog bind:this={modal} class="modal">
-					<div class="modal-box">
-						<p>Are you sure you want to delete this project?</p>
-						<div class="modal-action">
-							<button class="btn" onclick={() => modal?.close()}> No </button>
-							<button class="btn btn-error" onclick={() => $deletion.mutate()}> Yes </button>
-						</div>
-					</div>
-				</dialog>
+				<ul>
+					{#each $connections.filter((i) => $page.data.user.id !== i.user.id) as { user }}
+						<li class="tooltip tooltip-bottom" data-tip={user.name}>
+							<Avatar
+								name={user.name}
+								class="ddd-avatar size-8 rounded-full border-2"
+								borderColor={user.color}
+							/>
+						</li>
+					{/each}
+				</ul>
 			</div>
-			<div class="flex-none items-center">
+			<div class="flex-none items-center gap-4">
+				{#if $project?.members.find((i) => i.role === 'OWNER' && i.user.id === $page.data.user.id)}
+					<button
+						class="btn btn-warning mask mask-squircle"
+						onclick={() => shareModal?.showModal()}
+					>
+						<Share2Icon class="size-5" />
+					</button>
+
+					<button class="btn btn-error mask mask-squircle" onclick={() => deleteModal?.showModal()}>
+						<TrashIcon class="size-5" />
+					</button>
+				{/if}
+
 				<div class="dropdown dropdown-end">
 					<div tabindex="0" role="button" class="avatar">
 						<Avatar name={$page.data.user?.name} />

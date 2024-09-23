@@ -1,7 +1,7 @@
 import { prisma } from '../db';
 import MessageResponse from '../interfaces/MessageResponse';
 import { jwtMiddleware } from '../middlewares';
-import { Project } from '@prisma/client';
+import { Prisma, Project } from '@prisma/client';
 import express from 'express';
 import { z } from 'zod';
 
@@ -75,6 +75,18 @@ router.get<{ id: string }, Project | MessageResponse>('/:id', async (req, res) =
                     userId: user.id,
                 }
             }
+        },
+        select: {
+            id: true,
+            embed: true,
+            name: true,
+            public: true,
+            status: true,
+            members: {
+                include: {
+                    user: true,
+                }
+            }
         }
     });
 
@@ -88,15 +100,24 @@ router.get<{ id: string }, Project | MessageResponse>('/:id', async (req, res) =
     res.json(project);
 })
 
+
+const updateSchema = z.object({
+    name: z.string().min(3).max(32),
+    members: z.array(z.object({
+        role: z.string(),
+        email: z.string(),
+    })),
+    public: z.boolean(),
+    embed: z.boolean(),
+}).partial();
+
+type ProjectUpdateRequest = z.infer<typeof updateSchema>;
+
 router.put<{ id: string }, Project | MessageResponse, ProjectCreateRequest>('/:id', async (req, res) => {
     const { user } = res.locals;
     const { id } = req.params;
 
-    const schema = z.object({
-        name: z.string().min(3).max(32),
-    }).partial();
-
-    const parsed = schema.safeParse(req.body);
+    const parsed = updateSchema.safeParse(req.body);
 
     if (!parsed.success) {
         res.status(400).json({
@@ -105,7 +126,22 @@ router.put<{ id: string }, Project | MessageResponse, ProjectCreateRequest>('/:i
         return;
     }
 
-    const { name, markup, diagram } = parsed.data;
+    const { name, public: isPublic, embed, members } = parsed.data;
+
+    const foundUsers = await prisma.user.findMany({
+        where: {
+            email: {
+                in: members?.map(member => member.email) ?? []
+            }
+        }
+    });
+
+    if (foundUsers.length !== members?.length) {
+        res.status(400).json({
+            message: 'Some users not found',
+        });
+        return;
+    }
 
     const project = await prisma.project.update({
         where: {
@@ -117,7 +153,18 @@ router.put<{ id: string }, Project | MessageResponse, ProjectCreateRequest>('/:i
             }
         },
         data: {
-            name
+            name,
+            public: isPublic,
+            embed,
+            members: members ? {
+                deleteMany: {},
+                createMany: {
+                    data: members?.map(member => ({
+                        role: member.role,
+                        userId: foundUsers.find(u => u.email === member.email)?.id,
+                    })) ?? []
+                }
+            } : undefined
         }
     })
 
