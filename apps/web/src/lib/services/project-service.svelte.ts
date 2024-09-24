@@ -1,42 +1,47 @@
 import { grammar } from "$lib";
-import { directusClient } from "$lib/client";
-import { createItem, deleteItem, readItem, readItems, updateItem, type Query } from "@directus/sdk";
+import { client } from "$lib/client";
 
 export async function createProject(name: string, token: string) {
-    await directusClient.setToken(token)
+    await client.setToken(token)
 
-    return directusClient.request(createItem("projects", { name, markup: grammar }));
+    const { data } = await client.post("/projects", { name, markup: grammar });
+
+    return data
 }
 
 export async function updateProject(id: string | number, params: {
     name?: string;
-    markup?: string;
-    diagram?: object
+    members?: {
+        role: string,
+        userId: string
+    }[],
+    public: boolean,
+    embed: boolean,
 }, token: string) {
-    await directusClient.setToken(token)
+    await client.setToken(token)
 
-    return await directusClient.request(updateItem("projects", id, params));
+    const { data } = await client.put(`/projects/${id}`, params);
+    return data
 }
 
 export async function getProject(id: string | number, token: string) {
-    await directusClient.setToken(token)
+    await client.setToken(token)
 
-    return directusClient.request(readItem("projects", id));
+    const { data } = await client.get(`/projects/${id}`);
+    return data
 }
 
 
-export async function listProjects(token: string, query?: Query<any, any>) {
-    await directusClient.setToken(token)
+export async function listProjects(token: string) {
+    await client.setToken(token)
 
-    return directusClient.request(readItems("projects", {
-        fields: "id,name,date_created,date_updated",
-        sort: ["-date_updated"],
-        ...query
-    }));
+    const { data } = await client.get("/projects");
+    return data
 }
 
 export async function deleteProject(id: string | number, token: string) {
-    await directusClient.setToken(token)
+    await client.setToken(token)
 
-    return directusClient.request(deleteItem("projects", id));
+    const { data } = await client.delete(`/projects/${id}`);
+    return data
 }

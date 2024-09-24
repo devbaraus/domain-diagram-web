@@ -1,0 +1,53 @@
+services:
+  api:
+    image: devsbaraus/ddd-api:latest
+    build: 
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: ddd_api
+    env_file:
+      - .env
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.ddd-api.rule: Host(`ddd.lab.baraus.dev`)
+      traefik.http.routers.ddd-api.entrypoints: web,websecure
+      traefik.http.routers.ddd-api.tls.certresolver: letsencrypt
+      traefik.http.routers.ddd-api.service: ddd-api
+      traefik.http.services.ddd-api.loadbalancer.server.port: 3000
+    volumes:
+      - ddd_persistence:/app/src/persistence
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - proxy
+      - default
+
+  db:
+    image: postgres:latest
+    container_name: ddd_db
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5532:5432"
+    volumes:
+      - ddd_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  ddd_persistence:
+    external: true
+  ddd_db:
+    external: true
+
+networks:
+  proxy:
+    external: true

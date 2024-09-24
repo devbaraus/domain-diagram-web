@@ -455,8 +455,21 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         draw(value);
     }
 
+    const resizeObserver = new ResizeObserver(() => {
+        if (diagram && el.getBoundingClientRect().width > 0 && el.getBoundingClientRect().height > 0) {
+            svg.attr("viewBox", `0 0 ${el.getBoundingClientRect().width} ${el.getBoundingClientRect().height}`)
+            draw(diagram);
+        }
+    })
+
+    resizeObserver.observe(el);
+
     return {
         update(value: Diagram) {
+            if (_.isUndefined(value)) {
+                return;
+            }
+
             if (_.isEqual(value, diagram)) {
                 return;
             }

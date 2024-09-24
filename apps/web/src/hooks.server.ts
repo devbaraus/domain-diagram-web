@@ -1,5 +1,4 @@
-import { directusClient } from "$lib/client"
-import { readUser } from "@directus/sdk"
+import { client } from "$lib/client"
 import type { Handle } from "@sveltejs/kit"
 
 export const handle: Handle = async ({ event, resolve }) => {
@@ -12,9 +11,9 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
 
     try {
-        await directusClient.setToken(session)
+        await client.setToken(session)
 
-        const data = await directusClient.request(readUser('me'))
+        const { data } = await client.get("/users/me")
 
         if (data) {
             event.locals.user = data as any
