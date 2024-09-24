@@ -70,7 +70,7 @@
 			{/each}
 		</div>
 
-		<button class="mx-auto mt-auto block" onclick={() => ($mobSwitch = !$mobSwitch)}>
+		<button class="mx-auto mt-auto block lg:hidden" onclick={() => ($mobSwitch = !$mobSwitch)}>
 			{#if !$mobSwitch}
 				<ToggleRightIcon class="size-8" />
 			{:else}
@@ -148,14 +148,14 @@
 			<div class="flex-none items-center gap-1 lg:gap-4">
 				{#if $project?.members.find((i) => i.role === 'OWNER' && i.user.id === $page.data.user.id)}
 					<button
-						class="btn btn-sm btn-primary mask mask-squircle"
+						class="btn btn-sm lg:btn-md btn-primary mask mask-squircle"
 						onclick={() => shareModal?.showModal()}
 					>
 						<Share2Icon class="size-4 lg:size-5" />
 					</button>
 
 					<button
-						class="btn btn-sm btn-error mask mask-squircle"
+						class="btn btn-sm lg:btn-md btn-error mask mask-squircle"
 						onclick={() => deleteModal?.showModal()}
 					>
 						<TrashIcon class="size-4 lg:size-5" />
