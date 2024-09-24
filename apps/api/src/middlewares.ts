@@ -39,14 +39,23 @@ export async function jwtMiddleware(req: Request, res: Response, next: NextFunct
     });
   }
 
-  // Verifica se o token é válido
-  const isValid = await verifyToken(token);
+  let isValid;
 
-  if (!isValid) {
+  try {
+    // Verifica se o token é válido
+    isValid = await verifyToken(token);
+
+    if (!isValid) {
+      return res.status(401).json({
+        message: 'Invalid token',
+      });
+    }
+  } catch (error) {
     return res.status(401).json({
       message: 'Invalid token',
     });
   }
+
 
   const user = await prisma.user.findUnique({
     where: {
