@@ -34,8 +34,7 @@
 	});
 
 	const update = createMutation({
-		mutationFn: async ({ members }) =>
-			await updateProject($page.params.id, { members }, $page.data.session),
+		mutationFn: async (data) => await updateProject($page.params.id, data, $page.data.session),
 		onSuccess: () => {
 			shareModal?.close();
 			toast.success('Project shared successfully');
@@ -47,6 +46,13 @@
 			toast.error('Failed to share project');
 		}
 	});
+
+	function handleKeyDown(e) {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			e.target.blur();
+		}
+	}
 </script>
 
 <svelte:head>
@@ -132,7 +138,12 @@
 		</dialog>
 		<div class="navbar bg-base-100 h-12 border-b">
 			<div class="flex-1 space-x-2 px-2">
-				<span class="text-xl">{$project?.name}</span>
+				<span
+					class="text-xl"
+					contenteditable
+					onkeydown={handleKeyDown}
+					onblur={(e) => $update.mutate({ name: e.currentTarget.innerText })}>{$project?.name}</span
+				>
 				<ul>
 					{#each $connections.filter((i) => $page.data.user.id !== i.user.id) as { user }}
 						<li class="tooltip tooltip-bottom" data-tip={user.name}>
