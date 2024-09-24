@@ -14,7 +14,10 @@ export default {
 
 	daisyui: {
 		themes: [
-			'bumblebee'
+			'bumblebee',
+			// 'dracula',
+			// 'light',
+			// 'corporate',
 		]
 	},
 	plugins: [require('daisyui')]

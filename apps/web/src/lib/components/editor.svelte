@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 	import { PUBLIC_WS_URL } from '$env/static/public';
 	import { connections, editor, model, monaco } from '$lib/store';
+	import { cn } from '$lib/utils';
 	import { onDestroy, onMount } from 'svelte';
 	import * as Y from 'yjs';
 
@@ -216,7 +217,6 @@
 </script>
 
 <div
-	id="editor"
 	bind:this={el}
 	class={props.class}
 	onkeydown={props.onkeydown}
@@ -225,11 +225,3 @@
 	aria-multiline="true"
 	tabindex="0"
 ></div>
-
-<style>
-	#editor {
-		width: calc((100vw * 0.3) - 48px);
-	}
-
-	/* Add color per user */
-</style>

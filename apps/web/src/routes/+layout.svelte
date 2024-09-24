@@ -1,6 +1,7 @@
 <script>
 	import { browser } from '$app/environment';
 	import { queryClient } from '$lib/client';
+	import { Toaster } from 'svelte-sonner';
 	import '../app.css';
 
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
@@ -28,5 +29,6 @@
 </svelte:head>
 
 <QueryClientProvider client={$queryClient}>
+	<Toaster expand={true} richColors />
 	<slot></slot>
 </QueryClientProvider>

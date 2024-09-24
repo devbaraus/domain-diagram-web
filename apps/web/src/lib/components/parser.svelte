@@ -3,7 +3,7 @@
 	import Diagram from '$lib/components/diagram.svelte';
 	import Editor from '$lib/components/editor.svelte';
 	import { PUBLIC_WS_URL } from '$env/static/public';
-	import { model, monaco } from '$lib/store';
+	import { mobSwitch, model, monaco } from '$lib/store';
 	import { extractDiagram } from '$lib/utils/diagram-extractor';
 	import {
 		checkForSyntaxErrors,
@@ -14,6 +14,7 @@
 	import _ from 'lodash';
 	import { onMount } from 'svelte';
 	import TreeSitter, { type Tree } from 'web-tree-sitter';
+	import { cn } from '$lib/utils';
 
 	let ws: WebSocket | undefined;
 	let parser: TreeSitter | undefined;
@@ -65,6 +66,14 @@
 	}
 </script>
 
-<Editor value={markup} onchange={handleChange} onkeydown={handleCtrlSave} />
+<Editor
+	class={cn(
+		!$mobSwitch ? 'left-0 top-0' : '-left-[calc(100%_+_1px)] top-0',
+		'absolute  h-full w-full overflow-hidden transition-all lg:static lg:w-[calc(100vw_*_0.3_-_48px)]'
+	)}
+	value={markup}
+	onchange={handleChange}
+	onkeydown={handleCtrlSave}
+/>
 <!-- <span class="w-96">{tree?.rootNode?.toString()}</span> -->
-<Diagram class="font-fira w-full flex-1 select-none" {diagram} />
+<Diagram class={cn('font-fira w-full flex-1 select-none overflow-hidden')} {diagram} />

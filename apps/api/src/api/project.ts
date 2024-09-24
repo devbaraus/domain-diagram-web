@@ -173,6 +173,46 @@ router.put<{ id: string }, Project | MessageResponse, ProjectUpdateRequest>('/:i
     res.json(project);
 })
 
+router.delete<{ id: string }, Project | MessageResponse>('/:id', async (req, res) => {
+    const { user } = res.locals;
+    const { id } = req.params;
+
+    const project = await prisma.project.findUnique({
+        where: {
+            id: parseInt(id),
+            members: {
+                some: {
+                    userId: user.id,
+                    role: 'OWNER',
+                }
+            }
+        },
+    })
+
+    if (!project) {
+        res.status(404).json({
+            message: 'Project not found',
+        });
+        return;
+    }
+
+    await prisma.$transaction([
+        prisma.projectMember.deleteMany({
+            where: {
+                projectId: project.id,
+            }
+        }),
+        prisma.project.delete({
+            where: {
+                id: project.id,
+            }
+        })
+    ])
+
+
+
+    res.json(project);
+})
 
 
 export default router;
