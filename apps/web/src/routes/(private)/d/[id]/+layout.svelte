@@ -7,7 +7,7 @@
 	import { project, connections, mobSwitch } from '$lib/store';
 	import { cn } from '$lib/utils';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
-	import { TrashIcon, Share2Icon, ToggleLeftIcon, ToggleRightIcon } from 'lucide-svelte';
+	import { TrashIcon, Share2Icon, LetterTextIcon, WorkflowIcon } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
 	let deleteModal;
@@ -34,8 +34,7 @@
 	});
 
 	const update = createMutation({
-		mutationFn: async ({ members }) =>
-			await updateProject($page.params.id, { members }, $page.data.session),
+		mutationFn: async (data) => await updateProject($page.params.id, data, $page.data.session),
 		onSuccess: () => {
 			shareModal?.close();
 			toast.success('Project shared successfully');
@@ -47,6 +46,13 @@
 			toast.error('Failed to share project');
 		}
 	});
+
+	function handleKeyDown(e) {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			e.target.blur();
+		}
+	}
 </script>
 
 <svelte:head>
@@ -54,7 +60,7 @@
 </svelte:head>
 
 <div class="z-10 flex max-w-[100dvw] divide-x">
-	<aside class="bg-base-100 z-10 flex h-screen w-16 flex-col justify-between p-2">
+	<aside class="bg-base-100 z-10 flex h-[100dvh] w-16 flex-col justify-between p-2">
 		<div class="space-y-2">
 			<ProjectCreateButton />
 
@@ -70,13 +76,17 @@
 			{/each}
 		</div>
 
-		<button class="mx-auto mt-auto block lg:hidden" onclick={() => ($mobSwitch = !$mobSwitch)}>
-			{#if !$mobSwitch}
-				<ToggleRightIcon class="size-8" />
-			{:else}
-				<ToggleLeftIcon class="size-8" />
+		<div class="space-y-2">
+			{#if $project?.members.find((i) => i.role === 'OWNER' && i.user.id === $page.data.user.id)}
+				<button class="btn btn-primary mask mask-squircle" onclick={() => shareModal?.showModal()}>
+					<Share2Icon class="size-5" />
+				</button>
+
+				<button class="btn btn-error mask mask-squircle" onclick={() => deleteModal?.showModal()}>
+					<TrashIcon class="size-5" />
+				</button>
 			{/if}
-		</button>
+		</div>
 	</aside>
 	<div class="w-full">
 		<dialog bind:this={deleteModal} class="modal">
@@ -132,7 +142,12 @@
 		</dialog>
 		<div class="navbar bg-base-100 h-12 border-b">
 			<div class="flex-1 space-x-2 px-2">
-				<span class="text-xl">{$project?.name}</span>
+				<span
+					class="text-xl"
+					contenteditable
+					onkeydown={handleKeyDown}
+					onblur={(e) => $update.mutate({ name: e.currentTarget.innerText })}>{$project?.name}</span
+				>
 				<ul>
 					{#each $connections.filter((i) => $page.data.user.id !== i.user.id) as { user }}
 						<li class="tooltip tooltip-bottom" data-tip={user.name}>
@@ -145,26 +160,20 @@
 					{/each}
 				</ul>
 			</div>
-			<div class="flex-none items-center gap-1 lg:gap-4">
-				{#if $project?.members.find((i) => i.role === 'OWNER' && i.user.id === $page.data.user.id)}
-					<button
-						class="btn btn-sm lg:btn-md btn-primary mask mask-squircle"
-						onclick={() => shareModal?.showModal()}
-					>
-						<Share2Icon class="size-4 lg:size-5" />
-					</button>
-
-					<button
-						class="btn btn-sm lg:btn-md btn-error mask mask-squircle"
-						onclick={() => deleteModal?.showModal()}
-					>
-						<TrashIcon class="size-4 lg:size-5" />
-					</button>
-				{/if}
-
+			<div class="flex-none items-center gap-2">
+				<button
+					class="btn btn-info mask mask-squircle lg:hidden"
+					onclick={() => ($mobSwitch = !$mobSwitch)}
+				>
+					{#if !$mobSwitch}
+						<LetterTextIcon class="size-8" />
+					{:else}
+						<WorkflowIcon class="size-8" />
+					{/if}
+				</button>
 				<div class="dropdown dropdown-end">
 					<div tabindex="0" role="button" class="avatar">
-						<Avatar name={$page.data.user?.name} class="size-8 lg:size-12" />
+						<Avatar name={$page.data.user?.name} />
 					</div>
 					<ul class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
 						<li>

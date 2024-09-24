@@ -123,26 +123,36 @@ router.put<{ id: string }, Project | MessageResponse, ProjectUpdateRequest>('/:i
 
     if (!parsed.success) {
         res.status(400).json({
-            message: 'Validation failed',
+            message: `Validation failed ${parsed.error.issues}`,
         });
         return;
     }
 
     const { name, public: isPublic, embed, members } = parsed.data;
 
-    const foundUsers = await prisma.user.findMany({
-        where: {
-            email: {
-                in: members?.map(member => member.email) ?? []
-            }
-        }
-    });
+    let foundUsers: {
+        id: number;
+        email: string;
+        name: string;
+        password: string;
+        active: boolean;
+    }[] = [];
 
-    if (foundUsers.length !== members?.length) {
-        res.status(400).json({
-            message: 'Some users not found',
+    if (members) {
+        foundUsers = await prisma.user.findMany({
+            where: {
+                email: {
+                    in: members?.map(member => member.email) ?? []
+                }
+            }
         });
-        return;
+
+        if (foundUsers.length !== members?.length) {
+            res.status(400).json({
+                message: 'Some users not found',
+            });
+            return;
+        }
     }
 
     const project = await prisma.project.update({
