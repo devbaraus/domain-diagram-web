@@ -6,22 +6,22 @@ import { prisma } from './db';
 import { verifyToken } from './utils/jwt';
 
 // Mapa para armazenar os documentos Yjs compartilhados
-const db = new LeveldbPersistence('persistence');
+// const db = new LeveldbPersistence('persistence');
 const persistence = {
     bindState: async (docName: any, content: string, ydoc: any) => {
-        const persistedYdoc = await db.getYDoc(docName);
-        const newUpdates = Y.encodeStateAsUpdate(ydoc);
+        // const persistedYdoc = await db.getYDoc(docName);
+        // const newUpdates = Y.encodeStateAsUpdate(ydoc);
 
-        db.storeUpdate(docName, newUpdates);
-        Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc));
+        // db.storeUpdate(docName, newUpdates);
+        // Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc));
 
-        // if (ydoc.share.size === 0) {
-        //     ydoc.getText('monaco').insert(0, content);
-        // }
+        // // if (ydoc.share.size === 0) {
+        // //     ydoc.getText('monaco').insert(0, content);
+        // // }
 
-        ydoc.on('update', async (update: any) => {
-            db.storeUpdate(docName, update);
-        });
+        // ydoc.on('update', async (update: any) => {
+        //     db.storeUpdate(docName, update);
+        // });
     },
     writeState: async (docName: any, ydoc: any) => {
         try {
@@ -103,7 +103,18 @@ export const startWebSocketServer = (server: any) => {
             return;
         }
 
-        yjs.setupWSConnection(ws, req, { docName: docName, content: project.markup });
+        let ydoc = yjs.docs.get(docName);
+
+        if (!ydoc) {
+            ydoc = new yjs.WSSharedDoc(docName);
+
+            const ytext = ydoc.getText('monaco');
+            ytext.insert(0, project.markup);
+
+            yjs.docs.set(docName, ydoc);
+        }
+
+        yjs.setupWSConnection(ws, req, ydoc);
     })
 };
 
