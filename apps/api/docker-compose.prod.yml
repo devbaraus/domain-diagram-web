@@ -14,8 +14,6 @@ services:
       traefik.http.routers.ddd-api.tls.certresolver: letsencrypt
       traefik.http.routers.ddd-api.service: ddd-api
       traefik.http.services.ddd-api.loadbalancer.server.port: 3000
-    volumes:
-      - ddd_persistence:/app/src/persistence
     depends_on:
       db:
         condition: service_healthy

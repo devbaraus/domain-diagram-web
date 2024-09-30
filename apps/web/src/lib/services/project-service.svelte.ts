@@ -31,10 +31,10 @@ export async function getProject(id: string | number, token: string) {
     return data
 }
 
-export async function embedProject(id: string | number) {
+export async function embedProject(id: string | number, token: string | null) {
     // await client.setToken(token)
 
-    const { data } = await client.get(`/projects/${id}/embed`);
+    const { data } = await client.get(`/projects/${id}/embed?access_token=${token}`);
     return data
 }
 

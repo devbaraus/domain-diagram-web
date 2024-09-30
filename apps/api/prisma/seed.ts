@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import * as bcrypt from 'bcrypt';
+import { randomBytes } from 'crypto';
 
 const prisma = new PrismaClient()
 
@@ -18,6 +19,7 @@ async function main() {
                         create: {
                             name: 'My First Project',
                             markup: '',
+                            embed: randomBytes(16).toString('hex'),
                             diagram: {},
                         }
                     }

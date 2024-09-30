@@ -9,7 +9,7 @@ import { z } from 'zod';
 const router = express.Router();
 
 function generateToken() {
-    return randomBytes(32).toString('hex');
+    return randomBytes(16).toString('hex');
 }
 
 
