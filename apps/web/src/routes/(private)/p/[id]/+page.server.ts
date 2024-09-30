@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
 
         return { ...locals, item: res }
     } catch (error) {
-        throw redirect(302, '/projects')
+        throw redirect(302, '/p')
     }
 }
 

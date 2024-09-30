@@ -13,7 +13,7 @@
 		onSuccess: () => {
 			deleteModal?.close();
 			$queryClient.invalidateQueries({ queryKey: ['list-projects'] });
-			goto('/projects');
+			goto('/p');
 		}
 	});
 </script>

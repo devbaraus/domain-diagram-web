@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
         return { ...locals, item: res }
     } catch (error) {
         console.log()
-        throw redirect(302, '/projects')
+        throw redirect(302, '/p')
     }
 }
 

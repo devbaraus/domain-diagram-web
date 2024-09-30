@@ -1,7 +1,7 @@
 import { redirect } from "@sveltejs/kit"
 import type { LayoutServerLoad } from "./$types"
 
-const pubMatcher = /^\/(docs|embeds\/\d+)/
+const pubMatcher = /^\/(docs|e\/\d+)/
 
 export const load: LayoutServerLoad = async ({ locals, url, parent }) => {
     await parent()
