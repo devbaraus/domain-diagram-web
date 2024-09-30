@@ -12,5 +12,5 @@ export const load: PageServerLoad = async ({ locals, parent }) => {
         res = [res]
     }
 
-    throw redirect(302, `/d/${res[0].id}`)
+    throw redirect(302, `/p/${res[0].id}`)
 }

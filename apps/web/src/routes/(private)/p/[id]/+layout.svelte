@@ -34,7 +34,7 @@
 
 			{#each $query.data as project}
 				<div class="tooltip tooltip-right z-20" data-tip={project.name}>
-					<a href={`/d/${project.id}`}>
+					<a href={`/p/${project.id}`}>
 						<Avatar
 							class={project.id == $page.params.id ? 'bg-neutral text-neutral-content' : ''}
 							name={project.name}

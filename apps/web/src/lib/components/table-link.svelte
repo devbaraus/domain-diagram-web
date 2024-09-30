@@ -6,4 +6,4 @@
 	let props: Props = $props();
 </script>
 
-<a href={`/d/${props.id}`}>{props.label}</a>
+<a href={`/p/${props.id}`}>{props.label}</a>
