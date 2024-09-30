@@ -1,50 +1,18 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import Avatar from '$lib/components/avatar.svelte';
 	import ProjectCreateButton from '$lib/components/projects/project-create-button.svelte';
-	import { deleteProject, listProjects, updateProject } from '$lib/services/project-service.svelte';
-	import { project, connections, mobSwitch } from '$lib/store';
-	import { cn } from '$lib/utils';
-	import { createMutation, createQuery } from '@tanstack/svelte-query';
-	import { TrashIcon, Share2Icon, LetterTextIcon, WorkflowIcon } from 'lucide-svelte';
-	import { toast } from 'svelte-sonner';
-
-	let deleteModal;
-	let shareModal;
-	let members = $state([]);
-
-	$effect(() => {
-		members = $project?.members.map((i) => ({ email: i.user.email, role: i.role }));
-	});
+	import ProjectDeleteButton from '$lib/components/projects/project-delete-button.svelte';
+	import ProjectUpdateButton from '$lib/components/projects/project-update-button.svelte';
+	import { listProjects } from '$lib/services/project-service.svelte';
+	import { connections, mobSwitch, project } from '$lib/store';
+	import { createQuery } from '@tanstack/svelte-query';
+	import { LetterTextIcon, WorkflowIcon } from 'lucide-svelte';
 
 	const query = createQuery({
 		queryKey: ['list-projects'],
 		queryFn: async () => await listProjects($page.data.session),
 		initialData: []
-	});
-
-	const deletion = createMutation({
-		mutationFn: async () => await deleteProject($page.params.id, $page.data.session),
-		onSuccess: () => {
-			deleteModal?.close();
-			$query.refetch();
-			goto('/d');
-		}
-	});
-
-	const update = createMutation({
-		mutationFn: async (data) => await updateProject($page.params.id, data, $page.data.session),
-		onSuccess: () => {
-			shareModal?.close();
-			toast.success('Project shared successfully');
-			$query.refetch();
-			goto('/d');
-		},
-		onError: () => {
-			shareModal?.close();
-			toast.error('Failed to share project');
-		}
 	});
 
 	function handleKeyDown(e) {
@@ -78,76 +46,15 @@
 
 		<div class="space-y-2">
 			{#if $project?.members.find((i) => i.role === 'OWNER' && i.user.id === $page.data.user.id)}
-				<button class="btn btn-primary mask mask-squircle" onclick={() => shareModal?.showModal()}>
-					<Share2Icon class="size-5" />
-				</button>
-
-				<button class="btn btn-error mask mask-squircle" onclick={() => deleteModal?.showModal()}>
-					<TrashIcon class="size-5" />
-				</button>
+				<ProjectUpdateButton />
+				<ProjectDeleteButton />
 			{/if}
 		</div>
 	</aside>
 	<div class="w-full">
-		<dialog bind:this={deleteModal} class="modal">
-			<div class="modal-box">
-				<p>Are you sure you want to delete this project?</p>
-				<div class="modal-action">
-					<button class="btn" onclick={() => deleteModal?.close()}>Cancel</button>
-					<button class="btn btn-error" onclick={() => $deletion.mutate()}>Delete</button>
-				</div>
-			</div>
-		</dialog>
-
-		<dialog bind:this={shareModal} class="modal">
-			<div class="modal-box space-y-2">
-				<p>Update who can see this project</p>
-
-				<div class="grid border-collapse grid-cols-2 gap-2">
-					{#if members}
-						{#each members as member}
-							<input
-								class={cn('input input-sm input-bordered', member.role === 'OWNER' && 'col-span-2')}
-								type="text"
-								disabled={member.role === 'OWNER'}
-								value={member.email}
-							/>
-							<button
-								class={cn('btn btn-sm', member.role === 'OWNER' && 'hidden')}
-								onclick={() => (members = members.filter((i) => i.email !== member.email))}
-								>Remove
-							</button>
-						{/each}
-					{/if}
-				</div>
-				<div>
-					<form
-						onsubmit={(e) => {
-							e.preventDefault();
-							const email = e.target.email.value;
-							e.target.reset();
-							if (members.find((i) => i.email === email)) return;
-							members.push({ email: email, role: 'MEMBER' });
-						}}
-					>
-						<input class="input input-bordered input-sm w-full" type="email" name="email" />
-					</form>
-				</div>
-
-				<div class="modal-action">
-					<button class="btn" onclick={() => shareModal?.close()}>Cancel</button>
-					<button class="btn btn-primary" onclick={() => $update.mutate({ members })}>Add</button>
-				</div>
-			</div>
-		</dialog>
 		<div class="navbar bg-base-100 h-12 border-b">
 			<div class="flex-1 space-x-2 px-2">
-				<span
-					class="text-xl"
-					contenteditable
-					onkeydown={handleKeyDown}
-					onblur={(e) => $update.mutate({ name: e.currentTarget.innerText })}>{$project?.name}</span
-				>
+				<span class="text-xl">{$project?.name}</span>
 				<ul>
 					{#each $connections.filter((i) => $page.data.user.id !== i.user.id) as { user }}
 						<li class="tooltip tooltip-bottom" data-tip={user.name}>

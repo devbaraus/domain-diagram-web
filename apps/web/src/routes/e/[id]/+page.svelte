@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import Parser from '$lib/components/parser-edit.svelte';
+	import Parser from '$lib/components/parser-embed.svelte';
 	import type { PageData } from './$types';
 	import { project } from '$lib/store';
 

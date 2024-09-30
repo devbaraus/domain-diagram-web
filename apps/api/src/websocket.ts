@@ -76,7 +76,6 @@ export const startWebSocketServer = (server: any) => {
             }
         })
 
-
         if (!user) {
             ws.close();
             return;
@@ -113,6 +112,8 @@ export const startWebSocketServer = (server: any) => {
 
             yjs.docs.set(docName, ydoc);
         }
+
+        console.log('Yjs document created:', docName);
 
         yjs.setupWSConnection(ws, req, ydoc);
     })

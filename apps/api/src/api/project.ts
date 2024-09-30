@@ -67,11 +67,26 @@ router.get<{}, Project[] | MessageResponse>('/', async (req, res) => {
 
 router.get<{ id: string }, Omit<Project, 'markup' | 'diagram'> | MessageResponse>('/:id', async (req, res) => {
     const { user } = res.locals;
-    const { id } = req.params;
+
+    const schema = z.object({
+        id: z.coerce.number().positive()
+    }).partial();
+
+    const parsed = schema.safeParse(req.params);
+
+    if (!parsed.success) {
+        res.status(400).json({
+            message: 'Validation failed',
+        });
+        return;
+    }
+
+    const { id } = parsed.data;
+
 
     const project = await prisma.project.findUnique({
         where: {
-            id: parseInt(id),
+            id: id,
             members: {
                 some: {
                     userId: user.id,
@@ -103,23 +118,39 @@ router.get<{ id: string }, Omit<Project, 'markup' | 'diagram'> | MessageResponse
 })
 
 
-const updateSchema = z.object({
-    name: z.string().min(3).max(32),
-    members: z.array(z.object({
-        role: z.string(),
-        email: z.string(),
-    })),
-    public: z.boolean(),
-    embed: z.boolean(),
-}).partial();
 
-type ProjectUpdateRequest = z.infer<typeof updateSchema>;
 
-router.put<{ id: string }, Project | MessageResponse, ProjectUpdateRequest>('/:id', async (req, res) => {
+
+router.put<{ id: string }, Project | MessageResponse>('/:id', async (req, res) => {
+    const paramSchema = z.object({
+        id: z.coerce.number().positive()
+    }).partial();
+
+    const paramParsed = paramSchema.safeParse(req.params);
+
+    if (!paramParsed.success) {
+        res.status(400).json({
+            message: 'Validation failed',
+        });
+        return;
+    }
+
+    const { id } = paramParsed.data;
+
+    const schema = z.object({
+        name: z.string().min(3).max(32),
+        members: z.array(z.object({
+            role: z.string(),
+            email: z.string(),
+        })),
+        public: z.boolean(),
+        embed: z.boolean(),
+    }).partial();
+
     const { user } = res.locals;
-    const { id } = req.params;
 
-    const parsed = updateSchema.safeParse(req.body);
+
+    const parsed = schema.safeParse(req.body);
 
     if (!parsed.success) {
         res.status(400).json({
@@ -185,11 +216,25 @@ router.put<{ id: string }, Project | MessageResponse, ProjectUpdateRequest>('/:i
 
 router.delete<{ id: string }, Project | MessageResponse>('/:id', async (req, res) => {
     const { user } = res.locals;
-    const { id } = req.params;
+
+    const schema = z.object({
+        id: z.coerce.number().positive()
+    }).partial();
+
+    const parsed = schema.safeParse(req.params);
+
+    if (!parsed.success) {
+        res.status(400).json({
+            message: 'Validation failed',
+        });
+        return;
+    }
+
+    const { id } = parsed.data;
 
     const project = await prisma.project.findUnique({
         where: {
-            id: parseInt(id),
+            id: id,
             members: {
                 some: {
                     userId: user.id,

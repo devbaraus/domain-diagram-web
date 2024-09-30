@@ -44,7 +44,11 @@
 	}, 300);
 
 	async function initializeParser() {
-		await TreeSitter.init();
+		await TreeSitter.init({
+			locateFile(scriptName: string, scriptDirectory: string) {
+				return `${$page.url.origin}/${scriptName}`;
+			}
+		});
 		parser = new TreeSitter();
 
 		const dslLang = await TreeSitter.Language.load('/tree-sitter-ddd.wasm');
