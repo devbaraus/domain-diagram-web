@@ -7,15 +7,9 @@ import { z } from 'zod';
 
 const router = express.Router();
 
-router.use(jwtMiddleware)
-
-type ProjectCreateRequest = {
-    name: string;
-    markup: string;
-};
 
 
-router.post<{}, Project | MessageResponse, ProjectCreateRequest>('/', async (req, res) => {
+router.post<{}, Project | MessageResponse>('/', jwtMiddleware, async (req, res) => {
     const schema = z.object({
         name: z.string().min(3).max(32),
         markup: z.string(),
@@ -50,7 +44,7 @@ router.post<{}, Project | MessageResponse, ProjectCreateRequest>('/', async (req
     res.json(project);
 })
 
-router.get<{}, Project[] | MessageResponse>('/', async (req, res) => {
+router.get<{}, Project[] | MessageResponse>('/', jwtMiddleware, async (req, res) => {
     const { user } = res.locals;
     const projects = await prisma.project.findMany({
         where: {
@@ -65,7 +59,52 @@ router.get<{}, Project[] | MessageResponse>('/', async (req, res) => {
     res.json(projects);
 })
 
-router.get<{ id: string }, Omit<Project, 'markup' | 'diagram'> | MessageResponse>('/:id', async (req, res) => {
+router.get<{ id: string }, Omit<Project, 'markup' | 'diagram'> | MessageResponse>('/:id/embed', async (req, res) => {
+    const schema = z.object({
+        id: z.coerce.number().positive()
+    }).partial();
+
+    const parsed = schema.safeParse(req.params);
+
+    if (!parsed.success) {
+        res.status(400).json({
+            message: 'Validation failed',
+        });
+        return;
+    }
+
+    const { id } = parsed.data;
+
+    const project = await prisma.project.findUnique({
+        where: {
+            id: id,
+            embed: true,
+        },
+        select: {
+            id: true,
+            embed: true,
+            name: true,
+            public: true,
+            status: true,
+            members: {
+                include: {
+                    user: true,
+                }
+            }
+        }
+    });
+
+    if (!project) {
+        res.status(404).json({
+            message: 'Project not found',
+        });
+        return;
+    }
+
+    res.json(project);
+})
+
+router.get<{ id: string }, Omit<Project, 'markup' | 'diagram'> | MessageResponse>('/:id', jwtMiddleware, async (req, res) => {
     const { user } = res.locals;
 
     const schema = z.object({
@@ -121,7 +160,7 @@ router.get<{ id: string }, Omit<Project, 'markup' | 'diagram'> | MessageResponse
 
 
 
-router.put<{ id: string }, Project | MessageResponse>('/:id', async (req, res) => {
+router.put<{ id: string }, Project | MessageResponse>('/:id', jwtMiddleware, async (req, res) => {
     const paramSchema = z.object({
         id: z.coerce.number().positive()
     }).partial();
@@ -214,7 +253,7 @@ router.put<{ id: string }, Project | MessageResponse>('/:id', async (req, res) =
     res.json(project);
 })
 
-router.delete<{ id: string }, Project | MessageResponse>('/:id', async (req, res) => {
+router.delete<{ id: string }, Project | MessageResponse>('/:id', jwtMiddleware, async (req, res) => {
     const { user } = res.locals;
 
     const schema = z.object({

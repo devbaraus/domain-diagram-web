@@ -15,7 +15,6 @@
 	let parser: TreeSitter | undefined;
 	let tree = $state<Tree>();
 	let diagram = $state<Diagram>();
-	let markup = $state<string>('');
 	let provider;
 	let type;
 	let doc;
@@ -59,11 +58,7 @@
 
 		doc = new Y.Doc();
 
-		provider = new WebsocketProvider(`${PUBLIC_WS_URL}`, $page.params.id, doc, {
-			params: {
-				access_token: $page.data.session
-			}
-		});
+		provider = new WebsocketProvider(`${PUBLIC_WS_URL}`, $page.params.id, doc);
 
 		type = doc.getText('monaco');
 

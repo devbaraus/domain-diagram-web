@@ -7,7 +7,7 @@ export const load: PageServerLoad = async ({ locals, url, parent }) => {
     await parent()
 
     if (locals.user) {
-        throw redirect(302, '/d')
+        throw redirect(302, '/projects')
     }
 }
 
@@ -35,6 +35,6 @@ export const actions: Actions = {
             maxAge: data.expires_at
         })
 
-        throw redirect(302, "/d")
+        throw redirect(302, "/projects")
     },
 }

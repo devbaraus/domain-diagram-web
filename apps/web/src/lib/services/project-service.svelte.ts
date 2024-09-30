@@ -31,6 +31,13 @@ export async function getProject(id: string | number, token: string) {
     return data
 }
 
+export async function embedProject(id: string | number) {
+    // await client.setToken(token)
+
+    const { data } = await client.get(`/projects/${id}/embed`);
+    return data
+}
+
 
 export async function listProjects(token: string) {
     await client.setToken(token)

@@ -23,7 +23,7 @@
 			shareModal?.close();
 			toast.success('Project shared successfully');
 			$queryClient.invalidateQueries({ queryKey: ['list-projects'] });
-			goto('/d');
+			goto('/projects');
 		},
 		onError: () => {
 			shareModal?.close();

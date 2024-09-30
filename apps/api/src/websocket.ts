@@ -58,28 +58,28 @@ export const startWebSocketServer = (server: any) => {
         const docName = urlParts && urlParts[1];
 
 
-        if (token == null) {
-            ws.close();
-            return;
-        }
+        // if (token == null) {
+        //     ws.close();
+        //     return;
+        // }
 
-        const isValid = await verifyToken(token);
+        // const isValid = await verifyToken(token);
 
-        if (!isValid) {
-            ws.close();
-            return;
-        }
+        // if (!isValid) {
+        //     ws.close();
+        //     return;
+        // }
 
-        const user = await prisma.user.findUnique({
-            where: {
-                id: Number(isValid.payload.sub)
-            }
-        })
+        // const user = await prisma.user.findUnique({
+        //     where: {
+        //         id: Number(isValid.payload.sub)
+        //     }
+        // })
 
-        if (!user) {
-            ws.close();
-            return;
-        }
+        // if (!user) {
+        //     ws.close();
+        //     return;
+        // }
 
         if (docName == null) {
             ws.close();
@@ -89,11 +89,11 @@ export const startWebSocketServer = (server: any) => {
         const project = await prisma.project.findUnique({
             where: {
                 id: Number(docName),
-                members: {
-                    some: {
-                        userId: user.id,
-                    }
-                }
+                // members: {
+                //     some: {
+                //         userId: user.id,
+                //     }
+                // }
             },
         });
 

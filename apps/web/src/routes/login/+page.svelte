@@ -18,7 +18,7 @@
 						await $queryClient.invalidateQueries({
 							queryKey: ['list-projects']
 						});
-						goto('/d');
+						goto('/projects');
 					} else {
 						alert('Invalid credentials');
 					}
