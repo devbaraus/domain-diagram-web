@@ -155,10 +155,10 @@ const pingTimeout = 30000;
 export const setupWSConnection = (
     conn,
     req,
-    { docName = req.url.slice(1).split('?')[0], content = '', gc = true } = {},
+    doc: WSSharedDoc,
 ) => {
     conn.binaryType = 'arraybuffer';
-    const doc = getYDoc(docName, content, gc);
+    // const doc = getYDoc(docName, content, gc);
     doc.conns.set(conn, new Set());
     conn.on('message', (message) => messageListener(conn, doc, new Uint8Array(message)));
 
