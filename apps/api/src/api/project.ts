@@ -1,3 +1,4 @@
+import { randomBytes } from 'crypto';
 import { prisma } from '../db';
 import MessageResponse from '../interfaces/MessageResponse';
 import { jwtMiddleware } from '../middlewares';
@@ -7,6 +8,9 @@ import { z } from 'zod';
 
 const router = express.Router();
 
+function generateToken() {
+    return randomBytes(32).toString('hex');
+}
 
 
 router.post<{}, Project | MessageResponse>('/', jwtMiddleware, async (req, res) => {
@@ -32,6 +36,7 @@ router.post<{}, Project | MessageResponse>('/', jwtMiddleware, async (req, res) 
             name,
             markup,
             diagram: {},
+            embed: generateToken(),
             members: {
                 create: {
                     userId: user.id,
@@ -73,12 +78,15 @@ router.get<{ id: string }, Omit<Project, 'markup' | 'diagram'> | MessageResponse
         return;
     }
 
+    const { access_token } = req.query
+
     const { id } = parsed.data;
 
     const project = await prisma.project.findUnique({
         where: {
             id: id,
-            embed: true,
+            public: access_token ? undefined : true,
+            embed: access_token ? String(access_token) : undefined,
         },
         select: {
             id: true,

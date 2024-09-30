@@ -48,7 +48,7 @@ model Project {
   markup  String
   diagram Json
   public  Boolean @default(false)
-  embed   Boolean @default(false)
+  embed   String
 
   status  ProjectStatus   @default(ACTIVE)
   members ProjectMember[]
