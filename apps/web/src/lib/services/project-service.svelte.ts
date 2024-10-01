@@ -34,7 +34,7 @@ export async function getProject(id: string | number, token: string) {
 export async function embedProject(id: string | number, token: string | null) {
     // await client.setToken(token)
 
-    const { data } = await client.get(`/projects/${id}/embed?access_token=${token}`);
+    const { data } = await client.get(`/projects/${id}?embed_token=${token}`);
     return data
 }
 

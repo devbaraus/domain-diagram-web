@@ -59,7 +59,7 @@
 					<div class="sr-only">refresh</div>
 				</button> -->
 				<ul class="space-x-2">
-					{#each $connections.filter((i) => $page.data.user.id !== i.user.id) as { user }}
+					{#each $connections.filter((i) => 'user' in i && $page.data.user.id !== i.user.id) as { user }}
 						<li class="tooltip tooltip-bottom" data-tip={user.name}>
 							<Avatar
 								name={user.name}

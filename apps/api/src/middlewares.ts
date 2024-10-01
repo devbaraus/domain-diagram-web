@@ -20,6 +20,57 @@ export function errorHandler(err: Error, req: Request, res: Response<ErrorRespon
   });
 }
 
+type AuthMiddleware = (req: Request, res: Response, next: NextFunction) => Promise<boolean>;
+
+export function guardMiddleware(combining: 'OR' | 'AND', ...guards: AuthMiddleware[]) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    let result = combining === 'AND';
+
+    for (const guard of guards) {
+      if (combining === 'AND') {
+        result = result && await guard(req, res, next);
+      } else {
+        result = result || await guard(req, res, next);
+      }
+    }
+
+    if (!result) {
+      res.status(401).json({
+        message: 'Unauthorized'
+      });
+      return;
+    }
+
+    next();
+  }
+}
+
+export async function projectTokenMiddleware(req: Request, res: Response, next: NextFunction): Promise<boolean> {
+  const embedToken = req.query.embed_token as string;
+  const projectId = req.params.id;
+
+  if (!embedToken) {
+    return false
+  }
+
+  const project = await prisma.project.findUnique({
+    where: {
+      id: Number(projectId),
+      public: !embedToken ? true : undefined,
+      embed: embedToken
+    }
+  });
+
+  if (!project) {
+    return false
+  }
+
+  res.locals.authenticated = true;
+  res.locals.anonymous = true;
+
+  return true
+}
+
 
 export async function jwtMiddleware(req: Request, res: Response, next: NextFunction) {
   const tokenHeader = req.headers.authorization;
@@ -34,9 +85,7 @@ export async function jwtMiddleware(req: Request, res: Response, next: NextFunct
   }
 
   if (!token) {
-    return res.status(401).json({
-      message: 'Token not provided',
-    });
+    return false
   }
 
   let isValid;
@@ -46,14 +95,10 @@ export async function jwtMiddleware(req: Request, res: Response, next: NextFunct
     isValid = await verifyToken(token);
 
     if (!isValid) {
-      return res.status(401).json({
-        message: 'Invalid token',
-      });
+      return false
     }
   } catch (error) {
-    return res.status(401).json({
-      message: 'Invalid token',
-    });
+    return false
   }
 
 
@@ -64,14 +109,14 @@ export async function jwtMiddleware(req: Request, res: Response, next: NextFunct
   })
 
   if (!user) {
-    return res.status(401).json({
-      message: 'Invalid token',
-    });
+    return false
   }
 
   res.locals.user = user;
+  res.locals.authenticated = true;
+  res.locals.anonymous = false;
 
-  next();
+  return true
 }
 
 export async function jwtWsMiddleware(ws: WebSocket, req: Request) {

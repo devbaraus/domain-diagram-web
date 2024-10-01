@@ -146,7 +146,7 @@
 				awareness
 					.getStates()
 					.values()
-					.filter((s) => s.user.id !== $page.data.user.id)
+					.filter((s) => 'user' in s && s.user.id !== $page.data.user.id)
 			)) {
 				const user = deco.user;
 				const cursor = deco.cursor;

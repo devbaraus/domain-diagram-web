@@ -101,7 +101,7 @@
 				class="btn mr-auto"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						`<iframe src="${$page.url.protocol}://${$page.url.host}/e/${$page.params.id}?token=${$project.embed}" width="100%" height="100%"></iframe>`
+						`<iframe src="${$page.url.protocol}//${$page.url.host}/e/${$page.params.id}?token=${$project.embed}" width="100%" height="100%"></iframe>`
 					);
 					modal?.close();
 					toast.success('Embed code copied to clipboard');

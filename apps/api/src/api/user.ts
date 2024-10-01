@@ -1,11 +1,11 @@
-import { jwtMiddleware } from '../middlewares';
+import { guardMiddleware, jwtMiddleware } from '../middlewares';
 import { User } from '@prisma/client';
 import express from 'express';
 import _ from 'lodash';
 
 const router = express.Router();
 
-router.get<{}, Omit<User, 'password'>>('/me', jwtMiddleware, (req, res) => {
+router.get<{}, Omit<User, 'password'>>('/me', guardMiddleware('OR', jwtMiddleware), (req, res) => {
     const { user } = res.locals
 
     res.json(_.omit(user, ['password']) as Omit<User, 'password'>);

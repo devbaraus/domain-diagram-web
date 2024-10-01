@@ -1,7 +1,7 @@
 import { randomBytes } from 'crypto';
 import { prisma } from '../db';
 import MessageResponse from '../interfaces/MessageResponse';
-import { jwtMiddleware } from '../middlewares';
+import { guardMiddleware, jwtMiddleware, projectTokenMiddleware } from '../middlewares';
 import { Prisma, Project } from '@prisma/client';
 import express from 'express';
 import { z } from 'zod';
@@ -13,7 +13,7 @@ function generateToken() {
 }
 
 
-router.post<{}, Project | MessageResponse>('/', jwtMiddleware, async (req, res) => {
+router.post<{}, Project | MessageResponse>('/', guardMiddleware('OR', jwtMiddleware), async (req, res) => {
     const schema = z.object({
         name: z.string().min(3).max(32),
         markup: z.string(),
@@ -49,8 +49,9 @@ router.post<{}, Project | MessageResponse>('/', jwtMiddleware, async (req, res) 
     res.json(project);
 })
 
-router.get<{}, Project[] | MessageResponse>('/', jwtMiddleware, async (req, res) => {
+router.get<{}, Project[] | MessageResponse>('/', guardMiddleware('OR', jwtMiddleware), async (req, res) => {
     const { user } = res.locals;
+
     const projects = await prisma.project.findMany({
         where: {
             members: {
@@ -64,56 +65,10 @@ router.get<{}, Project[] | MessageResponse>('/', jwtMiddleware, async (req, res)
     res.json(projects);
 })
 
-router.get<{ id: string }, Omit<Project, 'markup' | 'diagram'> | MessageResponse>('/:id/embed', async (req, res) => {
-    const schema = z.object({
-        id: z.coerce.number().positive()
-    }).partial();
-
-    const parsed = schema.safeParse(req.params);
-
-    if (!parsed.success) {
-        res.status(400).json({
-            message: 'Validation failed',
-        });
-        return;
-    }
-
-    const { access_token } = req.query
-
-    const { id } = parsed.data;
-
-    const project = await prisma.project.findUnique({
-        where: {
-            id: id,
-            public: access_token ? undefined : true,
-            embed: access_token ? String(access_token) : undefined,
-        },
-        select: {
-            id: true,
-            embed: true,
-            name: true,
-            public: true,
-            status: true,
-            members: {
-                include: {
-                    user: true,
-                }
-            }
-        }
-    });
-
-    if (!project) {
-        res.status(404).json({
-            message: 'Project not found',
-        });
-        return;
-    }
-
-    res.json(project);
-})
-
-router.get<{ id: string }, Omit<Project, 'markup' | 'diagram'> | MessageResponse>('/:id', jwtMiddleware, async (req, res) => {
+router.get<{ id: string }, Omit<Project, 'markup' | 'diagram'> | MessageResponse>('/:id', guardMiddleware('OR', projectTokenMiddleware, jwtMiddleware), async (req, res) => {
     const { user } = res.locals;
+    const { embed_token } = req.query
+    const { anonymous } = res.locals;
 
     const schema = z.object({
         id: z.coerce.number().positive()
@@ -134,7 +89,9 @@ router.get<{ id: string }, Omit<Project, 'markup' | 'diagram'> | MessageResponse
     const project = await prisma.project.findUnique({
         where: {
             id: id,
-            members: {
+            public: anonymous ? embed_token ? undefined : true : undefined,
+            embed: embed_token ? String(embed_token) : undefined,
+            members: embed_token ? undefined : {
                 some: {
                     userId: user.id,
                 }
@@ -164,11 +121,7 @@ router.get<{ id: string }, Omit<Project, 'markup' | 'diagram'> | MessageResponse
     res.json(project);
 })
 
-
-
-
-
-router.put<{ id: string }, Project | MessageResponse>('/:id', jwtMiddleware, async (req, res) => {
+router.put<{ id: string }, Project | MessageResponse>('/:id', guardMiddleware('OR', jwtMiddleware), async (req, res) => {
     const paramSchema = z.object({
         id: z.coerce.number().positive()
     }).partial();
@@ -261,7 +214,7 @@ router.put<{ id: string }, Project | MessageResponse>('/:id', jwtMiddleware, asy
     res.json(project);
 })
 
-router.delete<{ id: string }, Project | MessageResponse>('/:id', jwtMiddleware, async (req, res) => {
+router.delete<{ id: string }, Project | MessageResponse>('/:id', guardMiddleware('OR', jwtMiddleware), async (req, res) => {
     const { user } = res.locals;
 
     const schema = z.object({
