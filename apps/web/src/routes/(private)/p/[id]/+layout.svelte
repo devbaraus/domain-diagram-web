@@ -7,7 +7,7 @@
 	import { listProjects } from '$lib/services/project-service.svelte';
 	import { connections, mobSwitch, project } from '$lib/store';
 	import { createQuery } from '@tanstack/svelte-query';
-	import { LetterTextIcon, WorkflowIcon } from 'lucide-svelte';
+	import { LetterTextIcon, WorkflowIcon, RefreshCcwIcon, SettingsIcon } from 'lucide-svelte';
 
 	const query = createQuery({
 		queryKey: ['list-projects'],
@@ -20,6 +20,10 @@
 			e.preventDefault();
 			e.target.blur();
 		}
+	}
+
+	function reloadPage() {
+		window.location.reload();
 	}
 </script>
 
@@ -52,35 +56,43 @@
 		</div>
 	</aside>
 	<div class="w-full">
-		<div class="navbar bg-base-100 h-12 border-b">
-			<div class="flex-1 space-x-2 px-2">
-				<span class="text-xl">{$project?.name}</span>
-				<ul>
-					{#each $connections.filter((i) => $page.data.user.id !== i.user.id) as { user }}
+		<div class="bg-base-100 flex h-10 border-b p-2">
+			<div class="flex flex-1 space-x-2 px-2">
+				<span class="text line-clamp-1 w-24 lg:w-64">{$project?.name}</span>
+			</div>
+			<div class="flex flex-none items-center gap-2 lg:gap-2">
+				<!-- <button onclick={reloadPage}>
+					<RefreshCcwIcon class="size-4" />
+					<div class="sr-only">refresh</div>
+				</button>
+				<button>
+					<SettingsIcon class="size-4" />
+					<div class="sr-only">refresh</div>
+				</button> -->
+				<ul class="space-x-2">
+					{#each $connections as { user }}
 						<li class="tooltip tooltip-bottom" data-tip={user.name}>
 							<Avatar
 								name={user.name}
-								class="ddd-avatar size-8 rounded-full border-2"
+								class="ddd-avatar size-6 rounded-full border-2"
 								borderColor={user.color}
 							/>
 						</li>
 					{/each}
 				</ul>
-			</div>
-			<div class="flex-none items-center gap-2">
 				<button
-					class="btn btn-info mask mask-squircle lg:hidden"
+					class="btn btn-info btn-xs mask mask-squircle lg:hidden"
 					onclick={() => ($mobSwitch = !$mobSwitch)}
 				>
 					{#if !$mobSwitch}
-						<LetterTextIcon class="size-8" />
+						<LetterTextIcon class="size-4" />
 					{:else}
-						<WorkflowIcon class="size-8" />
+						<WorkflowIcon class="size-4" />
 					{/if}
 				</button>
 				<div class="dropdown dropdown-end">
 					<div tabindex="0" role="button" class="avatar">
-						<Avatar name={$page.data.user?.name} />
+						<Avatar class="size-6" name={$page.data.user?.name} />
 					</div>
 					<ul class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
 						<li>
@@ -92,8 +104,22 @@
 				</div>
 			</div>
 		</div>
+		<!-- <div class="navbar bg-base-100 h-12 border-b">
+			<div class="flex-none items-center gap-2">
+				<button
+					class="btn btn-info mask mask-squircle lg:hidden"
+					onclick={() => ($mobSwitch = !$mobSwitch)}
+				>
+					{#if !$mobSwitch}
+						<LetterTextIcon class="size-8" />
+					{:else}
+						<WorkflowIcon class="size-8" />
+					{/if}
+				</button>
+			</div>
+		</div> -->
 		<div
-			class="relative z-0 flex h-[calc(100dvh_-_64px)] max-h-[calc(100dvh_-_64px)] flex-1 bg-white"
+			class="relative z-0 flex h-[calc(100dvh_-_48px)] max-h-[calc(100dvh_-_48px)] flex-1 bg-white"
 		>
 			<slot></slot>
 		</div>

@@ -28,6 +28,9 @@
 	</div>
 </dialog>
 
-<button class="btn btn-error mask mask-squircle" onclick={() => deleteModal?.showModal()}>
-	<TrashIcon class="size-5" />
-</button>
+<div class="tooltip tooltip-right" data-tip="Delete">
+	<button class="btn btn-error mask mask-squircle" onclick={() => deleteModal?.showModal()}>
+		<span class="sr-only">delete</span>
+		<TrashIcon class="size-5" />
+	</button>
+</div>
