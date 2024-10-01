@@ -7,24 +7,13 @@
 	import { listProjects } from '$lib/services/project-service.svelte';
 	import { connections, mobSwitch, project } from '$lib/store';
 	import { createQuery } from '@tanstack/svelte-query';
-	import { LetterTextIcon, WorkflowIcon, RefreshCcwIcon, SettingsIcon } from 'lucide-svelte';
+	import { LetterTextIcon, WorkflowIcon } from 'lucide-svelte';
 
 	const query = createQuery({
 		queryKey: ['list-projects'],
 		queryFn: async () => await listProjects($page.data.session),
 		initialData: []
 	});
-
-	function handleKeyDown(e) {
-		if (e.key === 'Enter') {
-			e.preventDefault();
-			e.target.blur();
-		}
-	}
-
-	function reloadPage() {
-		window.location.reload();
-	}
 </script>
 
 <svelte:head>
