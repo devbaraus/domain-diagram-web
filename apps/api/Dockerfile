@@ -16,6 +16,8 @@ RUN npm run build
 
 FROM node:lts-slim AS runner
 
+RUN apt-get update -y && apt-get install -y openssl
+
 RUN npm install -g npm@latest pm2
 
 WORKDIR /app
