@@ -1,11 +1,8 @@
-import * as yjs from './yjs'
+import { User } from '@prisma/client';
 import { WebSocketServer } from 'ws';
-import { LeveldbPersistence } from 'y-leveldb';
-import * as Y from 'yjs';
-import morgan from 'morgan';
 import { prisma } from './db';
 import { verifyToken } from './utils/jwt';
-import { User } from '@prisma/client';
+import * as yjs from './yjs';
 
 // Mapa para armazenar os documentos Yjs compartilhados
 // const db = new LeveldbPersistence('persistence');

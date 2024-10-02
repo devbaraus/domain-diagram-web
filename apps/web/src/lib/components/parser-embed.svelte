@@ -61,9 +61,6 @@
 		const embedToken = $page.url.searchParams.get('token');
 		const accessToken = $page.data.session;
 
-		console.log('Access Token', accessToken);
-		console.log('Embed Token', embedToken);
-
 		provider = new WebsocketProvider(`${PUBLIC_WS_URL}`, $page.params.id, doc, {
 			params: accessToken
 				? {
@@ -80,9 +77,6 @@
 
 		provider.on('status', (event) => {
 			if (event.status === 'connected') {
-				console.log('Connected to YJS');
-				console.log('Type', type?.toJSON());
-
 				updateTree(type?.toJSON());
 
 				type?.observe(() => {
