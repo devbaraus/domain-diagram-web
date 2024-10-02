@@ -166,7 +166,9 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
         );
 
-        svgGroup.attr("transform", `translate(${translate[0]}, ${translate[1]}) scale(${scale})`);
+        if(!isNaN(translate[0]) && !isNaN(translate[1]) && !isNaN(scale)){
+            svgGroup.attr("transform", `translate(${translate[0]}, ${translate[1]}) scale(${scale})`);
+        }
     }
 
     function findClosestPorts(sourcePorts: any, targetPorts: any) {

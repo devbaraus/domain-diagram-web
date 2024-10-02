@@ -2,6 +2,7 @@ import * as yjs from './yjs'
 import { WebSocketServer } from 'ws';
 import { LeveldbPersistence } from 'y-leveldb';
 import * as Y from 'yjs';
+import morgan from 'morgan';
 import { prisma } from './db';
 import { verifyToken } from './utils/jwt';
 import { User } from '@prisma/client';
@@ -50,7 +51,6 @@ yjs.setPersistence(persistence);
 export const startWebSocketServer = (server: any) => {
     const wss = new WebSocketServer({ server });
 
-
     wss.on('connection', async (ws, req) => {
         // Pega o docId da URL, caso esteja sendo utilizado.
         const url = new URL(req.url as string, 'http://localhost:3000');
@@ -59,6 +59,8 @@ export const startWebSocketServer = (server: any) => {
         const embedToken = url.searchParams.get('embed_token')
         const docName = urlParts && urlParts[1];
         let user: User | null = null;
+
+        console.log(`WS ${url.pathname} CONNECTED`);
 
         if (accessToken) {
             const isValid = await verifyToken(accessToken);
