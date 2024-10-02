@@ -58,17 +58,24 @@
 
 		doc = new Y.Doc();
 
+		const embedToken = $page.url.searchParams.get('token');
+		const accessToken = $page.data.session;
+
 		provider = new WebsocketProvider(`${PUBLIC_WS_URL}`, $page.params.id, doc, {
-			params: {
-				embed_token: $page.url.searchParams.get('token')
-			}
+			params: accessToken
+				? accessToken
+				: embedToken
+					? {
+							embed_token: embedToken
+						}
+					: undefined
 		});
 
 		type = doc.getText('monaco');
 
 		provider.on('status', (event) => {
 			if (event.status === 'connected') {
-				debouncedTreeUpdate(type?.toJSON());
+				updateTree(type?.toJSON());
 
 				type?.observe(() => {
 					debouncedTreeUpdate(type?.toJSON());
@@ -80,7 +87,6 @@
 	});
 
 	onDestroy(() => {
-		console.log('disposing');
 		dispose();
 	});
 </script>

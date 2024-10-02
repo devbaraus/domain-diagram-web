@@ -94,8 +94,8 @@ router.get<{ id: string }, Omit<Project, 'markup' | 'diagram'> | MessageResponse
         where: {
             id: id,
             public: anonymous ? embed_token ? undefined : true : undefined,
-            embed: embed_token ? String(embed_token) : undefined,
-            members: embed_token ? undefined : {
+            embed: anonymous ? embed_token ? String(embed_token) : undefined : undefined,
+            members: anonymous ? undefined : {
                 some: {
                     userId: user.id,
                 }

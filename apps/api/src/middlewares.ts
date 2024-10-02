@@ -49,11 +49,7 @@ export async function projectTokenMiddleware(req: Request, res: Response, next: 
   const embedToken = req.query.embed_token as string;
   const projectId = req.params.id;
 
-  if (!embedToken) {
-    return false
-  }
-
-  const project = await prisma.project.findUnique({
+  const project = await prisma.project.count({
     where: {
       id: Number(projectId),
       public: !embedToken ? true : undefined,
@@ -64,6 +60,7 @@ export async function projectTokenMiddleware(req: Request, res: Response, next: 
   if (!project) {
     return false
   }
+
 
   res.locals.authenticated = true;
   res.locals.anonymous = true;

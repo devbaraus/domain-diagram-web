@@ -8,31 +8,66 @@ import axios from 'axios';
 export const queryClient = writable<QueryClient>();
 
 class Client {
-    private _client = axios.create({
-        baseURL: PUBLIC_API_URL,
-        withCredentials: true
-    })
+    private token: string | null = null
+    private http = fetch
 
+    constructor(
+        token?: string,
+        http?: any
+    ) {
+        if (token) {
+            this.token = token
+        }
 
-    async setToken(token: string) {
-        this._client.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        if (http) {
+            this.http = http
+        }
     }
 
-    async get(url: string) {
-        return this._client.get(url)
+    async get(resource: string) {
+        const url = new URL(resource, PUBLIC_API_URL)
+
+        return this.http(url, {
+            headers: this.token ? {
+                Authorization: `Bearer ${this.token}`,
+            } : {},
+        }).then(r => r.json())
     }
 
-    async post(url: string, data: any) {
-        return this._client.post(url, data)
+    async post(resource: string, data: any) {
+        const url = new URL(resource, PUBLIC_API_URL)
+
+        return this.http(url, {
+            method: 'POST',
+            headers: this.token ? {
+                Authorization: `Bearer ${this.token}`,
+            } : {},
+            body: JSON.stringify(data),
+        }).then(r => r.json())
     }
 
-    async put(url: string, data: any) {
-        return this._client.put(url, data)
+    async put(resource: string, data: any) {
+        const url = new URL(resource, PUBLIC_API_URL)
+
+        return this.http(url, {
+            method: 'PUT',
+            headers: this.token ? {
+                Authorization: `Bearer ${this.token}`,
+            } : {},
+            body: JSON.stringify(data),
+        }).then(r => r.json())
     }
 
-    async delete(url: string) {
-        return this._client.delete(url)
+    async delete(resource: string) {
+        const url = new URL(resource, PUBLIC_API_URL)
+
+        return this.http(url, {
+            method: 'DELETE',
+            headers: this.token ? {
+                Authorization: `Bearer ${this.token}`,
+            } : {},
+        }).then(r => r.json())
     }
 }
 
-export const client = new Client()
+export const client = (token?: string, http?: any) => new Client(token, http)

@@ -111,7 +111,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
     function draw(value) {
         diagram = value;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
+
         const domainEntities = [value.aggregates, value.entities, value.valueObjects, value.enums, value.events, value.services].flat();
         const links = domainEntities.map(domain => domain.properties?.map(prop => ({
             source: domain.name,

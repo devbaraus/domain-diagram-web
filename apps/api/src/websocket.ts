@@ -60,12 +60,6 @@ export const startWebSocketServer = (server: any) => {
         const docName = urlParts && urlParts[1];
         let user: User | null = null;
 
-
-        if (!accessToken && !embedToken) {
-            ws.close();
-            return;
-        }
-
         if (accessToken) {
             const isValid = await verifyToken(accessToken);
 
@@ -95,7 +89,7 @@ export const startWebSocketServer = (server: any) => {
             where: {
                 id: Number(docName),
                 public: accessToken ? undefined : embedToken ? undefined : true,
-                embed: embedToken ? String(embedToken) : undefined,
+                embed: accessToken ? undefined : embedToken ? String(embedToken) : undefined,
                 members: user ? {
                     some: {
                         userId: user.id,
