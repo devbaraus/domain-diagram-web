@@ -12,7 +12,7 @@
 	const query = createQuery({
 		queryKey: ['list-projects'],
 		queryFn: async () => await listProjects($page.data.session),
-		initialData: []
+		initialData: $page.data.projects
 	});
 </script>
 
@@ -27,7 +27,7 @@
 
 			{#each $query.data as project}
 				<div class="tooltip tooltip-right z-20" data-tip={project.name}>
-					<a href={`/p/${project.id}`}>
+					<a href={`/p/${project.id}`} data-sveltekit-reload>
 						<Avatar
 							class={project.id == $page.params.id ? 'bg-neutral text-neutral-content' : ''}
 							name={project.name}
@@ -47,17 +47,9 @@
 	<div class="w-full">
 		<div class="bg-base-100 flex h-10 border-b p-2">
 			<div class="flex flex-1 space-x-2 px-2">
-				<span class="text line-clamp-1 w-24 lg:w-64">{$project?.name}</span>
+				<span class="text line-clamp-1 w-24 lg:w-64">{$page.data.item?.name}</span>
 			</div>
 			<div class="flex flex-none items-center gap-2 lg:gap-2">
-				<!-- <button onclick={reloadPage}>
-					<RefreshCcwIcon class="size-4" />
-					<div class="sr-only">refresh</div>
-				</button>
-				<button>
-					<SettingsIcon class="size-4" />
-					<div class="sr-only">refresh</div>
-				</button> -->
 				<ul class="space-x-2">
 					{#each $connections.filter((i) => 'user' in i && $page.data.user.id !== i.user.id) as { user }}
 						<li class="tooltip tooltip-bottom" data-tip={user.name}>

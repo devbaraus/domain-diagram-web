@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { PUBLIC_WS_URL } from '$env/static/public';
-	import { connections, editor, model, monaco } from '$lib/store';
-	import { cn } from '$lib/utils';
+	import { connections, editor, model, monaco, project } from '$lib/store';
 	import { onDestroy, onMount } from 'svelte';
 	import * as Y from 'yjs';
 
@@ -47,17 +46,6 @@
 	let awareness;
 	let decorations;
 
-	interface CursorsType {
-		lineNumber: number;
-		column: number;
-	}
-	interface SelectionsType {
-		startLineNumber: number;
-		startColumn: number;
-		endLineNumber: number;
-		endColumn: number;
-	}
-
 	let props: {
 		value: string;
 		class?: string;
@@ -85,7 +73,7 @@
 			minimap: { enabled: false }
 		});
 
-		$model = $monaco.editor.createModel('', 'ddd');
+		$model = $monaco.editor.createModel($page.data.item?.markup, 'ddd');
 		$editor.setModel($model);
 
 		doc = new Y.Doc();
@@ -98,11 +86,6 @@
 		type = doc.getText('monaco');
 		binding = new MonacoBinding(type, $editor?.getModel()!, new Set([$editor]), provider.awareness);
 
-		// TODO Aproveitar na versão embed
-		// doc.on('update', (update) => {
-		// 	console.log(doc.getText('monaco').toJSON());
-		// });
-
 		awareness = provider.awareness;
 		awareness.setLocalState({
 			user: {
@@ -112,7 +95,6 @@
 			}
 		});
 
-		// Update cursor positions for each user
 		$editor.onDidChangeCursorPosition((e: any) => {
 			decorations?.clear();
 			const cursor = e.position;
@@ -211,9 +193,9 @@
 		return dispose;
 	});
 
-	onDestroy(() => {
-		dispose();
-	});
+	// onDestroy(() => {
+	// 	dispose();
+	// });
 </script>
 
 <div
