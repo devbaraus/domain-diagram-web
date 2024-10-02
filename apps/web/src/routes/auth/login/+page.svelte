@@ -1,12 +1,17 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import { Routes } from '$lib';
 	import { queryClient } from '$lib/client';
+	import { toast } from 'svelte-sonner';
 </script>
 
 <div class="flex min-h-screen items-center justify-center self-center">
-	<div class="flexflex-col items-stretch p-6 shadow md:p-8 lg:p-16">
-		<h3 class="text-center text-xl font-semibold">Login</h3>
+	<div class="flex flex-col items-stretch p-6 shadow md:p-8 lg:p-16">
+		<div role="tablist" class="tabs tabs-bordered">
+			<a href={Routes.LOGIN} class="tab tab-active text-center text-xl font-semibold">Login</a>
+			<a href={Routes.REGISTER} class="tab text-center text-xl font-semibold">Register</a>
+		</div>
 		<!-- <h3 class="text-base-content/70 mt-2 text-center text-sm">
 			Seamless Access, Secure Connection: Your Gateway to a Personalized Experience.
 		</h3> -->
@@ -20,7 +25,7 @@
 						});
 						goto('/p');
 					} else {
-						alert('Invalid credentials');
+						toast.error('Invalid credentials');
 					}
 				};
 			}}

@@ -1,13 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import Parser from '$lib/components/parser-edit.svelte';
-	import type { PageData } from './$types';
-
-	let { data }: { data: PageData } = $props();
 </script>
 
 <svelte:head>
-	<title>Domain Driven Diagram - {data.item?.name}</title>
+	<title>{$page.data.item?.name} | Domain Driven Diagram</title>
 </svelte:head>
 
 {#key $page.params.id}

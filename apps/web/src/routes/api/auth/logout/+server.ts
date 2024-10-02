@@ -1,3 +1,4 @@
+import { Routes } from '$lib'
 import { redirect } from '@sveltejs/kit'
 
 export function GET({ cookies }) {
@@ -5,5 +6,5 @@ export function GET({ cookies }) {
         path: '/',
     })
 
-    throw redirect(303, '/login')
+    throw redirect(303, Routes.LOGIN)
 }

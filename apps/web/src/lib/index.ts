@@ -1,4 +1,11 @@
 // place files you want to import through the `$lib` alias in this folder.
+export const Routes = {
+    LOGIN: '/auth/login',
+    REGISTER: '/auth/register',
+    PROJECT: '/p',
+    EMBED: '/e',
+}
+
 export const grammar = `// This a placeholder grammar
 Aggregate<UserID> User {
     username: String

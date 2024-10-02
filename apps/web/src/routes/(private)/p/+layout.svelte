@@ -16,10 +16,6 @@
 	});
 </script>
 
-<svelte:head>
-	<title>{$page.data.item?.name} | Domain Driven Diagram</title>
-</svelte:head>
-
 <div class="z-10 flex max-w-[100dvw] divide-x">
 	<aside class="bg-base-100 z-10 flex h-[100dvh] w-16 flex-col justify-between p-2">
 		<div class="space-y-2">

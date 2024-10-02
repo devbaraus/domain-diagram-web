@@ -29,6 +29,6 @@
 </svelte:head>
 
 <QueryClientProvider client={$queryClient}>
-	<Toaster expand={true} richColors />
+	<Toaster expand={true} richColors position={'bottom-center'} />
 	<slot></slot>
 </QueryClientProvider>
