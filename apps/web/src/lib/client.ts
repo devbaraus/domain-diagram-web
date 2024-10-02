@@ -11,6 +11,30 @@ class Client {
     private token: string | null = null
     private http = fetch
 
+    private returnData = (r: Response) => {
+        if (r.ok) {
+            return r.json()
+        }
+
+        if (r.status === 401) {
+            throw new Error('Unauthorized')
+        }
+
+        if (r.status === 404) {
+            throw new Error('Not found')
+        }
+
+        if (r.status === 400) {
+            throw new Error('Validation failed')
+        }
+
+        if (r.status >= 500) {
+            throw new Error('Internal server error')
+        }
+
+        throw new Error(r.statusText)
+    }
+
     constructor(
         token?: string,
         http?: any
@@ -31,7 +55,7 @@ class Client {
             headers: this.token ? {
                 Authorization: `Bearer ${this.token}`,
             } : {},
-        }).then(r => r.json())
+        }).then(this.returnData)
     }
 
     async post(resource: string, data: any) {
@@ -43,7 +67,7 @@ class Client {
                 Authorization: `Bearer ${this.token}`,
             } : {},
             body: JSON.stringify(data),
-        }).then(r => r.json())
+        }).then(this.returnData)
     }
 
     async put(resource: string, data: any) {
@@ -55,7 +79,7 @@ class Client {
                 Authorization: `Bearer ${this.token}`,
             } : {},
             body: JSON.stringify(data),
-        }).then(r => r.json())
+        }).then(this.returnData)
     }
 
     async delete(resource: string) {
@@ -66,7 +90,7 @@ class Client {
             headers: this.token ? {
                 Authorization: `Bearer ${this.token}`,
             } : {},
-        }).then(r => r.json())
+        }).then(this.returnData)
     }
 }
 

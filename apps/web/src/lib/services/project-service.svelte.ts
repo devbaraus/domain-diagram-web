@@ -16,27 +16,23 @@ export async function updateProject(id: string | number, params: {
     public: boolean,
     embed: boolean,
 }, token: string) {
-    const { data } = await client(token).put(`/projects/${id}`, params);
-    return data
+    return client(token).put(`/projects/${id}`, params);
 }
 
 export async function getProject(id: string | number, token: string) {
-    const { data } = await client(token).get(`/projects/${id}`);
-    return data
+    return client(token).get(`/projects/${id}`);
+
 }
 
 export async function embedProject(id: string | number, token: string | null) {
-    const { data } = await client().get(`/projects/${id}` + (token ? `?embed_token=${token}` : ""));
-    return data
+    return client().get(`/projects/${id}` + (token ? `?embed_token=${token}` : ""));
 }
 
 
 export async function listProjects(token: string) {
-    const { data } = await client(token).get("/projects");
-    return data
+    return client(token).get("/projects");
 }
 
 export async function deleteProject(id: string | number, token: string) {
-    const { data } = await client(token).delete(`/projects/${id}`);
-    return data
+    return client(token).delete(`/projects/${id}`);
 }
