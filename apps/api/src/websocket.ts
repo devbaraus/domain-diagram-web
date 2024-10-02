@@ -66,7 +66,6 @@ export const startWebSocketServer = (server: any) => {
             return;
         }
 
-
         if (accessToken) {
             const isValid = await verifyToken(accessToken);
 

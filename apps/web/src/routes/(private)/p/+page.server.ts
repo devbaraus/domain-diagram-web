@@ -1,4 +1,4 @@
-import { createProject, listProjects } from "$lib/services/project-service.svelte"
+import { createProject } from "$lib/services/project-service.svelte"
 import { redirect } from "@sveltejs/kit"
 import type { PageServerLoad } from "./$types"
 

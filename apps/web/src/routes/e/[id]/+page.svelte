@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import Parser from '$lib/components/parser-embed.svelte';
-	import type { PageData } from './$types';
 </script>
 
 <svelte:head>
