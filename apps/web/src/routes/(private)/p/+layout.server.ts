@@ -1,6 +1,6 @@
 import { listProjects } from "$lib/services/project-service.svelte"
 import { redirect } from "@sveltejs/kit"
-import type { PageServerLoad } from "./$types"
+import type { PageServerLoad } from "./[id]/$types"
 
 export const load: PageServerLoad = async ({ locals }) => {
     try {
