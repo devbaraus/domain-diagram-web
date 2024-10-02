@@ -66,7 +66,9 @@
 
 		provider = new WebsocketProvider(`${PUBLIC_WS_URL}`, $page.params.id, doc, {
 			params: accessToken
-				? accessToken
+				? {
+						access_token: accessToken
+					}
 				: embedToken
 					? {
 							embed_token: embedToken
