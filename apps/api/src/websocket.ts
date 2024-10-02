@@ -60,13 +60,21 @@ export const startWebSocketServer = (server: any) => {
         const docName = urlParts && urlParts[1];
         let user: User | null = null;
 
-        console.log(`WS ${url.pathname} CONNECTED`);
+
+        if (docName == null) {
+            ws.close(
+                1003
+            );
+            return;
+        }
 
         if (accessToken) {
             const isValid = await verifyToken(accessToken);
 
             if (!isValid) {
-                ws.close();
+                ws.close(
+                    3000
+                );
                 return;
             }
 
@@ -77,14 +85,11 @@ export const startWebSocketServer = (server: any) => {
             })
 
             if (!user) {
-                ws.close();
+                ws.close(
+                    3003
+                );
                 return;
             }
-        }
-
-        if (docName == null) {
-            ws.close();
-            return;
         }
 
         const project = await prisma.project.findUnique({
@@ -101,9 +106,13 @@ export const startWebSocketServer = (server: any) => {
         });
 
         if (project == null) {
-            ws.close();
+            ws.close(
+                3008
+            );
             return;
         }
+
+        console.log(`WS ${url.pathname} CONNECTED`);
 
         let ydoc = yjs.docs.get(docName);
 
