@@ -52,20 +52,22 @@ class Client {
         const url = new URL(resource, PUBLIC_API_URL)
 
         return this.http(url, {
-            headers: this.token ? {
-                Authorization: `Bearer ${this.token}`,
-            } : {},
+            headers: {
+                Authorization: this.token ? `Bearer ${this.token}` : '',
+                'Content-Type': 'application/json',
+            },
         }).then(this.returnData)
     }
 
-    async post(resource: string, data: any) {
+    async post(resource: string, data: Object) {
         const url = new URL(resource, PUBLIC_API_URL)
 
         return this.http(url, {
             method: 'POST',
-            headers: this.token ? {
-                Authorization: `Bearer ${this.token}`,
-            } : {},
+            headers: {
+                Authorization: this.token ? `Bearer ${this.token}` : '',
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify(data),
         }).then(this.returnData)
     }
@@ -75,9 +77,10 @@ class Client {
 
         return this.http(url, {
             method: 'PUT',
-            headers: this.token ? {
-                Authorization: `Bearer ${this.token}`,
-            } : {},
+            headers: {
+                Authorization: this.token ? `Bearer ${this.token}` : '',
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify(data),
         }).then(this.returnData)
     }
@@ -87,9 +90,10 @@ class Client {
 
         return this.http(url, {
             method: 'DELETE',
-            headers: this.token ? {
-                Authorization: `Bearer ${this.token}`,
-            } : {},
+            headers: {
+                Authorization: this.token ? `Bearer ${this.token}` : '',
+                'Content-Type': 'application/json',
+            },
         }).then(this.returnData)
     }
 }

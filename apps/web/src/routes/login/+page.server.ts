@@ -21,7 +21,7 @@ export const actions: Actions = {
             return fail(400, { invalid: true })
         }
 
-        const { data } = await client.post('/auth/login', { email, password })
+        const data = await client().post('/auth/login', { email, password })
 
         if (!data.access_token || !data.expires_at) {
             return fail(401, { invalid: true })
