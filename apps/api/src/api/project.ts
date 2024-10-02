@@ -59,6 +59,10 @@ router.get<{}, Project[] | MessageResponse>('/', guardMiddleware('OR', jwtMiddle
                     userId: user.id,
                 }
             }
+        },
+        select: {
+            name: true,
+            id: true,
         }
     });
 
