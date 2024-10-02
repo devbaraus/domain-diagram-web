@@ -62,14 +62,8 @@
 
 		type = doc.getText('monaco');
 
-		provider.on('status', (event) => {
-			if (event.status === 'connected') {
-				debouncedTreeUpdate(type.toJSON());
-
-				type?.observe(() => {
-					debouncedTreeUpdate(type?.toJSON());
-				});
-			}
+		type?.observe(() => {
+			debouncedTreeUpdate(type?.toJSON());
 		});
 
 		return dispose;
