@@ -3,9 +3,9 @@ import { redirect } from "@sveltejs/kit"
 import type { PageServerLoad } from "./$types"
 
 export const load: PageServerLoad = async ({ locals, parent }) => {
-    await parent()
+    const data = await parent()
 
-    let res = await listProjects(locals.session)
+    let res = data.projects
 
     if (!res.length) {
         res = await createProject(locals.user.name + '\'s project', locals.session)
