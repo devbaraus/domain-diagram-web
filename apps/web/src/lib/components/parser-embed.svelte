@@ -75,6 +75,9 @@
 
 		provider.on('status', (event) => {
 			if (event.status === 'connected') {
+				console.log('Connected to YJS');
+				console.log('Type', type?.toJSON());
+
 				updateTree(type?.toJSON());
 
 				type?.observe(() => {
