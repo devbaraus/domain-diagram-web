@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { PUBLIC_WS_URL } from '$env/static/public';
-	import { connections, editor, model, monaco, project } from '$lib/store';
-	import { onDestroy, onMount } from 'svelte';
+	import { connections, editor, model, monaco } from '$lib/store';
+	import { onMount } from 'svelte';
 	import * as Y from 'yjs';
 
 	const backgrounds = [

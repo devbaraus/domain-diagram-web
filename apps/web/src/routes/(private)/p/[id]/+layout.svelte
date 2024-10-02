@@ -5,7 +5,7 @@
 	import ProjectDeleteButton from '$lib/components/projects/project-delete-button.svelte';
 	import ProjectUpdateButton from '$lib/components/projects/project-update-button.svelte';
 	import { listProjects } from '$lib/services/project-service.svelte';
-	import { connections, mobSwitch, project } from '$lib/store';
+	import { connections, mobSwitch } from '$lib/store';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { LetterTextIcon, WorkflowIcon } from 'lucide-svelte';
 
@@ -17,7 +17,7 @@
 </script>
 
 <svelte:head>
-	<title>Domain Driven Diagram</title>
+	<title>{$page.data.item?.name} | Domain Driven Diagram</title>
 </svelte:head>
 
 <div class="z-10 flex max-w-[100dvw] divide-x">
@@ -38,7 +38,7 @@
 		</div>
 
 		<div class="space-y-2">
-			{#if $project?.members.find((i) => i.role === 'OWNER' && i.user.id === $page.data.user.id)}
+			{#if $page.data.item?.members.find((i) => i.role === 'OWNER' && i.user.id === $page.data.user.id)}
 				<ProjectUpdateButton />
 				<ProjectDeleteButton />
 			{/if}
@@ -85,20 +85,6 @@
 				</div>
 			</div>
 		</div>
-		<!-- <div class="navbar bg-base-100 h-12 border-b">
-			<div class="flex-none items-center gap-2">
-				<button
-					class="btn btn-info mask mask-squircle lg:hidden"
-					onclick={() => ($mobSwitch = !$mobSwitch)}
-				>
-					{#if !$mobSwitch}
-						<LetterTextIcon class="size-8" />
-					{:else}
-						<WorkflowIcon class="size-8" />
-					{/if}
-				</button>
-			</div>
-		</div> -->
 		<div
 			class="relative z-0 flex h-[calc(100dvh_-_48px)] max-h-[calc(100dvh_-_48px)] flex-1 bg-white"
 		>

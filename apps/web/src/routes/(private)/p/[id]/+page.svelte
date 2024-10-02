@@ -2,13 +2,8 @@
 	import { page } from '$app/stores';
 	import Parser from '$lib/components/parser-edit.svelte';
 	import type { PageData } from './$types';
-	import { project } from '$lib/store';
 
 	let { data }: { data: PageData } = $props();
-
-	$effect(() => {
-		project.set(data.item);
-	});
 </script>
 
 <svelte:head>

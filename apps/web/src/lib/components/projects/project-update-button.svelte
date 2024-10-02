@@ -3,7 +3,6 @@
 	import { page } from '$app/stores';
 	import { queryClient } from '$lib/client';
 	import { updateProject } from '$lib/services/project-service.svelte';
-	import { project } from '$lib/store';
 	import { cn } from '$lib/utils';
 	import { createMutation } from '@tanstack/svelte-query';
 	import { PenIcon } from 'lucide-svelte';
@@ -14,7 +13,7 @@
 	let members = $state([]);
 
 	$effect(() => {
-		members = $project?.members.map((i) => ({ email: i.user.email, role: i.role }));
+		members = $page.data.item?.members.map((i) => ({ email: i.user.email, role: i.role }));
 	});
 
 	const update = createMutation({
@@ -45,13 +44,13 @@
 					minlength="3"
 					type="text"
 					placeholder="Daisy"
-					value={$project.name}
+					value={$page.data.item.name}
 				/>
 			</label>
 
 			<label class="label cursor-pointer justify-start gap-2">
 				<span class="label-text">Public</span>
-				<input type="checkbox" class="toggle" checked={$project.public} />
+				<input type="checkbox" class="toggle" checked={$page.data.item.public} />
 			</label>
 
 			<div class="grid border-collapse grid-cols-2 gap-2">
@@ -101,7 +100,7 @@
 				class="btn mr-auto"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						`<iframe src="${$page.url.protocol}//${$page.url.host}/e/${$page.params.id}?token=${$project.embed}" width="100%" height="100%"></iframe>`
+						`<iframe src="${$page.url.protocol}//${$page.url.host}/e/${$page.params.id}?token=${$page.data.item.embed}" width="100%" height="100%"></iframe>`
 					);
 					modal?.close();
 					toast.success('Embed code copied to clipboard');
