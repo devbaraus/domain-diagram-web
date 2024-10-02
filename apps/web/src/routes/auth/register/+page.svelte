@@ -41,12 +41,13 @@
 				</div>
 				<div class="form-control">
 					<label for="email" class="label"
-						><span class="label-text cursor-pointer">Email Address</span></label
+						><span class="label-text cursor-pointer">Email</span></label
 					>
 					<div class="form-control rounded-box border-base-content/20 border ps-3">
 						<input
 							id="email"
-							placeholder="Email Address"
+							placeholder="example@dddiagram.com"
+							type="email"
 							class="input input-sm w-full transition-all focus:border-transparent focus:outline-0 focus:outline-offset-0"
 							name="email"
 						/>
