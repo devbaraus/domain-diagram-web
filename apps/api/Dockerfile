@@ -1,4 +1,4 @@
-FROM node:lts AS builder
+FROM node:lts-slim AS builder
 
 RUN npm install -g npm@latest
 
@@ -12,4 +12,24 @@ COPY . .
 
 RUN npx prisma generate
 
-CMD ["npm", "run", "dev"]
+RUN npm run build
+
+FROM node:lts-slim AS runner
+
+RUN npm install -g npm@latest pm2
+
+WORKDIR /app
+
+COPY --from=builder /app/package*.json ./
+
+RUN npm install --only=production
+
+COPY --from=builder /app/prisma ./prisma
+
+RUN npx prisma generate
+
+COPY --from=builder /app/dist ./dist
+
+EXPOSE 3000
+
+CMD ["pm2-runtime", "dist/index.js"]

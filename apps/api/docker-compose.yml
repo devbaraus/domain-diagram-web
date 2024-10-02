@@ -1,17 +1,4 @@
 services:
-  api:
-    image: devsbaraus/ddd-api:latest
-    build: 
-      context: .
-      dockerfile: Dockerfile
-    container_name: ddd_api
-    volumes:
-      - .:/app
-    env_file:
-      - .env
-    ports:
-      - "3000:3000"
-
   db:
     image: postgres:latest
     container_name: ddd_db
