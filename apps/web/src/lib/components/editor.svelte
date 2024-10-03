@@ -73,7 +73,7 @@
 			minimap: { enabled: false }
 		});
 
-		$model = $monaco.editor.createModel($page.data.item?.markup, 'ddd');
+		$model = $monaco.editor.createModel('', 'ddd');
 		$editor.setModel($model);
 
 		doc = new Y.Doc();
