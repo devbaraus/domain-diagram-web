@@ -126,7 +126,7 @@
 
 			for (const deco of Array.from(
 				awareness
-					.getStates()
+					?.getStates()
 					.values()
 					.filter((s) => 'user' in s && s.user.id !== $page.data.user.id)
 			)) {

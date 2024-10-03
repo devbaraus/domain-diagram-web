@@ -2,9 +2,7 @@ import { grammar } from "$lib";
 import { client } from "$lib/client";
 
 export async function createProject(name: string, token: string) {
-    const { data } = await client(token).post("/projects", { name, markup: grammar });
-
-    return data
+    return client(token).post("/projects", { name, markup: grammar });
 }
 
 export async function updateProject(id: string | number, params: {
