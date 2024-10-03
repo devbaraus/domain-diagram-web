@@ -118,17 +118,14 @@
 		awareness.on('change', (e) => {
 			decorations?.clear();
 			decorateCursors();
-			connections.set(awareness.getStates().values());
+			connections.set(Array.from(awareness.getStates().values()));
 		});
 
 		function decorateCursors() {
 			const r: any = [];
 
-			for (const deco of Array.from(
-				awareness
-					?.getStates()
-					.values()
-					.filter((s) => 'user' in s && s.user.id !== $page.data.user.id)
+			for (const deco of Array.from(awareness.getStates().values()).filter(
+				(s) => 'user' in s && s.user.id !== $page.data.user.id
 			)) {
 				const user = deco.user;
 				const cursor = deco.cursor;
