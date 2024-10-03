@@ -176,7 +176,7 @@
 	}
 
 	function dispose() {
-		provider?.disconnect();
+		provider?.destroy();
 		binding?.destroy();
 		doc?.destroy();
 

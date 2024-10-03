@@ -6,6 +6,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
     let diagram: Diagram = value;
     let editor = null
     let fixed = false
+    const minZoom = 0.1, maxZoom = 2;
 
     editorInstance?.subscribe(value => editor = value);
 
@@ -14,10 +15,12 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         .attr("width", '100%')
         .attr("height", '100%')
         .attr("viewBox", `0 0 ${el.getBoundingClientRect().width} ${el.getBoundingClientRect().height}`)
-        .call(d3.zoom().on("zoom", function (event) {
-            fixed = true;
-            svgGroup.attr("transform", event.transform);
-        }))
+        .call(d3.zoom()
+            .scaleExtent([minZoom, maxZoom])
+            .on("zoom", function (event) {
+                fixed = true;
+                svgGroup.attr("transform", event.transform);
+            }))
 
     const svgGroup = svg.append("g");
     let links, nodes, contexts
@@ -166,7 +169,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
         );
 
-        if(!isNaN(translate[0]) && !isNaN(translate[1]) && !isNaN(scale)){
+        if (!isNaN(translate[0]) && !isNaN(translate[1]) && !isNaN(scale)) {
             svgGroup.attr("transform", `translate(${translate[0]}, ${translate[1]}) scale(${scale})`);
         }
     }
@@ -445,7 +448,9 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
             const closestPorts = findClosestPorts(sourcePorts, targetPorts);
 
-            return `M${sourcePorts[closestPorts.source].x},${sourcePorts[closestPorts.source].y}L${targetPorts[closestPorts.target].x},${targetPorts[closestPorts.target].y}`;
+            return d3.linkHorizontal()
+                .source(() => [sourcePorts[closestPorts.source].x, sourcePorts[closestPorts.source].y])
+                .target(() => [targetPorts[closestPorts.target].x, targetPorts[closestPorts.target].y])();
         });
 
         if (!fixed) {

@@ -7,6 +7,4 @@
 	<title>{$page.data.item?.name} | Domain Driven Diagram</title>
 </svelte:head>
 
-{#key $page.params.id}
-	<Parser id={$page.params.id} />
-{/key}
+<Parser id={$page.params.id} />
