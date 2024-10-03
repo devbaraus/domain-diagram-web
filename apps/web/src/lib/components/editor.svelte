@@ -83,6 +83,12 @@
 			}
 		});
 
+		provider.on('status', (e) => {
+			if (e.status === 'disconnected') {
+				$model.setValue('');
+			}
+		});
+
 		type = doc.getText('monaco');
 		binding = new MonacoBinding(type, $editor?.getModel()!, new Set([$editor]), provider.awareness);
 
