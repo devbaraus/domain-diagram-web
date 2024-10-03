@@ -14,7 +14,7 @@ app.use(morgan('dev'));
 app.use(helmet());
 app.use(cors({
   credentials: true,
-  origin: process.env.CORS_ORIGIN,
+  origin: process.env.CORS_ORIGIN?.split(','),
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 
