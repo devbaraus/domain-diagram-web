@@ -49,7 +49,7 @@
 	}
 
 	function dispose() {
-		provider?.disconnect();
+		provider?.destroy();
 		doc?.destroy();
 	}
 

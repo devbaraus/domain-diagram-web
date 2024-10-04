@@ -109,7 +109,13 @@ router.get<{ id: string }, Omit<Project, 'markup' | 'diagram'> | MessageResponse
             status: true,
             members: {
                 include: {
-                    user: true,
+                    user: {
+                        select: {
+                            id: true,
+                            email: true,
+                            name: true,
+                        }
+                    },
                 }
             }
         }
