@@ -22,7 +22,7 @@
 			modal?.close();
 			toast.success('Project shared successfully');
 			$queryClient.invalidateQueries({ queryKey: ['list-projects'] });
-			goto('/p');
+			// window.location.reload();
 		},
 		onError: () => {
 			modal?.close();
@@ -35,7 +35,17 @@
 	<div class="modal-box space-y-2">
 		<p>Update the settings this project</p>
 
-		<form action="">
+		<form
+			onsubmit={(e) => {
+				e.preventDefault();
+				const formData = new FormData(e.target);
+				const name = formData.get('name') as string;
+				const pub = formData.get('public') === 'on';
+				const newMembers = members.map((i) => ({ email: i.email, role: i.role }));
+
+				$update.mutate({ name, public: pub, members: newMembers });
+			}}
+		>
 			<label class="label cursor-pointer justify-start gap-2">
 				<span class="label-text">Name</span>
 				<input
@@ -50,19 +60,22 @@
 
 			<label class="label cursor-pointer justify-start gap-2">
 				<span class="label-text">Public</span>
-				<input type="checkbox" class="toggle" checked={$page.data.item.public} />
+				<input name="public" type="checkbox" class="toggle" checked={$page.data.item.public} />
 			</label>
 
 			<div class="grid border-collapse grid-cols-2 gap-2">
 				{#if members}
-					{#each members as member}
+					{#each members as member, index}
 						<input
+							name="members[].email"
 							class={cn('input input-sm input-bordered', member.role === 'OWNER' && 'col-span-2')}
 							type="text"
 							disabled={member.role === 'OWNER'}
 							value={member.email}
 						/>
+						<input type="text" name="members[].role" class="hidden" value={member.role} />
 						<button
+							type="button"
 							class={cn('btn btn-sm', member.role === 'OWNER' && 'hidden')}
 							onclick={() => (members = members.filter((i) => i.email !== member.email))}
 							>Remove
@@ -74,7 +87,6 @@
 				<input
 					class="input input-bordered input-sm w-full"
 					type="email"
-					name="email"
 					onkeydown={(e) => {
 						if (e.key === 'Enter') {
 							e.preventDefault();
@@ -93,22 +105,23 @@
 					}}
 				/>
 			</div>
-		</form>
 
-		<div class="modal-action">
-			<button
-				class="btn mr-auto"
-				onclick={() => {
-					navigator.clipboard.writeText(
-						`<iframe src="${$page.url.protocol}//${$page.url.host}/e/${$page.params.id}?token=${$page.data.item.embed}" width="100%" height="100%"></iframe>`
-					);
-					modal?.close();
-					toast.success('Embed code copied to clipboard');
-				}}>Embed</button
-			>
-			<button class="btn" onclick={() => modal?.close()}>Cancel</button>
-			<button class="btn btn-primary" onclick={() => $update.mutate({ members })}>Add</button>
-		</div>
+			<div class="modal-action">
+				<button
+					type="button"
+					class="btn mr-auto"
+					onclick={() => {
+						navigator.clipboard.writeText(
+							`${$page.url.protocol}//${$page.url.host}/e/${$page.params.id}?token=${$page.data.item.embed}`
+						);
+						modal?.close();
+						toast.success('Embed code copied to clipboard');
+					}}>Embed</button
+				>
+				<button type="button" class="btn" onclick={() => modal?.close()}>Cancel</button>
+				<button class="btn btn-primary">Save</button>
+			</div>
+		</form>
 	</div>
 </dialog>
 
