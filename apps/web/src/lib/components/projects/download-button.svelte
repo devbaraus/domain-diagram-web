@@ -3,7 +3,10 @@
 	import { DownloadIcon } from 'lucide-svelte';
 	import { diagram } from '$lib/store';
 
+	let processing = false;
+
 	function downloadPng() {
+		processing = true;
 		const group = document.querySelector('#diagram > g');
 		const transform = group?.getAttribute('transform');
 
@@ -26,6 +29,7 @@
 			svg?.setAttribute('width', width);
 			svg?.setAttribute('height', height);
 			svg?.setAttribute('viewBox', viewBox);
+			processing = false;
 		});
 	}
 
@@ -48,11 +52,6 @@
 			canvas.width = svgElement.getBBox().width * scale;
 			canvas.height = svgElement.getBBox().height * scale;
 
-			console.log('width', width);
-			console.log('scale', scale);
-			console.log('svgElement.getBBox().width', svgElement.getBBox().width);
-			console.log('canvas.width', canvas.width);
-
 			// Draw the image on the canvas with scaling
 			context.drawImage(img, 0, 0, canvas.width, canvas.height);
 
@@ -74,7 +73,7 @@
 </script>
 
 <div class="tooltip tooltip-right" data-tip="Download">
-	<button class="btn btn-info mask mask-squircle" onclick={downloadPng}>
+	<button disabled={processing} class="btn btn-info mask mask-squircle" onclick={downloadPng}>
 		<span class="sr-only">download</span>
 		<DownloadIcon class="size-5" />
 	</button>
