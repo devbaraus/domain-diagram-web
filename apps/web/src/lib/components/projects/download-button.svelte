@@ -30,7 +30,7 @@
 	}
 
 	function svgToCanvasAndDownload(svgElement, filename = 'image.png', callback: Function) {
-		const contexts = $diagram.contexts.length;
+		const contexts = Math.ceil(Math.sqrt($diagram.contexts.length));
 		const widthPerContext = 1200;
 		const width = contexts * widthPerContext;
 		const scale = width / svgElement.getBBox().width;
