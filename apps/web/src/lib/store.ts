@@ -6,6 +6,7 @@ export const monaco: Writable<typeof Monaco> = writable(null);
 export const model: Writable<Monaco.editor.ITextModel> = writable(null);
 export const connections: Writable<any[]> = writable([]);
 export const mobSwitch: Writable<boolean> = writable(false);
+export const diagram: Writable<any> = writable(null);
 
 export type DiagramStore = {
     fixed: boolean,

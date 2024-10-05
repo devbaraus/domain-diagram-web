@@ -44,7 +44,6 @@
 	"type": "module",
 	"dependencies": {
 		"@tanstack/svelte-query": "^5.55.4",
-		"axios": "^1.7.7",
 		"clsx": "^2.1.1",
 		"lodash": "^4.17.21",
 		"lucide-svelte": "^0.438.0",

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { DownloadIcon } from 'lucide-svelte';
+	import { diagram } from '$lib/store';
 
 	function downloadPng() {
 		const group = document.querySelector('#diagram > g');
@@ -20,15 +21,20 @@
 			`-40 -40 ${group?.getBoundingClientRect().width} ${group?.getBoundingClientRect().height}`
 		);
 
-		svgToCanvasAndDownload(svg, 'diagram.png');
-
-		group?.setAttribute('transform', transform);
-		svg?.setAttribute('width', width);
-		svg?.setAttribute('height', height);
-		svg?.setAttribute('viewBox', viewBox);
+		svgToCanvasAndDownload(svg, 'diagram.png', () => {
+			group?.setAttribute('transform', transform);
+			svg?.setAttribute('width', width);
+			svg?.setAttribute('height', height);
+			svg?.setAttribute('viewBox', viewBox);
+		});
 	}
 
-	function svgToCanvasAndDownload(svgElement, filename = 'image.png', scale = 3) {
+	function svgToCanvasAndDownload(svgElement, filename = 'image.png', callback: Function) {
+		const contexts = $diagram.contexts.length;
+		const widthPerContext = 1200;
+		const width = contexts * widthPerContext;
+		const scale = width / svgElement.getBBox().width;
+
 		const svgData = new XMLSerializer().serializeToString(svgElement); // Convert SVG to XML string
 		const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' }); // Create a Blob from the SVG
 		const url = URL.createObjectURL(svgBlob); // Create a URL for the Blob
@@ -41,6 +47,11 @@
 			// Set canvas dimensions based on the SVG size and scale factor
 			canvas.width = svgElement.getBBox().width * scale;
 			canvas.height = svgElement.getBBox().height * scale;
+
+			console.log('width', width);
+			console.log('scale', scale);
+			console.log('svgElement.getBBox().width', svgElement.getBBox().width);
+			console.log('canvas.width', canvas.width);
 
 			// Draw the image on the canvas with scaling
 			context.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -55,6 +66,7 @@
 			// Cleanup: remove the Blob URL and download link
 			URL.revokeObjectURL(url);
 			document.body.removeChild(a);
+			callback();
 		};
 
 		img.src = url; // Set the SVG URL as the image source
