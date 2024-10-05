@@ -23,6 +23,13 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
                 svgGroup.attr("transform", event.transform);
             }))
 
+    const style = svg.append("style")
+    style.text(`@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
+            text {
+                font-family: 'Fira Code', monospace;
+            }`);
+
+
     const svgGroup = svg.append("g");
     let links, nodes, contexts
 

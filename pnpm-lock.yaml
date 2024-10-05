@@ -125,9 +125,6 @@ importers:
       lucide-svelte:
         specifier: ^0.438.0
         version: 0.438.0(svelte@5.0.0-next.241)
-      save-svg-as-png:
-        specifier: ^1.4.17
-        version: 1.4.17
       svelte-sonner:
         specifier: ^0.3.28
         version: 0.3.28(svelte@5.0.0-next.241)
@@ -3016,9 +3013,6 @@ packages:
 
   sander@0.5.1:
     resolution: {integrity: sha512-3lVqBir7WuKDHGrKRDn/1Ye3kwpXaDOMsiRP1wd6wpZW56gJhsbp5RqQpA6JG/P+pkXizygnr1dKR8vzWaVsfA==}
-
-  save-svg-as-png@1.4.17:
-    resolution: {integrity: sha512-7QDaqJsVhdFPwviCxkgHiGm9omeaMBe1VKbHySWU6oFB2LtnGCcYS13eVoslUgq6VZC6Tjq/HddBd1K6p2PGpA==}
 
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
@@ -6470,8 +6464,6 @@ snapshots:
       graceful-fs: 4.2.11
       mkdirp: 0.5.6
       rimraf: 2.7.1
-
-  save-svg-as-png@1.4.17: {}
 
   semver@6.3.1: {}
 
