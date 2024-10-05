@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { DownloadIcon } from 'lucide-svelte';
 
 	function downloadPng() {
@@ -16,7 +17,7 @@
 		svg?.setAttribute('height', '100%');
 		svg?.setAttribute(
 			'viewBox',
-			`0 -40 ${group?.getBoundingClientRect().width} ${group?.getBoundingClientRect().height}`
+			`-40 -40 ${group?.getBoundingClientRect().width} ${group?.getBoundingClientRect().height}`
 		);
 
 		svgToCanvasAndDownload(svg, 'diagram.png');
@@ -47,7 +48,7 @@
 			// Create the download link
 			const a = document.createElement('a');
 			a.href = canvas.toDataURL('image/png');
-			a.download = filename;
+			a.download = $page.data.item?.name ? `${$page.data.item.name}.png` : filename;
 			document.body.appendChild(a);
 			a.click();
 
