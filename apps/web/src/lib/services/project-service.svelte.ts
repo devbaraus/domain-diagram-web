@@ -11,8 +11,8 @@ export async function updateProject(id: string | number, params: {
         role: string,
         userId: string
     }[],
-    public: boolean,
-    embed: boolean,
+    markup?: string,
+    public?: boolean,
 }, token: string) {
     return client(token).put(`/projects/${id}`, params);
 }

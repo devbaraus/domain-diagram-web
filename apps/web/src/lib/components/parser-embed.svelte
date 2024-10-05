@@ -56,34 +56,38 @@
 	onMount(async () => {
 		await initializeParser();
 
-		doc = new Y.Doc();
+		if ($page.data.item.realtime) {
+			doc = new Y.Doc();
 
-		const embedToken = $page.url.searchParams.get('token');
-		const accessToken = $page.data.session;
+			const embedToken = $page.url.searchParams.get('token');
+			const accessToken = $page.data.session;
 
-		provider = new WebsocketProvider(`${PUBLIC_WS_URL}`, $page.params.id, doc, {
-			params: accessToken
-				? {
-						access_token: accessToken
-					}
-				: embedToken
+			provider = new WebsocketProvider(`${PUBLIC_WS_URL}`, $page.params.id, doc, {
+				params: accessToken
 					? {
-							embed_token: embedToken
+							access_token: accessToken
 						}
-					: undefined
-		});
+					: embedToken
+						? {
+								embed_token: embedToken
+							}
+						: undefined
+			});
 
-		type = doc.getText('monaco');
+			type = doc.getText('monaco');
 
-		provider.on('status', (event) => {
-			if (event.status === 'connected') {
-				updateTree(type?.toJSON());
+			provider.on('status', (event) => {
+				if (event.status === 'connected') {
+					updateTree(type?.toJSON());
 
-				type?.observe(() => {
-					debouncedTreeUpdate(type?.toJSON());
-				});
-			}
-		});
+					type?.observe(() => {
+						debouncedTreeUpdate(type?.toJSON());
+					});
+				}
+			});
+		} else {
+			updateTree($page.data.item.markup);
+		}
 
 		return dispose;
 	});

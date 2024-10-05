@@ -16,11 +16,9 @@
 	import TreeSitter, { type Tree } from 'web-tree-sitter';
 	import { cn } from '$lib/utils';
 
-	let ws: WebSocket | undefined;
 	let parser: TreeSitter | undefined;
 	let tree = $state<Tree>();
 	let diagram = $state<Diagram>();
-	let markup = $state<string>('');
 
 	const updateTree = (value: string) => {
 		tree = parser?.parse(value);
@@ -75,7 +73,6 @@
 		!$mobSwitch ? 'left-0 top-0' : '-left-[calc(100%_+_1px)] top-0',
 		'absolute  h-full w-full overflow-hidden transition-all lg:static lg:w-[calc(100vw_*_0.3_-_48px)]'
 	)}
-	value={markup}
 	onchange={handleChange}
 	onkeydown={handleCtrlSave}
 />

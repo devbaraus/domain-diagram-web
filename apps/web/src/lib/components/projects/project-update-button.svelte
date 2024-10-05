@@ -98,7 +98,7 @@
 							}
 
 							if (members.find((i) => i.email === email)) return;
-							members.push({ email: email, role: 'MEMBER' });
+							members.push({ email: email, role: 'VIEWER' });
 
 							e.currentTarget.value = '';
 						}

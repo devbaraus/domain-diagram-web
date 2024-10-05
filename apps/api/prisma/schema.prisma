@@ -21,8 +21,8 @@ model User {
 
 enum Role {
   OWNER
-  MEMBER
-  GUEST
+  EDITOR
+  VIEWER
 }
 
 model ProjectMember {
@@ -43,12 +43,13 @@ enum ProjectStatus {
 }
 
 model Project {
-  id      Int     @id @default(autoincrement())
-  name    String
-  markup  String
-  diagram Json
-  public  Boolean @default(false)
-  embed   String
+  id       Int     @id @default(autoincrement())
+  name     String
+  markup   String
+  diagram  Json
+  public   Boolean @default(false)
+  embed    String
+  realtime Boolean @default(false)
 
   status  ProjectStatus   @default(ACTIVE)
   members ProjectMember[]

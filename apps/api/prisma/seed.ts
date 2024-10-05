@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Role } from '@prisma/client'
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 
@@ -14,11 +14,13 @@ async function main() {
             password: await bcrypt.hash('Admin1234)', 10),
             projects: {
                 create: {
-                    role: 'OWNER',
+                    role: Role.OWNER,
                     project: {
                         create: {
                             name: 'My First Project',
                             markup: '',
+                            public: false,
+                            realtime: false,
                             embed: randomBytes(16).toString('hex'),
                             diagram: {},
                         }

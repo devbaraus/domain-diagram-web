@@ -2,7 +2,7 @@ import { randomBytes } from 'crypto';
 import { prisma } from '../db';
 import MessageResponse from '../interfaces/MessageResponse';
 import { guardMiddleware, jwtMiddleware, projectTokenMiddleware } from '../middlewares';
-import { Prisma, Project } from '@prisma/client';
+import { Prisma, Project, Role } from '@prisma/client';
 import express from 'express';
 import { z } from 'zod';
 
@@ -40,7 +40,7 @@ router.post<{}, Project | MessageResponse>('/', guardMiddleware('OR', jwtMiddlew
             members: {
                 create: {
                     userId: user.id,
-                    role: 'OWNER',
+                    role: Role.OWNER,
                 }
             }
         }
@@ -105,6 +105,9 @@ router.get<{ id: string }, Omit<Project, 'markup' | 'diagram'> | MessageResponse
             id: true,
             embed: true,
             name: true,
+            markup: true,
+            diagram: true,
+            realtime: true,
             public: true,
             status: true,
             members: {
@@ -150,11 +153,13 @@ router.put<{ id: string }, Project | MessageResponse>('/:id', guardMiddleware('O
     const schema = z.object({
         name: z.string().min(3).max(32),
         members: z.array(z.object({
-            role: z.string(),
+            role: z.nativeEnum(Role),
             email: z.string(),
         })),
         public: z.boolean(),
-        embed: z.boolean(),
+        // embed: z.boolean(),
+        markup: z.string(),
+        realtime: z.boolean(),
     }).partial();
 
     const { user } = res.locals;
@@ -169,7 +174,7 @@ router.put<{ id: string }, Project | MessageResponse>('/:id', guardMiddleware('O
         return;
     }
 
-    const { name, public: isPublic, embed, members } = parsed.data;
+    const { name, public: isPublic, members, markup, realtime } = parsed.data;
 
     let foundUsers: {
         id: number;
@@ -208,7 +213,8 @@ router.put<{ id: string }, Project | MessageResponse>('/:id', guardMiddleware('O
         data: {
             name,
             public: isPublic,
-            embed,
+            realtime,
+            markup,
             members: members ? {
                 deleteMany: {},
                 createMany: {
@@ -248,7 +254,7 @@ router.delete<{ id: string }, Project | MessageResponse>('/:id', guardMiddleware
             members: {
                 some: {
                     userId: user.id,
-                    role: 'OWNER',
+                    role: Role.OWNER,
                 }
             }
         },

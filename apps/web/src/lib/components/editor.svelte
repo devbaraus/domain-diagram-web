@@ -1,8 +1,12 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { PUBLIC_WS_URL } from '$env/static/public';
+	import { updateProject } from '$lib/services/project-service.svelte';
 	import { connections, editor, model, monaco } from '$lib/store';
+	import { createMutation, createQuery } from '@tanstack/svelte-query';
+	import _ from 'lodash';
 	import { onDestroy, onMount } from 'svelte';
+	import { toast } from 'svelte-sonner';
 	import * as Y from 'yjs';
 
 	const backgrounds = [
@@ -53,28 +57,21 @@
 		onkeydown?: (e: KeyboardEvent) => void;
 	} = $props();
 
-	async function setup() {
+	const updateMutation = createMutation({
+		mutationFn: async (data) => await updateProject($page.params.id, data, $page.data.session),
+		onSuccess: () => {},
+		onError: () => {
+			toast.error('Failed to save');
+		}
+	});
+
+	const debouncedUpdate = _.debounce((value: Object) => {
+		$updateMutation.mutate(value);
+	}, 500);
+
+	async function setupRealtime() {
 		const { WebsocketProvider } = await import('y-websocket');
 		const { MonacoBinding } = await import('y-monaco');
-		$monaco = (await import('$lib/monaco')).default;
-
-		// Your monaco instance is ready, let's display some code!
-		$editor = $monaco.editor.create(el, {
-			theme: 'default',
-			wordWrap: 'wordWrapColumn',
-			wordWrapColumn: 60,
-			wrappingIndent: 'indent',
-			lineNumbers: 'on',
-			fontFamily: 'Fira Code',
-			fontSize: 14,
-			tabSize: 2,
-			fontLigatures: "'zero', 'ss02', 'ss03', 'ss04', 'ss05', 'calt'",
-			scrollBeyondLastLine: false,
-			minimap: { enabled: false }
-		});
-
-		$model = $monaco.editor.createModel('', 'ddd');
-		$editor.setModel($model);
 
 		doc = new Y.Doc();
 		provider = new WebsocketProvider(`${PUBLIC_WS_URL}`, $page.params.id, doc, {
@@ -177,6 +174,46 @@
 		$model.onDidChangeContent((e) => {
 			props.onchange?.($model.getValue());
 		});
+	}
+
+	async function setupRest() {
+		$model.setValue($page.data.item.markup);
+
+		$model.onDidChangeContent((e) => {
+			debouncedUpdate({ markup: $model.getValue() });
+
+			props.onchange?.($model.getValue());
+		});
+	}
+
+	async function setup() {
+		$monaco = (await import('$lib/monaco')).default;
+
+		// Your monaco instance is ready, let's display some code!
+		$editor = $monaco.editor.create(el, {
+			theme: 'default',
+			wordWrap: 'wordWrapColumn',
+			wordWrapColumn: 60,
+			wrappingIndent: 'indent',
+			lineNumbers: 'on',
+			fontFamily: 'Fira Code',
+			fontSize: 14,
+			tabSize: 2,
+			fontLigatures: "'zero', 'ss02', 'ss03', 'ss04', 'ss05', 'calt'",
+			scrollBeyondLastLine: false,
+			minimap: { enabled: false }
+		});
+
+		$model = $monaco.editor.createModel('', 'ddd');
+		$editor.setModel($model);
+
+		if ($page.data.item.realtime) {
+			console.log('realtime');
+			await setupRealtime();
+		} else {
+			console.log('rest');
+			await setupRest();
+		}
 
 		props.onchange?.($model.getValue());
 	}
