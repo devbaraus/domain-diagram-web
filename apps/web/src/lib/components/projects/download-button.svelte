@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { DownloadIcon } from 'lucide-svelte';
-	import * as donwloader from 'save-svg-as-png';
 
 	function downloadPng() {
 		const group = document.querySelector('#diagram > g');
