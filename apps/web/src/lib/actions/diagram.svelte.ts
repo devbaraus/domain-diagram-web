@@ -12,6 +12,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
     const svg = d3.select(el)
         .append("svg")
+        .attr("id", "diagram")
         .attr("width", '100%')
         .attr("height", '100%')
         .attr("viewBox", `0 0 ${el.getBoundingClientRect().width} ${el.getBoundingClientRect().height}`)

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import Avatar from '$lib/components/avatar.svelte';
+	import DownloadButton from '$lib/components/projects/download-button.svelte';
 	import ProjectCreateButton from '$lib/components/projects/project-create-button.svelte';
 	import ProjectDeleteButton from '$lib/components/projects/project-delete-button.svelte';
 	import ProjectUpdateButton from '$lib/components/projects/project-update-button.svelte';
@@ -34,6 +35,7 @@
 		</div>
 
 		<div class="space-y-2">
+			<DownloadButton />
 			{#if $page.data.item?.members.find((i) => i.role === 'OWNER' && i.user.id === $page.data.user.id)}
 				<ProjectUpdateButton />
 				<ProjectDeleteButton />
