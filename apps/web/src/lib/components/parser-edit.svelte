@@ -15,6 +15,7 @@
 	import { onMount } from 'svelte';
 	import TreeSitter, { type Tree } from 'web-tree-sitter';
 	import { cn } from '$lib/utils';
+	import { diagram as diagramStore } from '$lib/store';
 
 	let parser: TreeSitter | undefined;
 	let tree = $state<Tree>();
@@ -31,6 +32,7 @@
 		}
 
 		diagram = extractDiagram(tree?.rootNode);
+		diagramStore.set(diagram);
 		const diagnostic = lintAST(tree);
 
 		updateDefinitionMarkers($monaco, diagram);

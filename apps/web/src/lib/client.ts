@@ -1,9 +1,6 @@
 import { PUBLIC_API_URL } from '$env/static/public'
 import { QueryClient } from '@tanstack/svelte-query';
 import { writable } from 'svelte/store';
-import axios from 'axios';
-
-// export const client = createDirectus(PUBLIC_API_URL).with(authentication()).with(rest())
 
 export const queryClient = writable<QueryClient>();
 
