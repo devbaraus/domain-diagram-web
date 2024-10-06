@@ -281,7 +281,7 @@ export function extractAggregate(node: SyntaxNode | undefined): Aggregate | unde
     if(!hasGeneric) {
         const genericType = data.name + "ID";
         data.ids.push(genericType);
-        data.properties.push({
+        data.properties.unshift({
             name: 'id',
             type: genericType,
             array: false,
@@ -545,7 +545,7 @@ export function extractEntity(node: SyntaxNode | undefined): Entity | undefined 
     if(!hasGeneric) {
         const genericType = data.name + "ID";
         data.ids.push(genericType);
-        data.properties.push({
+        data.properties.unshift({
             name: 'id',
             type: genericType,
             array: false,
