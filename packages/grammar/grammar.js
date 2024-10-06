@@ -49,7 +49,7 @@ module.exports = grammar({
     aggregate: ($) =>
       seq(
         choice("Aggregate", "AggregateRoot"),
-        $.generic_type,
+        optional($.generic_type),
         $.identifier,
         "{",
         repeat(choice($.field, $.method, $.comment)),
@@ -60,7 +60,7 @@ module.exports = grammar({
     entity: ($) =>
       seq(
         "Entity",
-        $.generic_type,
+        optional($.generic_type),
         $.identifier,
         "{",
         repeat(choice($.field, $.method, $.comment)),

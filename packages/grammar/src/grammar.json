@@ -144,8 +144,16 @@
           ]
         },
         {
-          "type": "SYMBOL",
-          "name": "generic_type"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "generic_type"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "SYMBOL",
@@ -189,8 +197,16 @@
           "value": "Entity"
         },
         {
-          "type": "SYMBOL",
-          "name": "generic_type"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "generic_type"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "SYMBOL",

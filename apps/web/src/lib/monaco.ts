@@ -43,14 +43,14 @@ monaco.languages.registerCompletionItemProvider("ddd", {
       {
         label: 'Aggregate',
         kind: monaco.languages.CompletionItemKind.Keyword,
-        insertText: 'Aggregate<${1:AggregateIdentifier}> ${2:AggregateName} {\n\t$0\n}',
+        insertText: 'Aggregate ${1:AggregateName} {\n\t$0\n}',
         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
         documentation: 'Defines a new aggregate',
       },
       {
         label: 'Entity',
         kind: monaco.languages.CompletionItemKind.Keyword,
-        insertText: 'Entity<${1:EntityIdentifier}> ${2:EntityName} {\n\t$0\n}',
+        insertText: 'Entity ${1:EntityName} {\n\t$0\n}',
         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
         documentation: 'Defines a new entity',
       },
@@ -149,14 +149,14 @@ monaco.languages.registerHoverProvider("ddd", {
         contents: [
           { value: "**Aggregate**" },
           { value: "Represents a cluster of associated objects treated as a unit." },
-          { value: "`Aggregate<AggregateIdentifier> AggregateName { ... }`" }
+          { value: "`Aggregate AggregateName { ... }`" }
         ],
       },
       Entity: {
         contents: [
           { value: "**Entity**" },
           { value: "An object with identity that persists over time." },
-          { value: "`Entity<EntityIdentifier> EntityName { ... }`" }
+          { value: "`Entity EntityName { ... }`" }
         ],
       },
       ValueObject: {

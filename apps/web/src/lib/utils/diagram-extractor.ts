@@ -228,8 +228,11 @@ export function extractAggregate(node: SyntaxNode | undefined): Aggregate | unde
         }
     }
 
+    let hasGeneric = false
+
     for (let child of node.children) {
         if (child.type === 'generic_type') {
+            hasGeneric = true;
             const genericType = extractGenericType(child);
 
             data.ids.push(genericType);
@@ -273,6 +276,19 @@ export function extractAggregate(node: SyntaxNode | undefined): Aggregate | unde
                 data.methods.push(method);
             }
         }
+    }
+
+    if(!hasGeneric) {
+        const genericType = data.name + "ID";
+        data.ids.push(genericType);
+        data.properties.push({
+            name: 'id',
+            type: genericType,
+            array: false,
+            kind: 'reference',
+            nullable: false,
+            default: ''
+        })
     }
 
     return data
@@ -476,8 +492,11 @@ export function extractEntity(node: SyntaxNode | undefined): Entity | undefined 
         }
     }
 
+    let hasGeneric = false
+
     for (let child of node.children) {
         if (child.type === 'generic_type') {
+            hasGeneric = true;
             const genericType = extractGenericType(child);
 
             data.ids.push(genericType);
@@ -521,6 +540,19 @@ export function extractEntity(node: SyntaxNode | undefined): Entity | undefined 
                 data.methods.push(method);
             }
         }
+    }
+
+    if(!hasGeneric) {
+        const genericType = data.name + "ID";
+        data.ids.push(genericType);
+        data.properties.push({
+            name: 'id',
+            type: genericType,
+            array: false,
+            kind: 'reference',
+            nullable: false,
+            default: ''
+        })
     }
 
     return data
