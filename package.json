@@ -6,6 +6,7 @@
   "scripts": {
     "web": "pnpm --filter web",
     "grammar": "pnpm --filter grammar",
+    "mvc": "pnpm --filter mvc",
     "api": "pnpm --filter api"
   },
   "keywords": [],
