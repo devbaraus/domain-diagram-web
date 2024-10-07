@@ -211,17 +211,11 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             .attr("class", (d) => `${d.type} context-${d.context}`)
             .on("mouseover", function (event, d) {
                 d3.select(this).select("rect").attr("stroke", "black");
-                links.attr("stroke", l => {
-                    if (!l) {
-                        return
-                    }
-
+                links.each(function (l) {
                     if (l.source === d.name || l.target === d.name) {
-                        return "black"
-                    } else {
-                        return "lightgrey"
+                        d3.select(this).attr("stroke", "black").raise();
                     }
-                });
+                })
             })
             .on("mouseout", function (event, d) {
                 d3.select(this).select("rect").attr("stroke", "none");
@@ -349,17 +343,17 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
                 const position = d.position;
 
                 const ports = {
-                    top: { x: bounds.width / 2, y: 0 },
-                    right: { x: bounds.width, y: bounds.height / 2 },
-                    bottom: { x: bounds.width / 2, y: bounds.height },
-                    left: { x: 0, y: bounds.height / 2 }
+                    top: { x: bounds.width / 2, y: 0, pos: 'top' },
+                    right: { x: bounds.width, y: bounds.height / 2, pos: 'right' },
+                    bottom: { x: bounds.width / 2, y: bounds.height, pos: 'bottom' },
+                    left: { x: 0, y: bounds.height / 2, pos: 'left' }
                 };
 
                 const absolutePorts = {
-                    top: { x: position.x + ports.top.x, y: position.y + ports.top.y },
-                    right: { x: position.x + ports.right.x, y: position.y + ports.right.y },
-                    bottom: { x: position.x + ports.bottom.x, y: position.y + ports.bottom.y },
-                    left: { x: position.x + ports.left.x, y: position.y + ports.left.y }
+                    top: { x: position.x + ports.top.x, y: position.y + ports.top.y, pos: 'top' },
+                    right: { x: position.x + ports.right.x, y: position.y + ports.right.y, pos: 'right' },
+                    bottom: { x: position.x + ports.bottom.x, y: position.y + ports.bottom.y, pos: 'bottom' },
+                    left: { x: position.x + ports.left.x, y: position.y + ports.left.y, pos: 'left' }
                 }
 
                 d.ports = absolutePorts;
@@ -456,7 +450,11 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
             const closestPorts = findClosestPorts(sourcePorts, targetPorts);
 
-            return d3.linkHorizontal()
+            const isHorizontal = sourcePorts[closestPorts.source].pos === 'right' || sourcePorts[closestPorts.source].pos === 'left';
+
+            const link = isHorizontal ? d3.linkHorizontal() : d3.linkVertical();
+
+            return link
                 .source(() => [sourcePorts[closestPorts.source].x, sourcePorts[closestPorts.source].y])
                 .target(() => [targetPorts[closestPorts.target].x, targetPorts[closestPorts.target].y])();
         });
