@@ -24,7 +24,7 @@
 		svg?.setAttribute('height', '100%');
 		svg?.setAttribute(
 			'viewBox',
-			`-40 -40 ${group?.getBoundingClientRect().width} ${group?.getBoundingClientRect().height}`
+			`-40 -40 ${group?.getBBox().width + 20} ${group?.getBBox().height}`
 		);
 
 		const contexts = Math.ceil(Math.sqrt($diagram.contexts.length));
