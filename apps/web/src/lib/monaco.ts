@@ -6,28 +6,80 @@ monaco.languages.register({ id: 'ddd' });
 monaco.languages.setMonarchTokensProvider('ddd', {
   tokenizer: {
     root: [
-      // Keywords
-      [/\b(Context|BoundedContext|Aggregate|AggregateRoot|Entity|ValueObject|DomainEvent|Event|DomainService|Service|Enum)\b/, "keyword"],
-
-      // Types (String, Int, UUID, etc.)
-      [/\b(String|Int|UUID|Boolean|Float|Date|Null)\b/, "type"],
-
-      // Identifiers (variables, types)
-      [/[a-zA-Z_]\w*/, "identifier"],
-
-      // Operators
-      [/\{|\}|\(|\)|\?|\[|\]/, "delimiter"],
-
-      // Values (strings, numbers, booleans, null)
-      [/"[^"]*"/, "string"],
-      [/\b-?\d+(\.\d+)?\b/, "number"],
-      [/\b(true|false|null)\b/, "constant"],
-
-      // Comments
-      [/\/\/.*$/, "comment"],
+      [/\b(Context|BoundedContext|Aggregate|AggregateRoot|Entity|ValueObject|DomainEvent|Event|DomainService|Service|Enum)\b/, 'keyword'],
+      [/\/\/.*/, 'comment'],
+      [/\{/, 'delimiter.bracket'],
+      [/\}/, 'delimiter.bracket'],
+      [/[a-zA-Z_]\w*/, 'identifier'],
+      [/\b(String|Int|UUID|Boolean|Float|Date|Null|true|false|null)\b/, 'type'],
+      [/"[^"]*"/, 'string'],
+      [/(\d+(\.\d+)?)/, 'number'],
+      [/\[|\]/, 'delimiter.array'],
     ],
   },
 });
+
+monaco.languages.setLanguageConfiguration('ddd', {
+  comments: {
+    lineComment: '//',
+  },
+  brackets: [
+    ['{', '}'],
+    ['[', ']'],
+  ],
+  autoClosingPairs: [
+    { open: '{', close: '}' },
+    { open: '[', close: ']' },
+    { open: '"', close: '"' },
+  ],
+  surroundingPairs: [
+    { open: '{', close: '}' },
+    { open: '[', close: ']' },
+    { open: '"', close: '"' },
+  ],
+  indentationRules: {
+    increaseIndentPattern: /{\s*$/,
+    decreaseIndentPattern: /^\s*}/,
+  },
+});
+
+monaco.languages.registerDocumentFormattingEditProvider('ddd', {
+  provideDocumentFormattingEdits: function (model, options, token) {
+    const text = model.getValue();
+    const formatted = formatDDDCode(text);
+    return [
+      {
+        range: model.getFullModelRange(),
+        text: formatted
+      }
+    ];
+  }
+});
+
+function formatDDDCode(text) {
+  const lines = text.split('\n');
+  let indentLevel = 0;
+  const indentString = '  '; // Two spaces indentation
+
+  const formattedLines = lines.map((line) => {
+    const trimmedLine = line.trim();
+
+    if (trimmedLine.endsWith('}')) {
+      indentLevel--;
+    }
+
+    const indentedLine = indentString.repeat(indentLevel) + trimmedLine;
+
+    if (trimmedLine.endsWith('{')) {
+      indentLevel++;
+    }
+
+    return indentedLine;
+  });
+
+  return formattedLines.join('\n');
+}
+
 
 monaco.languages.registerCompletionItemProvider("ddd", {
   provideCompletionItems: () => {
