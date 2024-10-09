@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "projects" ALTER COLUMN "embed" DROP DEFAULT,
-ALTER COLUMN "embed" SET DATA TYPE TEXT;
