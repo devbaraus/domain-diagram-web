@@ -97,5 +97,4 @@
 	});
 </script>
 
-<!-- <span class="w-96">{tree?.rootNode?.toString()}</span> -->
 <Diagram class={cn('font-fira h-screen w-full flex-1 select-none overflow-hidden')} {diagram} />

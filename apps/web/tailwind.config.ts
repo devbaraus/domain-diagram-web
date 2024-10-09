@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 export default {
-	content: ['./src/**/*.{html,js,svelte,ts}'],
+	content: ['./src/**/*.{html,js,svelte,ts,svx,md}'],
 
 	theme: {
 		extend: {
@@ -11,7 +11,6 @@ export default {
 			}
 		}
 	},
-
 	daisyui: {
 		themes: [
 			'bumblebee',
@@ -20,5 +19,5 @@ export default {
 			// 'corporate',
 		]
 	},
-	plugins: [require('daisyui')]
+	plugins: [require('@tailwindcss/typography'), require('daisyui')]
 } as Config;

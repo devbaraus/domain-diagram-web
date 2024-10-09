@@ -1,7 +1,6 @@
-import { fail, redirect } from "@sveltejs/kit"
-import type { Actions, PageServerLoad } from "../$types"
-import { client } from "$lib/client"
-import { goto } from "$app/navigation"
+import { redirect } from "@sveltejs/kit"
+import type { PageServerLoad } from "../$types"
+import { Routes } from "$lib"
 
 export const load: PageServerLoad = async ({ locals, url, parent }) => {
     await parent()
