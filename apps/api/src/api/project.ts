@@ -207,6 +207,9 @@ router.put<{ id: string }, Project | MessageResponse>('/:id', guardMiddleware('O
             members: {
                 some: {
                     userId: user.id,
+                    role: {
+                        in: [Role.OWNER, Role.EDITOR],
+                    }
                 }
             }
         },
