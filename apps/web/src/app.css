@@ -11,3 +11,76 @@
     z-index: 9999 !important;
 }
 
+
+/* General styles for the language definition */
+.token.comment {
+    color: #8e908c; /* Gray */
+    font-style: italic;
+  }
+  
+  .token.keyword {
+    color: #66d9ef; /* Cyan */
+    font-weight: bold;
+  }
+  
+  .token.string {
+    color: #e6db74; /* Yellow */
+  }
+  
+  .token.number {
+    color: #ae81ff; /* Purple */
+  }
+  
+  .token.boolean {
+    color: #f92672; /* Pink */
+  }
+  
+  .token.null {
+    color: #f92672; /* Pink */
+  }
+  
+  .token.identifier {
+    color: #a6e22e; /* Green */
+  }
+  
+  .token.operator {
+    color: #f8f8f2; /* White */
+  }
+  
+  .token.punctuation {
+    color: #f8f8f2; /* White */
+  }
+  
+  .token.generic {
+    color: #66d9ef; /* Cyan */
+  }
+  
+  .token.method {
+    color: #a6e22e; /* Green */
+  }
+  
+  .token.field {
+    color: #a6e22e; /* Green */
+  }
+  
+  /* Additional styling for nested structures */
+  .token.parameters {
+    color: #f8f8f2; /* White */
+  }
+  
+  .token.function-name {
+    color: #66d9ef; /* Cyan */
+  }
+  
+  .token.parameter-name {
+    color: #a6e22e; /* Green */
+  }
+  
+  .token.parameter-type {
+    color: #f92672; /* Pink */
+  }
+  
+  .token.type {
+    color: #f92672; /* Pink */
+  }
+  

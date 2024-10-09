@@ -187,10 +187,13 @@
 	}
 
 	async function setup() {
+		const projectRole = $page.data.item.members.find((i) => i.userId === $page.data.user.id)?.role;
+
 		$monaco = (await import('$lib/monaco')).default;
 
 		// Your monaco instance is ready, let's display some code!
 		$editor = $monaco.editor.create(el, {
+			readOnly: projectRole === 'VIEWER' || typeof projectRole === 'undefined',
 			theme: 'default',
 			wordWrap: 'wordWrapColumn',
 			wordWrapColumn: 60,

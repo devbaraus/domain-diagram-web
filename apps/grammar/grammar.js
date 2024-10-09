@@ -135,6 +135,7 @@ module.exports = grammar({
         "Float",
         "Date",
         "Null",
+        "Void",
       ),
 
     // Array type definition (e.g., String[])

@@ -48,6 +48,7 @@
 		"clsx": "^2.1.1",
 		"lodash": "^4.17.21",
 		"lucide-svelte": "^0.438.0",
+		"prismjs": "^1.29.0",
 		"svelte-sonner": "^0.3.28",
 		"tailwind-merge": "^2.5.3",
 		"tree-sitter": "^0.21.1",
