@@ -16,7 +16,7 @@
 </div>
 
 <dialog bind:this={modal} class="modal">
-	<div class="modal-box">
+	<div class="modal-box max-w-3xl">
 		<h3 class="mb-2 text-lg font-bold">Create a new project</h3>
 		<form
 			method="POST"

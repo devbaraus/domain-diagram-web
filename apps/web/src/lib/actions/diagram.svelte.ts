@@ -15,6 +15,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         .attr("id", "diagram")
         .attr("width", '100%')
         .attr("height", '100%')
+        .style("background-color", "#1f1f1f")
         .attr("viewBox", `0 0 ${el.getBoundingClientRect().width} ${el.getBoundingClientRect().height}`)
         .call(d3.zoom()
             .scaleExtent([minZoom, maxZoom])
@@ -36,18 +37,17 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
 
     const colors = [
-        "#dd6b66",
-        "#759aa0",
-        "#e69d87",
-        "#8dc1a9",
-        "#ea7e53",
-        "#eedd78",
-        "#73a373",
-        "#73b9bc",
-        "#7289ab",
-        "#91ca8c",
-        "#f49f42"
-    ]
+        "#e57373", // Light Red
+        "#64b5f6", // Light Blue
+        "#81c784", // Light Green
+        "#ffb74d", // Orange
+        "#9575cd", // Purple
+        "#4db6ac", // Teal
+        "#f06292", // Pink
+        "#7986cb", // Indigo
+        "#ffd54f", // Yellow
+        "#90a4ae"  // Blue Gray
+    ];
 
     const layout = {
         contextPadding: 60,
@@ -57,20 +57,20 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         rowGap: 30,
         columns: 4,
         contextColumns: 1
-    }
+    };
 
     const backgroundColors = {
-        'text': 'white',
-        'node': '#F3F3F3',
-        'property': '#595959',
-        'context': '#FDFDFD',
-        'type': '#8c8c8c',
-        "aggregate": "#1f78b4",
-        "entity": "#33a02c",
-        "enum": "#e31a1c",
-        "value_object": "#ff7f00",
-        "service": "#6a3d9a",
-        "event": "#99e1d9"
+        'text': '#e0e0e0', // Light text color
+        'node': '#333333', // Dark gray for node background
+        'property': '#9e9e9e', // Light gray for properties text
+        'context': '#424242', // Darker gray for context
+        'type': '#bdbdbd',    // Lighter gray for types
+        "aggregate": "#0288d1", // Dark blue
+        "entity": "#388e3c",    // Dark green
+        "enum": "#d32f2f",      // Dark red
+        "value_object": "#f57c00", // Orange
+        "service": "#7b1fa2",   // Purple
+        "event": "#26a69a"      // Teal
     };
 
     function formatType(type: Type) {

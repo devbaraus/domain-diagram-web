@@ -19,7 +19,7 @@
 </script>
 
 <dialog bind:this={deleteModal} class="modal">
-	<div class="modal-box">
+	<div class="modal-box max-w-3xl">
 		<p>Are you sure you want to delete this project?</p>
 		<div class="modal-action">
 			<button class="btn" onclick={() => deleteModal?.close()}>Cancel</button>

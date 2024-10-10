@@ -194,7 +194,7 @@
 		// Your monaco instance is ready, let's display some code!
 		$editor = $monaco.editor.create(el, {
 			readOnly: projectRole === 'VIEWER' || typeof projectRole === 'undefined',
-			theme: 'default',
+			theme: 'dark',
 			wordWrap: 'wordWrapColumn',
 			wordWrapColumn: 60,
 			wrappingIndent: 'indent',

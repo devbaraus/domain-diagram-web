@@ -43,7 +43,7 @@
 </script>
 
 <dialog bind:this={modal} class="modal">
-	<div class="modal-box space-y-2">
+	<div class="modal-box max-w-3xl space-y-2">
 		<p>Update the settings this project</p>
 
 		<label class="label cursor-pointer justify-start gap-2">
@@ -79,7 +79,11 @@
 							disabled={member.role === 'OWNER'}
 						/>
 
-						<select bind:value={member.role} class="col-span-1" disabled={member.role === 'OWNER'}>
+						<select
+							bind:value={member.role}
+							class="select select-bordered select-sm col-span-1"
+							disabled={member.role === 'OWNER'}
+						>
 							<option value="OWNER">OWNER</option>
 							<option value="VIEWER">VIEWER</option>
 							<option value="EDITOR">EDITOR</option>
@@ -119,7 +123,7 @@
 					type="email"
 					placeholder="Add member by email"
 				/>
-				<select name="role">
+				<select class="select select-bordered select-sm" name="role">
 					<option value="VIEWER">VIEWER</option>
 					<option value="EDITOR">EDITOR</option>
 				</select>

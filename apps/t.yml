@@ -1,0 +1,6 @@
+abacate: nice
+banana: good
+algo: [
+  {a: 1, b: 2},
+  {a: 3, b: 4}
+]

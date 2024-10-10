@@ -94,15 +94,15 @@
 </div>
 
 <dialog bind:this={modal} class="modal">
-	<div class="modal-box">
+	<div class="modal-box max-w-3xl">
 		<h3 class="mb-2 text-lg font-bold">Configure download</h3>
-		<label class="input input-bordered flex items-center gap-2">
-			Context Width (px)
-			<input inputmode="numeric" bind:value={widthPerContext} />
+		<label class="label gap-2">
+			<span class="label-text">Context Width</span>
+			<input class="input input-bordered flex-1" inputmode="numeric" bind:value={widthPerContext} />
 		</label>
-		<label class="input input-bordered flex items-center gap-2">
-			Image Format
-			<select bind:value={imageformat}>
+		<label class="label gap-2">
+			<span class="label-text"> Image Format </span>
+			<select class="select select-bordered flex-1" bind:value={imageformat}>
 				<option value="image/png">PNG</option>
 				<option value="image/jpeg">JPEG</option>
 				<option value="image/webp">WebP</option>

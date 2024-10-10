@@ -8,10 +8,15 @@ An **Aggregate** or **AggregateRoot** is a cluster of related objects that are t
 
 ```ddd
 Aggregate Order {
-  orderId: UUID
-  status: String
-  totalAmount: Float
-  addItem(item: Item): Void
+  name: CategoryName
+  slug: Slug
+  companyId: CompanyID
+  parentId: CategoryID
+  childrenIds: CategoryID[]
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date?
+  deletedAt: Date?
 }
 ```
 
