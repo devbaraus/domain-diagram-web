@@ -6,7 +6,7 @@ monaco.languages.register({ id: 'ddd' });
 monaco.languages.setMonarchTokensProvider('ddd', {
   tokenizer: {
     root: [
-      [/\b(Context|BoundedContext|Aggregate|AggregateRoot|Entity|ValueObject|DomainEvent|Event|DomainService|Service|Enum)\b/, 'keyword'],
+      [/\b(Context|BoundedContext|Aggregate|AggregateRoot|Entity|ValueObject|DomainEvent|Event|DomainService|Service|Enum|Repository)\b/, 'keyword'],
       [/\/\/.*/, 'comment'],
       [/\{/, 'delimiter.bracket'],
       [/\}/, 'delimiter.bracket'],
@@ -15,6 +15,7 @@ monaco.languages.setMonarchTokensProvider('ddd', {
       [/"[^"]*"/, 'string'],
       [/(\d+(\.\d+)?)/, 'number'],
       [/\[|\]/, 'delimiter.array'],
+      [/@(emits|note)\w*/, 'annotation'],
     ],
   },
 });
@@ -133,6 +134,28 @@ monaco.languages.registerCompletionItemProvider("ddd", {
         insertText: 'Service ${1:ServiceName} {\n\t$0\n}',
         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
         documentation: 'Defines a new service',
+      },
+      {
+        label: 'Repository',
+        kind: monaco.languages.CompletionItemKind.Keyword,
+        insertText: 'Repository ${1:RepositoryName} {\n\t$0\n}',
+        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        documentation: 'Defines a new repository',
+      },
+      {
+        label: 'emits',
+        kind: monaco.languages.CompletionItemKind.Keyword,
+        insertText: '@emits(${1:EventName})',
+        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+
+        documentation: 'Annotation for domain events',
+      },
+      {
+        label: 'note',
+        kind: monaco.languages.CompletionItemKind.Keyword,
+        insertText: '@note("${1:Note}")',
+        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        documentation: 'Annotation for notes',
       },
       // Primitive types
       {

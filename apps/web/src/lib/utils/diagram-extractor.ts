@@ -12,7 +12,7 @@ export function extractType(node: SyntaxNode | undefined): Type | undefined {
         nullable: false
     }
 
-    for (let child of node.children) {
+    for (const child of node.children) {
         if (child.type === 'primitive_type') {
             data = {
                 type: child.text,
@@ -77,10 +77,33 @@ export function extractField(node: SyntaxNode | undefined): Property | undefined
         array: false,
         kind: 'primitive',
         nullable: false,
-        default: ''
+        default: '',
+        note: {
+            text: '',
+            markup: {
+                start: {
+                    row: 0,
+                    column: 0
+                },
+                end: {
+                    row: 0,
+                    column: 0
+                }
+            }
+        },
+        markup: {
+            start: {
+                row: 0,
+                column: 0
+            },
+            end: {
+                row: 0,
+                column: 0
+            }
+        }
     }
 
-    for (let child of node.children) {
+    for (const child of node.children) {
         if (child.type === 'identifier') {
             data.name = child.text;
         }
@@ -97,6 +120,18 @@ export function extractField(node: SyntaxNode | undefined): Property | undefined
         if (child.type === 'value') {
             data.default = child.text;
         }
+
+
+        data.markup = {
+            start: {
+                row: child.startPosition.row,
+                column: child.startPosition.column
+            },
+            end: {
+                row: child.endPosition.row,
+                column: child.endPosition.column
+            }
+        }
     }
 
 
@@ -108,7 +143,7 @@ export function extractGenericType(node: SyntaxNode | undefined): string {
         return '';
     }
 
-    for (let child of node.children) {
+    for (const child of node.children) {
         if (child.type === 'identifier') {
             return child.text;
         }
@@ -126,7 +161,7 @@ export function extractParamsList(node: SyntaxNode | undefined): Parameter[] | u
 
     const data: Parameter[] = []
 
-    for (let child of node.children) {
+    for (const child of node.children) {
         if (child.type == "field") {
             const param = extractField(child);
 
@@ -139,23 +174,136 @@ export function extractParamsList(node: SyntaxNode | undefined): Parameter[] | u
     return data;
 }
 
-export function extractMethod(node: SyntaxNode | undefined): Method | undefined {
+export function extractEmitter(node: SyntaxNode | undefined): Emitter {
+    if (!node) {
+        return {
+            events: [],
+            markup: {
+                start: {
+                    row: 0,
+                    column: 0
+                },
+                end: {
+                    row: 0,
+                    column: 0
+                }
+            }
+        }
+    }
+
+    const data: Emitter = {
+        events: [],
+        markup: {
+            start: {
+                row: 0,
+                column: 0
+            },
+            end: {
+                row: 0,
+                column: 0
+            }
+        }
+    }
+
+    for (const child of node.children) {
+        if (child.type == "identifier") {
+            data.events.push(child.text);
+        }
+    }
+
+    data.markup = {
+        start: {
+            row: node.startPosition.row,
+            column: node.startPosition.column
+        },
+        end: {
+            row: node.endPosition.row,
+            column: node.endPosition.column
+        }
+    }
+
+    return data;
+}
+
+export function extractNote(node: SyntaxNode | undefined): Note {
+    if (!node) {
+        return {
+            text: '',
+            markup: {
+                start: {
+                    row: 0,
+                    column: 0
+                },
+                end: {
+                    row: 0,
+                    column: 0
+                }
+            }
+        }
+    }
+
+    const data = {
+        text: '',
+        markup: {
+            start: {
+                row: 0,
+                column: 0
+            },
+            end: {
+                row: 0,
+                column: 0
+            }
+        }
+    }
+
+
+    for (const child of node.children) {
+        if (child.type == "string") {
+            data.text = child.text.replaceAll('"', '');
+        }
+    }
+
+    data.markup = {
+        start: {
+            row: node.startPosition.row,
+            column: node.startPosition.column
+        },
+        end: {
+            row: node.endPosition.row,
+            column: node.endPosition.column
+        }
+    }
+
+    return data
+}
+
+export function extractMethod(node: SyntaxNode | undefined): Omit<Method, 'note' | 'emits' | 'markup'> | undefined {
     if (!node) {
         return;
     }
 
-    const data: Method = {
+    const data: Omit<Method, 'note' | 'emits'> = {
         name: '',
         parameters: [],
         return: {
             type: '',
             kind: 'primitive',
             array: false,
-            nullable: false
+            nullable: false,
+        },
+        markup: {
+            start: {
+                row: 0,
+                column: 0
+            },
+            end: {
+                row: 0,
+                column: 0
+            }
         }
     }
 
-    for (let child of node.children) {
+    for (const child of node.children) {
         if (child.type === 'identifier') {
             data.name = child.text;
         }
@@ -173,6 +321,94 @@ export function extractMethod(node: SyntaxNode | undefined): Method | undefined 
 
             if (returnType) {
                 data.return = returnType;
+            }
+        }
+    }
+
+    return data;
+}
+
+export function extractMethodWithAnnotations(node: SyntaxNode | undefined): Method | undefined {
+    if (!node) {
+        return;
+    }
+
+    const data: Method = {
+        name: '',
+        parameters: [],
+        note: {
+            text: '',
+            markup: {
+                start: {
+                    row: 0,
+                    column: 0
+                },
+                end: {
+                    row: 0,
+                    column: 0
+                }
+            }
+        },
+        emits: {
+            events: [],
+            markup: {
+                start: {
+                    row: 0,
+                    column: 0
+                },
+                end: {
+                    row: 0,
+                    column: 0
+                }
+            }
+        },
+        return: {
+            type: '',
+            kind: 'primitive',
+            array: false,
+            nullable: false,
+        },
+        markup: {
+            start: {
+                row: 0,
+                column: 0
+            },
+            end: {
+                row: 0,
+                column: 0
+            }
+        }
+    }
+
+    for (const child of node.children) {
+        if (child.type === 'method') {
+            const method = extractMethod(child);
+            data.name = method?.name || '';
+            data.parameters = method?.parameters || [];
+            data.return = method?.return || data.return;
+        }
+
+
+        if (child.type === 'annotation_emitter') {
+            const emitter = extractEmitter(child);
+
+            if (emitter) {
+                data.emits = emitter;
+            }
+        }
+
+        if (child.type === 'annotation_note') {
+            data.note = extractNote(child)
+        }
+
+        data.markup = {
+            start: {
+                row: child.startPosition.row,
+                column: child.startPosition.column
+            },
+            end: {
+                row: child.endPosition.row,
+                column: child.endPosition.column
             }
         }
     }
@@ -230,7 +466,7 @@ export function extractAggregate(node: SyntaxNode | undefined): Aggregate | unde
 
     let hasGeneric = false
 
-    for (let child of node.children) {
+    for (const child of node.children) {
         if (child.type === 'generic_type') {
             hasGeneric = true;
             const genericType = extractGenericType(child);
@@ -242,7 +478,30 @@ export function extractAggregate(node: SyntaxNode | undefined): Aggregate | unde
                 array: false,
                 kind: 'reference',
                 nullable: false,
-                default: ''
+                default: '',
+                note: {
+                    text: '',
+                    markup: {
+                        start: {
+                            row: 0,
+                            column: 0
+                        },
+                        end: {
+                            row: 0,
+                            column: 0
+                        }
+                    }
+                },
+                markup: {
+                    start: {
+                        row: 0,
+                        column: 0
+                    },
+                    end: {
+                        row: 0,
+                        column: 0
+                    }
+                }
             })
         }
 
@@ -269,8 +528,8 @@ export function extractAggregate(node: SyntaxNode | undefined): Aggregate | unde
             }
         }
 
-        if (child.type === 'method') {
-            const method = extractMethod(child);
+        if (child.type === 'method_emitter') {
+            const method = extractMethodWithAnnotations(child);
 
             if (method) {
                 data.methods.push(method);
@@ -278,7 +537,7 @@ export function extractAggregate(node: SyntaxNode | undefined): Aggregate | unde
         }
     }
 
-    if(!hasGeneric) {
+    if (!hasGeneric) {
         const genericType = data.name + "ID";
         data.ids.push(genericType);
         data.properties.unshift({
@@ -287,7 +546,30 @@ export function extractAggregate(node: SyntaxNode | undefined): Aggregate | unde
             array: false,
             kind: 'reference',
             nullable: false,
-            default: ''
+            default: '',
+            note: {
+                text: '',
+                markup: {
+                    start: {
+                        row: 0,
+                        column: 0
+                    },
+                    end: {
+                        row: 0,
+                        column: 0
+                    }
+                }
+            },
+            markup: {
+                start: {
+                    row: 0,
+                    column: 0
+                },
+                end: {
+                    row: 0,
+                    column: 0
+                }
+            }
         })
     }
 
@@ -341,7 +623,7 @@ export function extractValueObject(node: SyntaxNode | undefined): ValueObject | 
         }
     }
 
-    for (let child of node.children) {
+    for (const child of node.children) {
         if (child.type === 'identifier') {
             data.name = child.text;
             data.id = child.text;
@@ -416,7 +698,7 @@ export function extractEvent(node: SyntaxNode | undefined): DomainEvent | undefi
         }
     }
 
-    for (let child of node.children) {
+    for (const child of node.children) {
         if (child.type === 'identifier') {
             data.name = child.text;
             data.id = child.text;
@@ -494,7 +776,7 @@ export function extractEntity(node: SyntaxNode | undefined): Entity | undefined 
 
     let hasGeneric = false
 
-    for (let child of node.children) {
+    for (const child of node.children) {
         if (child.type === 'generic_type') {
             hasGeneric = true;
             const genericType = extractGenericType(child);
@@ -506,7 +788,30 @@ export function extractEntity(node: SyntaxNode | undefined): Entity | undefined 
                 array: false,
                 kind: 'reference',
                 nullable: false,
-                default: ''
+                default: '',
+                note: {
+                    text: '',
+                    markup: {
+                        start: {
+                            row: 0,
+                            column: 0
+                        },
+                        end: {
+                            row: 0,
+                            column: 0
+                        }
+                    }
+                },
+                markup: {
+                    start: {
+                        row: 0,
+                        column: 0
+                    },
+                    end: {
+                        row: 0,
+                        column: 0
+                    }
+                }
             })
         }
 
@@ -533,8 +838,8 @@ export function extractEntity(node: SyntaxNode | undefined): Entity | undefined 
             }
         }
 
-        if (child.type === 'method') {
-            const method = extractMethod(child);
+        if (child.type === 'method_note') {
+            const method = extractMethodWithAnnotations(child);
 
             if (method) {
                 data.methods.push(method);
@@ -542,7 +847,7 @@ export function extractEntity(node: SyntaxNode | undefined): Entity | undefined 
         }
     }
 
-    if(!hasGeneric) {
+    if (!hasGeneric) {
         const genericType = data.name + "ID";
         data.ids.push(genericType);
         data.properties.unshift({
@@ -551,7 +856,30 @@ export function extractEntity(node: SyntaxNode | undefined): Entity | undefined 
             array: false,
             kind: 'reference',
             nullable: false,
-            default: ''
+            default: '',
+            note: {
+                text: '',
+                markup: {
+                    start: {
+                        row: 0,
+                        column: 0
+                    },
+                    end: {
+                        row: 0,
+                        column: 0
+                    }
+                }
+            },
+            markup: {
+                start: {
+                    row: 0,
+                    column: 0
+                },
+                end: {
+                    row: 0,
+                    column: 0
+                }
+            }
         })
     }
 
@@ -605,7 +933,7 @@ export function extractRepository(node: SyntaxNode | undefined): Repository | un
         }
     }
 
-    for (let child of node.children) {
+    for (const child of node.children) {
         if (child.type === 'identifier') {
             data.name = child.text;
             data.id = child.text;
@@ -622,8 +950,8 @@ export function extractRepository(node: SyntaxNode | undefined): Repository | un
         }
 
 
-        if (child.type === 'method') {
-            const method = extractMethod(child);
+        if (child.type === 'method_note') {
+            const method = extractMethodWithAnnotations(child);
 
             if (method) {
                 data.methods.push(method);
@@ -681,7 +1009,7 @@ export function extractService(node: SyntaxNode | undefined): Service | undefine
         }
     }
 
-    for (let child of node.children) {
+    for (const child of node.children) {
         if (child.type === 'identifier') {
             data.name = child.text;
             data.id = child.text;
@@ -697,8 +1025,8 @@ export function extractService(node: SyntaxNode | undefined): Service | undefine
             }
         }
 
-        if (child.type === 'method') {
-            const method = extractMethod(child);
+        if (child.type === 'method_note') {
+            const method = extractMethodWithAnnotations(child);
 
             if (method) {
                 data.methods.push(method);
@@ -756,7 +1084,7 @@ export function extractEnum(node: SyntaxNode | undefined): Enum | undefined {
         }
     }
 
-    for (let child of node.children) {
+    for (const child of node.children) {
         if (child.type === 'identifier') {
             data.name = child.text;
             data.id = child.text;
@@ -781,7 +1109,7 @@ export function extractEnum(node: SyntaxNode | undefined): Enum | undefined {
     return data
 }
 
-export function extractDiagram(node: SyntaxNode | undefined, context?: string = 'DEFAULT', line?: number = 0, passDiagram?: Diagram = undefined): Diagram {
+export function extractDiagram(node: SyntaxNode | undefined, context: string = 'DEFAULT', passDiagram: Diagram | undefined = undefined): Diagram {
     const diagram: Diagram = passDiagram || {
         aggregates: [],
         entities: [],
@@ -847,7 +1175,7 @@ export function extractDiagram(node: SyntaxNode | undefined, context?: string = 
 
     diagram.contexts.push(contextData);
 
-    for (let child of node.children) {
+    for (const child of node.children) {
         if (child.type === 'aggregate') {
             const aggregate = extractAggregate(child);
 
@@ -913,17 +1241,14 @@ export function extractDiagram(node: SyntaxNode | undefined, context?: string = 
         }
         if (child.type === 'context') {
             let name = ''
-            let line = 0;
 
-            for (let children of child.children) {
+            for (const children of child.children) {
                 if (children.type === 'identifier') {
                     name = children.text;
-                    line = children.startPosition.row + 1;
                 }
             }
 
-
-            extractDiagram(child, name, line, diagram);
+            extractDiagram(child, name, diagram);
         }
     }
 

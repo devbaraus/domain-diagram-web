@@ -18,7 +18,7 @@ module.exports = grammar({
         $.enum,
         $.event,
         $.service,
-        // $.repository,
+        $.repository,
         $.context,
       ),
 
@@ -37,7 +37,7 @@ module.exports = grammar({
             $.enum,
             $.event,
             $.service,
-            // $.repository,
+            $.repository,
           ),
         ),
         "}",
@@ -52,9 +52,12 @@ module.exports = grammar({
         optional($.generic_type),
         $.identifier,
         "{",
-        repeat(choice($.field, $.method, $.comment)),
+        repeat(choice($.field, $.method_emitter, $.comment)),
         "}",
       ),
+
+
+
 
     // Entity definition (with optional generic type)
     entity: ($) =>
@@ -63,7 +66,7 @@ module.exports = grammar({
         optional($.generic_type),
         $.identifier,
         "{",
-        repeat(choice($.field, $.method, $.comment)),
+        repeat(choice($.field, $.method_note, $.comment)),
         "}",
       ),
 
@@ -87,19 +90,23 @@ module.exports = grammar({
         choice("DomainService", "Service"),
         $.identifier,
         "{",
-        repeat(choice($.method, $.comment)),
+        repeat(choice($.method_note, $.comment)),
         "}",
       ),
 
-    // // Repository definition
-    // repository: ($) =>
-    //   seq("Repository", $.identifier, "{", repeat($.method), "}"),
+    // Repository definition
+    repository: ($) =>
+      seq("Repository", $.identifier, "{", repeat($.method_note), "}"),
 
     // Enum definition
     enum: ($) => seq("Enum", $.identifier, "{", repeat(choice($.enum_value, $.comment)), "}"),
 
     // Enum values inside enum definition
-    enum_value: ($) => $.identifier,
+    enum_value: ($) => seq($.identifier, optional($.annotation_note)),
+
+    annotation_emitter: ($) => seq("@emits(", seq($.identifier, optional(repeat(seq(",", $.identifier)))), ')'),
+
+    annotation_note: ($) => seq("@note(", $.string, ")"),
 
     // Method definition
     method: ($) =>
@@ -109,10 +116,15 @@ module.exports = grammar({
         optional(seq($.field, optional(repeat(seq(",", $.field))))),
         ")",
         optional(seq(":", $.type)),
-      ),
+      )
+    ,
+
+    method_emitter: ($) => seq($.method, optional(repeat(choice($.annotation_emitter, $.annotation_note)))),
+
+    method_note: ($) => seq($.method, optional($.annotation_note)),
 
     // Field definition
-    field: ($) => seq($.identifier, ":", $.type, optional(seq("=", $.value))),
+    field: ($) => seq(seq($.identifier, ":", $.type, optional(seq("=", $.value))), optional($.annotation_note)),
 
     // Generic type definition
     generic_type: ($) => seq("<", $.identifier, ">"),

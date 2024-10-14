@@ -1,5 +1,16 @@
 declare type KindType = "reference" | "primitive";
 
+declare type MarkupPosition = {
+    start: {
+        row: number;
+        column: number;
+    };
+    end: {
+        row: number;
+        column: number;
+    };
+}
+
 declare type Type = {
     type: string;
     kind: KindType;
@@ -14,6 +25,8 @@ declare type Property = {
     array: boolean;
     nullable: boolean;
     default: string;
+    note: Note;
+    markup: MarkupPosition;
 }
 
 declare type Port = {
@@ -38,10 +51,23 @@ type Common = {
 
 declare type Parameter = Property
 
+declare type Emitter = {
+    events: string[];
+    markup: MarkupPosition;
+}
+
+declare type Note = {
+    text: string;
+    markup: MarkupPosition;
+}
+
 declare type Method = {
     name: string;
     parameters: Parameter[];
     return: Type;
+    note: Note;
+    emits: Emitter;
+    markup: MarkupPosition;
 }
 
 declare type Markup = {

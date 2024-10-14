@@ -7,7 +7,7 @@
 	import { extractDiagram } from '$lib/utils/diagram-extractor';
 	import {
 		checkForSyntaxErrors,
-		lintAST,
+		linter,
 		updateDefinitionMarkers,
 		updateModelMarkers
 	} from '$lib/utils/editor-utils';
@@ -31,9 +31,11 @@
 			return;
 		}
 
-		diagram = extractDiagram(tree?.rootNode);
+		let diagram = extractDiagram(tree?.rootNode);
+		console.log(diagram);
+
 		diagramStore.set(diagram);
-		const diagnostic = lintAST(tree);
+		const diagnostic = linter(tree, diagram);
 
 		updateDefinitionMarkers($monaco, diagram);
 		updateModelMarkers($monaco, $model, diagnostic);
@@ -78,4 +80,7 @@
 	onchange={handleChange}
 	onkeydown={handleCtrlSave}
 />
-<Diagram class={cn('font-fira w-full flex-1 select-none overflow-hidden')} {diagram} />
+<Diagram
+	class={cn('font-fira w-full flex-1 select-none overflow-hidden')}
+	diagram={$diagramStore}
+/>

@@ -24,7 +24,37 @@
           "named": true
         },
         {
-          "type": "method",
+          "type": "method_emitter",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "annotation_emitter",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "annotation_note",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "string",
           "named": true
         }
       ]
@@ -102,6 +132,10 @@
           "named": true
         },
         {
+          "type": "repository",
+          "named": true
+        },
+        {
           "type": "service",
           "named": true
         },
@@ -137,7 +171,7 @@
           "named": true
         },
         {
-          "type": "method",
+          "type": "method_note",
           "named": true
         }
       ]
@@ -171,9 +205,13 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "annotation_note",
+          "named": true
+        },
         {
           "type": "identifier",
           "named": true
@@ -212,6 +250,10 @@
       "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "annotation_note",
+          "named": true
+        },
         {
           "type": "identifier",
           "named": true
@@ -266,6 +308,48 @@
     }
   },
   {
+    "type": "method_emitter",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "annotation_emitter",
+          "named": true
+        },
+        {
+          "type": "annotation_note",
+          "named": true
+        },
+        {
+          "type": "method",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "method_note",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "annotation_note",
+          "named": true
+        },
+        {
+          "type": "method",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "nullable_type",
     "named": true,
     "fields": {},
@@ -305,6 +389,25 @@
     }
   },
   {
+    "type": "repository",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "method_note",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "service",
     "named": true,
     "fields": {},
@@ -321,7 +424,7 @@
           "named": true
         },
         {
-          "type": "method",
+          "type": "method_note",
           "named": true
         }
       ]
@@ -357,6 +460,10 @@
         },
         {
           "type": "event",
+          "named": true
+        },
+        {
+          "type": "repository",
           "named": true
         },
         {
@@ -484,6 +591,14 @@
     "named": false
   },
   {
+    "type": "@emits(",
+    "named": false
+  },
+  {
+    "type": "@note(",
+    "named": false
+  },
+  {
     "type": "Aggregate",
     "named": false
   },
@@ -540,6 +655,10 @@
     "named": false
   },
   {
+    "type": "Repository",
+    "named": false
+  },
+  {
     "type": "Service",
     "named": false
   },
@@ -553,6 +672,10 @@
   },
   {
     "type": "ValueObject",
+    "named": false
+  },
+  {
+    "type": "Void",
     "named": false
   },
   {

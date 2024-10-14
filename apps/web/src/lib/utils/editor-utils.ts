@@ -9,7 +9,14 @@ enum MarkerSeverity {
     Error = 8
 }
 
-export function lintAST(ast) {
+export function linter(ast, diagram: Diagram) {
+    // const aggregateNames = diagram.aggregates.map((aggregate) => aggregate.name);
+    // const entityNames = diagram.entities.map((entity) => entity.name);
+    // const valueObjectNames = diagram.valueObjects.map((valueObject) => valueObject.name);
+    // const enumNames = diagram.enums.map((enumType) => enumType.name);
+    // const serviceNames = diagram.services.map((service) => service.name);
+    // const repositoryNames = diagram.repositories.map((repository) => repository.name);
+    const eventNames = diagram.events.map((event) => event.name);
     const diagnostics = [];
 
     ast.rootNode.children.forEach((node) => {
@@ -45,6 +52,24 @@ export function lintAST(ast) {
             }
         }
     });
+
+    diagram.aggregates.forEach((aggregate) => {
+        aggregate.methods.forEach((method) => {
+            method.emits.events.forEach((emittedEvent) => {
+                if (!eventNames.includes(emittedEvent)) {
+                    diagnostics.push({
+                        message: `Event "${emittedEvent}" is not defined.`,
+                        severity: MarkerSeverity.Error,
+                        startLineNumber: method.emits.markup.start.row + 1,
+                        startColumn: method.emits.markup.start.column + 1,
+                        endLineNumber: method.emits.markup.end.row + 1,
+                        endColumn: method.emits.markup.end.column + 1,
+                    });
+                }
+            })
+        })
+    })
+
     return diagnostics;
 }
 

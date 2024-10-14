@@ -64,6 +64,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         'node': '#F3F3F3',
         'property': '#595959',
         'context': '#FDFDFD',
+        'repository': '#ce6a85',
         'type': '#8c8c8c',
         "aggregate": "#1f78b4",
         "entity": "#33a02c",
@@ -199,7 +200,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
     }
 
     function drawDomain(value: Diagram) {
-        const domainEntities = [value.aggregates, value.entities, value.valueObjects, value.enums, value.events, value.services].flat()
+        const domainEntities = [value.aggregates, value.entities, value.valueObjects, value.enums, value.events, value.services, value.repositories].flat()
 
         nodes = svgGroup.append("g")
             .attr("class", "nodes")
@@ -265,6 +266,10 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
 
         svgGroup.selectAll(".value_object").each(function (d) {
             drawProperties(d3.select(this), d.properties, 0);
+        });
+
+        svgGroup.selectAll(".repository").each(function (d) {
+            drawMethods(d3.select(this), d.methods, 0);
         });
 
         svgGroup.selectAll(".enum").each(function (d) {
@@ -364,7 +369,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
     function drawContexts(value: Diagram) {
         layout.contextColumns = Math.ceil(Math.sqrt(value.contexts.length));
 
-        const contextsToRender = value.contexts.filter(c => [c.aggregates, c.entities, c.valueObjects, c.enums, c.services, c.events].flat().length > 0);
+        const contextsToRender = value.contexts.filter(c => [c.aggregates, c.entities, c.valueObjects, c.enums, c.services, c.events, c.repositories].flat().length > 0);
 
         contexts = svgGroup.append("g")
             .attr("class", "contexts")
