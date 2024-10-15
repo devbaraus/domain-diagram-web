@@ -419,15 +419,29 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         const domainEntitiesToLink = [value.aggregates, value.entities, value.valueObjects, value.enums].flat()
 
         const domainLinks = domainEntitiesToLink.map(domain => {
-            return domain.properties?.map(prop => {
-                return {
+            const connections = []
+
+            domain.properties?.forEach(prop => {
+                connections.push({
                     source: domain.name, target: domainEntitiesToLink.find(e => {
                         if ('id' in e) return prop.type === e.id;
                         if ('ids' in e) return e.ids.includes(prop.type);
                         return false;
-                    })?.name
-                };
+                    })?.name,
+                    type: 'solid'
+                })
             })
+
+            domain.methods?.forEach(method => {
+                method.emits?.events.forEach(eventName => {
+                    connections.push({
+                        source: domain.name, target: value.events.find(e => e.type == 'event' && e.name === eventName)?.name, type: 'dashed'
+                    })
+                })
+            })
+
+            return connections
+
         }).flat().filter(link => Boolean(link) && Boolean(link.target) && link.source !== link.target);
 
         drawContexts(value);
@@ -440,7 +454,8 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             .append("path")
             .attr("stroke", "lightgrey")
             .attr("stroke-width", 1)
-            .attr("fill", "none");
+            .attr("fill", "none")
+            .attr("stroke-dasharray", d => d.type === 'dashed' ? "5" : "none");
 
         drawDomain(value);
 
