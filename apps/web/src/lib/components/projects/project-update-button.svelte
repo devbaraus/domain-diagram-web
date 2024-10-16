@@ -24,7 +24,7 @@
 			modal?.close();
 			toast.success('Project shared successfully');
 			$queryClient.invalidateQueries({ queryKey: ['list-projects'] });
-			// window.location.reload();
+			window.location.reload();
 		},
 		onError: () => {
 			modal?.close();

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { queryClient } from '$lib/client';
 	import { deleteProject } from '$lib/services/project-service.svelte';
@@ -13,7 +12,7 @@
 		onSuccess: () => {
 			deleteModal?.close();
 			$queryClient.invalidateQueries({ queryKey: ['list-projects'] });
-			goto('/p');
+			window.location.href = '/p';
 		}
 	});
 </script>

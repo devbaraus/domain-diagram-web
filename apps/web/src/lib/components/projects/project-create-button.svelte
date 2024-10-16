@@ -31,7 +31,7 @@
 						await $queryClient.invalidateQueries({
 							queryKey: ['list-projects']
 						});
-						goto(`/p/${result.data.item.id}`);
+						window.location.href = `/p/${result.data.item.id}`;
 					}
 				};
 			}}
