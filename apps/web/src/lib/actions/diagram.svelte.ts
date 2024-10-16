@@ -296,7 +296,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             const bounds = d3.select(this).node().getBBox();
             const rects = d3.select(this).selectAll("rect");
             const text = d3.select(this).select("text");
-            const tspan = d3.selectAll("tspan");
+            // const tspan = d3.selectAll("tspan").attr("dx", "100%")
 
             rects.each(function (d) {
                 const self = d3.select(this);
@@ -304,7 +304,6 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             })
 
             text.attr("x", (bounds.width + 10) / 2)
-            tspan.attr("dx", null).attr("x", bounds.width);
         })
     }
 
