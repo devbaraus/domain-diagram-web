@@ -102,20 +102,30 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             .enter();
 
         propertiesGroup.append("text")
+            .text((prop: Property) => prop.name)
             .attr("x", 10)
             .attr("y", (_: never, i: number) => 40 + (offset + i) * layout.lineHeigth + layout.lineHeigth / 2)
             .attr("dy", ".35em")
             .attr("text-anchor", "start")
             .attr("fill", backgroundColors.property)
-            .text((prop: Property) => prop.name);
-
-        propertiesGroup.append("text")
-            .attr("x", 310)
-            .attr("y", (_: never, i: number) => 40 + (offset + i) * layout.lineHeigth + layout.lineHeigth / 2)
-            .attr("dy", ".35em")
+            // append sibling text with type
+            .append("tspan")
+            .text((prop: Property) =>
+                formatType(prop)
+            )
             .attr("text-anchor", "end")
+            .attr("dx", 10)
             .attr("fill", backgroundColors.type)
-            .text((prop: Property) => formatType(prop));
+        // .attr("x", function (prop: Property) {
+        //     const parent = d3.select(this.parentNode);
+        //     const textLength = parent.node().getComputedTextLength();
+        //     const selfLength = d3.select(this).node().getComputedTextLength();
+        //     const rowLength = textLength + 10 + selfLength
+
+        //     return rowLength > layout.nodeWidth - 10 ? rowLength : layout.nodeWidth - 10;
+        // })
+
+
     }
 
     function drawMethods(node: any, methods: Method[], offset: number) {
@@ -131,15 +141,12 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             .attr("dy", ".35em")
             .attr("text-anchor", "start")
             .attr("fill", backgroundColors.property)
-            .text((method: Method) => `${method.name}(${method.parameters.map(p => p.name).join(', ')})`);
-
-        methodsGroup.append("text")
-            .attr("x", 310)
-            .attr("y", (_: never, i: number) => 40 + (offset + i) * layout.lineHeigth + layout.lineHeigth / 2)
-            .attr("dy", ".35em")
+            .text((method: Method) => `${method.name}(${method.parameters.map(p => p.name).join(', ')})`)
+            .append("tspan")
+            .text((method: Method) => formatType(method.return))
             .attr("text-anchor", "end")
+            .attr("dx", 10)
             .attr("fill", backgroundColors.type)
-            .text((method: Method) => formatType(method.return));
     }
 
 
@@ -283,22 +290,54 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
         svgGroup.selectAll(".service").each(function (d) {
             drawMethods(d3.select(this), d.methods, 0);
         });
+
+        // refresh positions and widths
+        nodes.each(function (d) {
+            const bounds = d3.select(this).node().getBBox();
+            const rects = d3.select(this).selectAll("rect");
+            const text = d3.select(this).select("text");
+
+            rects.each(function (d) {
+                const self = d3.select(this);
+                self.attr("width", bounds.width + 10);
+            })
+
+            text.attr("x", (bounds.width + 10) / 2)
+        })
     }
 
     function positionDiagram(value: Diagram) {
         for (const context of value.contexts) {
             const nodes = svgGroup.selectAll(`.context-${context.name}`);
             let heights = new Array(layout.columns).fill(0);
+            let xPos = new Array(layout.columns).fill(0);
+
+            nodes.each(function (d, i) {
+                const nextColumnIndex = heights.indexOf(Math.min(...heights))
+                const nextWidthIndex = (nextColumnIndex + 1) % layout.columns;
+                const width = d3.select(this).node().getBBox().width;
+
+                heights[nextColumnIndex] += d3.select(this).node().getBBox().height + layout.rowGap;
+
+                if (nextWidthIndex !== 0 && (width + layout.columnGap) > xPos[nextWidthIndex]) {
+                    xPos[nextWidthIndex] = width + layout.columnGap;
+                }
+            });
+
+            heights = new Array(layout.columns).fill(0);
 
             nodes.attr("transform", function (d, i) {
                 const nextColumnIndex = heights.indexOf(Math.min(...heights));
                 // const nextColumnIndex = i % layout.columns;
-                const x = nextColumnIndex * (layout.nodeWidth + layout.columnGap); const y = heights[nextColumnIndex];
+                const x = xPos.slice(0, nextColumnIndex).reduce((acc, curr) => acc + curr, 0) + xPos[nextColumnIndex];
+                const y = heights[nextColumnIndex];
+
                 heights[nextColumnIndex] += d3.select(this).node().getBBox().height + layout.rowGap;
+
                 d.position.x = x;
                 d.position.y = y;
                 return `translate(${x}, ${y})`;
-            });
+            })
         }
 
         let cColWidth = new Array(layout.contextColumns).fill(0);

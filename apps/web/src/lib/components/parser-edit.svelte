@@ -32,7 +32,6 @@
 		}
 
 		let diagram = extractDiagram(tree?.rootNode);
-		console.log(diagram);
 
 		diagramStore.set(diagram);
 		const diagnostic = linter(tree, diagram);

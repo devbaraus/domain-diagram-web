@@ -211,10 +211,8 @@
 		$editor.setModel($model);
 
 		if ($page.data.item.realtime) {
-			console.log('realtime');
 			await setupRealtime();
 		} else {
-			console.log('rest');
 			await setupRest();
 		}
 
