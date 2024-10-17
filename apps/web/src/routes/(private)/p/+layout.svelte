@@ -17,8 +17,8 @@
 	});
 </script>
 
-<div class="z-10 flex max-w-[100dvw] divide-x">
-	<aside class="bg-base-100 z-10 flex h-[100dvh] w-16 flex-col justify-between p-2">
+<div class="z-10 flex max-h-dvh divide-x">
+	<aside class="bg-base-100 z-10 flex h-dvh w-16 flex-col justify-between p-2">
 		<div class="space-y-2">
 			<ProjectCreateButton />
 
@@ -42,7 +42,7 @@
 			{/if}
 		</div>
 	</aside>
-	<div class="w-full">
+	<div class="max-h-dvh w-full">
 		<div class="bg-base-100 flex h-10 border-b p-2">
 			<div class="flex flex-1 space-x-2 px-2">
 				<span class="text line-clamp-1 w-24 lg:w-64">{$page.data.item?.name}</span>
@@ -83,9 +83,7 @@
 				</div>
 			</div>
 		</div>
-		<div
-			class="relative z-0 flex h-[calc(100dvh_-_48px)] max-h-[calc(100dvh_-_48px)] flex-1 bg-white"
-		>
+		<div class="h-[calc(100vh_-_2.5rem)]">
 			<slot></slot>
 		</div>
 	</div>

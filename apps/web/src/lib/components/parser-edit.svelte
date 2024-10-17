@@ -2,8 +2,8 @@
 	import { page } from '$app/stores';
 	import Diagram from '$lib/components/diagram.svelte';
 	import Editor from '$lib/components/editor.svelte';
-	import { PUBLIC_WS_URL } from '$env/static/public';
-	import { mobSwitch, model, monaco } from '$lib/store';
+	import { diagram as diagramStore, model, monaco } from '$lib/store';
+	import { cn } from '$lib/utils';
 	import { extractDiagram } from '$lib/utils/diagram-extractor';
 	import {
 		checkForSyntaxErrors,
@@ -12,14 +12,15 @@
 		updateModelMarkers
 	} from '$lib/utils/editor-utils';
 	import _ from 'lodash';
+	import { Pane, PaneGroup, PaneResizer } from 'paneforge';
 	import { onMount } from 'svelte';
 	import TreeSitter, { type Tree } from 'web-tree-sitter';
-	import { cn } from '$lib/utils';
-	import { diagram as diagramStore } from '$lib/store';
 
 	let parser: TreeSitter | undefined;
 	let tree = $state<Tree>();
 	let diagram = $state<Diagram>();
+	let editorPane = $state(40);
+	let diagramPane = $state(60);
 
 	const updateTree = (value: string) => {
 		tree = parser?.parse(value);
@@ -71,15 +72,21 @@
 	}
 </script>
 
-<Editor
-	class={cn(
-		!$mobSwitch ? 'left-0 top-0' : '-left-[calc(100%_+_1px)] top-0',
-		'absolute  h-full w-full overflow-hidden transition-all lg:static lg:w-[calc(100vw_*_0.3_-_48px)]'
-	)}
-	onchange={handleChange}
-	onkeydown={handleCtrlSave}
-/>
-<Diagram
-	class={cn('font-fira w-full flex-1 select-none overflow-hidden')}
-	diagram={$diagramStore}
-/>
+<!-- <Editor
+			class={cn(
+				!$mobSwitch ? 'left-0 top-0' : '-left-[calc(100%_+_1px)] top-0',
+				'absolute  h-full w-full overflow-hidden transition-all lg:static lg:w-[calc(100vw_*_0.3_-_48px)]'
+			)}
+			onchange={handleChange}
+			onkeydown={handleCtrlSave}
+		/> -->
+
+<PaneGroup direction="horizontal">
+	<Pane defaultSize={editorPane}>
+		<Editor class={cn('h-full w-full')} onchange={handleChange} onkeydown={handleCtrlSave} />
+	</Pane>
+	<PaneResizer class="border border-dashed" />
+	<Pane defaultSize={diagramPane}>
+		<Diagram class={cn('h-full w-full flex-1 select-none')} diagram={$diagramStore} />
+	</Pane>
+</PaneGroup>

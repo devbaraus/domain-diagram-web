@@ -195,11 +195,9 @@
 		$editor = $monaco.editor.create(el, {
 			readOnly: projectRole === 'VIEWER' || typeof projectRole === 'undefined',
 			theme: 'default',
-			wordWrap: 'wordWrapColumn',
-			wordWrapColumn: 60,
-			wrappingIndent: 'indent',
 			lineNumbers: 'on',
 			fontFamily: 'Fira Code',
+			automaticLayout: true,
 			fontSize: 14,
 			tabSize: 2,
 			fontLigatures: "'zero', 'ss02', 'ss03', 'ss04', 'ss05', 'calt'",
