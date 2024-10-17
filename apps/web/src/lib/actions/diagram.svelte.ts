@@ -216,7 +216,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             .enter()
             .append("g")
             .attr("id", d => `node-${d.name}`)
-            .attr("class", (d) => `${d.type} context-${d.context}`)
+            .attr("class", (d) => `${d.type} node context-${d.context}`)
             .on("mouseover", function (event, d) {
                 d3.select(this).select("rect").attr("stroke", "black");
                 links.each(function (l) {
@@ -236,6 +236,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             })
 
         nodes.append("rect")
+            .classed("node-background", true)
             .attr("width", layout.nodeWidth)
             .attr("height", d => 50 + ((d.properties?.length ?? 0) + (d.methods?.length ?? 0) + (d.values?.length ?? 0)) * layout.lineHeigth)
             .attr("fill", backgroundColors.node)
@@ -243,6 +244,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             .attr("ry", 4);
 
         nodes.append("rect")
+            .classed("node-header", true)
             .attr("width", layout.nodeWidth - 2)
             .attr("height", 30)
             .attr("x", "1")
@@ -252,6 +254,7 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             .attr("fill", d => backgroundColors[d.type]);
 
         nodes.append("text")
+            .classed("node-name", true)
             .attr("x", layout.nodeWidth / 2)
             .attr("y", 20)
             .attr("text-anchor", "middle")
@@ -291,19 +294,13 @@ export function diagram(el: HTMLDivElement, value: Diagram) {
             drawMethods(d3.select(this), d.methods, 0);
         });
 
-        // refresh positions and widths
         nodes.each(function (d) {
             const bounds = d3.select(this).node().getBBox();
-            const rects = d3.select(this).selectAll("rect");
-            const text = d3.select(this).select("text");
-            // const tspan = d3.selectAll("tspan").attr("dx", "100%")
 
-            rects.each(function (d) {
-                const self = d3.select(this);
-                self.attr("width", bounds.width + 10);
-            })
-
-            text.attr("x", (bounds.width + 10) / 2)
+            d3.select(this).selectAll("rect.node-background").attr("width", bounds.width + 10)
+            d3.select(this).selectAll("rect.node-header").attr("width", bounds.width + 8)
+            d3.select(this).select("text").attr("x", (bounds.width + 10) / 2)
+            d3.select(this).selectAll("tspan").attr("x", bounds.width - 10)
         })
     }
 
