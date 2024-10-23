@@ -3,10 +3,10 @@
 	import { DownloadIcon, ChevronDownIcon } from 'lucide-svelte';
 	import { diagram } from '$lib/store';
 
-	let processing = false;
-	let modal: HTMLDialogElement;
-	let widthPerContext = 1200;
-	let imageformat = 'image/png';
+	let processing = $state(false);
+	let modal: HTMLDialogElement = $state();
+	let widthPerContext = $state(1200);
+	let imageformat = $state('image/png');
 
 	function downloadPng() {
 		processing = true;

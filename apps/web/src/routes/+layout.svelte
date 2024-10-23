@@ -5,6 +5,8 @@
 	import '../app.css';
 
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+	/** @type {{children?: import('svelte').Snippet}} */
+	let { children } = $props();
 
 	queryClient.set(
 		new QueryClient({
@@ -30,5 +32,5 @@
 
 <QueryClientProvider client={$queryClient}>
 	<Toaster expand={true} richColors position={'bottom-center'} />
-	<slot></slot>
+	{@render children?.()}
 </QueryClientProvider>

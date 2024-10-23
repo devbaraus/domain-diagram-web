@@ -5,7 +5,7 @@
 	import { createMutation } from '@tanstack/svelte-query';
 	import { TrashIcon } from 'lucide-svelte';
 
-	let deleteModal: HTMLDialogElement | undefined;
+	let deleteModal: HTMLDialogElement | undefined = $state();
 
 	const deletion = createMutation({
 		mutationFn: async () => await deleteProject($page.params.id, $page.data.session),

@@ -9,6 +9,11 @@
 	import { connections, mobSwitch } from '$lib/store';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { LetterTextIcon, WorkflowIcon } from 'lucide-svelte';
+	interface Props {
+		children?: import('svelte').Snippet;
+	}
+
+	let { children }: Props = $props();
 
 	const query = createQuery({
 		queryKey: ['list-projects'],
@@ -84,7 +89,7 @@
 			</div>
 		</div>
 		<div class="h-[calc(100vh_-_2.5rem)]">
-			<slot></slot>
+			{@render children?.()}
 		</div>
 	</div>
 </div>

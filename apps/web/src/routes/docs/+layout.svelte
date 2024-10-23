@@ -1,4 +1,6 @@
 <script>
+	/** @type {{children?: import('svelte').Snippet}} */
+	let { children } = $props();
 	const links = [
 		{
 			topic: 'Introduction',
@@ -53,6 +55,6 @@
 	</div>
 
 	<article class="prose prose-neutral flex-1 px-8 py-4">
-		<slot />
+		{@render children?.()}
 	</article>
 </div>

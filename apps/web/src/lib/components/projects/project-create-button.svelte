@@ -5,8 +5,8 @@
 	import { createQuery, QueryClient } from '@tanstack/svelte-query';
 	import { queryClient } from '$lib/client';
 
-	let loading = false;
-	let modal: HTMLDialogElement;
+	let loading = $state(false);
+	let modal: HTMLDialogElement = $state();
 </script>
 
 <div class="tooltip tooltip-right" data-tip="New project">
