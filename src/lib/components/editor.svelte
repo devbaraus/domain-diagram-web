@@ -87,92 +87,108 @@
 		});
 
 		type = doc.getText('monaco');
-		binding = new MonacoBinding(type, $editor?.getModel()!, new Set([$editor]), provider.awareness);
 
-		awareness = provider.awareness;
-		awareness.setLocalState({
-			user: {
-				id: $page.data.user.id,
-				name: $page.data.user.name,
-				color: colors[$page.data.user.id % colors.length]
-			}
-		});
-
-		$editor.onDidChangeCursorPosition((e: any) => {
-			decorations?.clear();
-			const cursor = e.position;
-			const localState = awareness?.getLocalState();
-			awareness?.setLocalState({
-				...localState,
-				cursor
-			});
-		});
-
-		$editor.onDidChangeCursorSelection((e: any) => {
-			decorations?.clear();
-			const selection = e.selection;
-			let localState = awareness?.getLocalState();
-			awareness?.setLocalState({
-				...localState,
-				selection
-			});
-		});
-
-		awareness.on('change', (e) => {
-			decorations?.clear();
-			decorateCursors();
-			connections.set(Array.from(awareness.getStates().values()));
-		});
-
-		function decorateCursors() {
-			const r: any = [];
-
-			for (const deco of Array.from(awareness.getStates().values()).filter(
-				(s) => 'user' in s && s.user.id !== $page.data.user.id
-			)) {
-				const user = deco.user;
-				const cursor = deco.cursor;
-				const selection = deco.selection;
-
-				if (cursor) {
-					r.push({
-						range: new $monaco.Range(
-							cursor.lineNumber,
-							cursor.column,
-							cursor.lineNumber,
-							cursor.column + 1
-						),
-						options: {
-							className: `${borders[user.id % borders.length]} opacity-50 rounded border-l-solid border-l-4 animate-pulse`,
-							hoverMessage: {
-								value: user.name,
-								isTrusted: true
-							}
-						}
-					});
+		// Wait for the provider to be connected before setting up the binding
+		provider.on('status', (e) => {
+			if (e.status === 'connected') {
+				// Only set initial content if the document is empty
+				if (!type.toJSON()) {
+					type.insert(0, $page.data.item.markup);
 				}
 
-				if (selection) {
-					r.push({
-						range: new $monaco.Range(
-							selection.startLineNumber,
-							selection.startColumn,
-							selection.endLineNumber,
-							selection.endColumn
-						),
-						options: {
-							className: `${backgrounds[user.id % backgrounds.length]} opacity-50 rounded`
-						}
+				binding = new MonacoBinding(
+					type,
+					$editor?.getModel()!,
+					new Set([$editor]),
+					provider.awareness
+				);
+
+				awareness = provider.awareness;
+				awareness.setLocalState({
+					user: {
+						id: $page.data.user.id,
+						name: $page.data.user.name,
+						color: colors[$page.data.user.id % colors.length]
+					}
+				});
+
+				$editor.onDidChangeCursorPosition((e: any) => {
+					decorations?.clear();
+					const cursor = e.position;
+					const localState = awareness?.getLocalState();
+					awareness?.setLocalState({
+						...localState,
+						cursor
 					});
+				});
+
+				$editor.onDidChangeCursorSelection((e: any) => {
+					decorations?.clear();
+					const selection = e.selection;
+					let localState = awareness?.getLocalState();
+					awareness?.setLocalState({
+						...localState,
+						selection
+					});
+				});
+
+				awareness.on('change', (e) => {
+					decorations?.clear();
+					decorateCursors();
+					connections.set(Array.from(awareness.getStates().values()));
+				});
+
+				function decorateCursors() {
+					const r: any = [];
+
+					for (const deco of Array.from(awareness.getStates().values()).filter(
+						(s) => 'user' in s && s.user.id !== $page.data.user.id
+					)) {
+						const user = deco.user;
+						const cursor = deco.cursor;
+						const selection = deco.selection;
+
+						if (cursor) {
+							r.push({
+								range: new $monaco.Range(
+									cursor.lineNumber,
+									cursor.column,
+									cursor.lineNumber,
+									cursor.column + 1
+								),
+								options: {
+									className: `${borders[user.id % borders.length]} opacity-50 rounded border-l-solid border-l-4 animate-pulse`,
+									hoverMessage: {
+										value: user.name,
+										isTrusted: true
+									}
+								}
+							});
+						}
+
+						if (selection) {
+							r.push({
+								range: new $monaco.Range(
+									selection.startLineNumber,
+									selection.startColumn,
+									selection.endLineNumber,
+									selection.endColumn
+								),
+								options: {
+									className: `${backgrounds[user.id % backgrounds.length]} opacity-50 rounded`
+								}
+							});
+						}
+					}
+
+					decorations?.clear();
+					decorations = $editor?.createDecorationsCollection(r);
 				}
+
+				$model.onDidChangeContent((e) => {
+					props.onchange?.($model.getValue());
+				});
 			}
-
-			decorations?.clear();
-			decorations = $editor?.createDecorationsCollection(r);
-		}
-
-		$model.onDidChangeContent((e) => {
-			props.onchange?.($model.getValue());
 		});
 	}
 
